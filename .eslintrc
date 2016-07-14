@@ -1,0 +1,39 @@
+{
+	"parser": "babel-eslint",
+	"plugins": ["babel", "flow-vars"],
+	"extends": ["eslint:recommended", "semistandard"],
+	"rules": {
+		"strict": 1,
+		"generator-star-spacing": 0,
+		"babel/generator-star-spacing": 1,
+		"babel/new-cap": 1,
+		"babel/array-bracket-spacing": 1,
+		"babel/object-curly-spacing": 1,
+		"babel/object-shorthand": 1,
+		"babel/arrow-parens": 1,
+		"babel/no-await-in-loop": 1,
+		"babel/flow-object-type": 1,
+		"indent": ["error", "tab", { "SwitchCase": 1}],
+		"space-before-function-paren": ["error", "never"],
+		"comma-dangle": ["error", "always-multiline"],
+		"no-console": 0,
+		"eqeqeq": ["error", "smart"],
+		"no-duplicate-imports": 0,
+		"operator-linebreak": ["error", "after"],
+		"no-undef": 0,
+		"flow-vars/define-flow-type": 1,
+		"flow-vars/use-flow-type": 1,
+	},
+	"env": {
+		"es6": true,
+		"node": true
+	},
+	"parserOptions": {
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": 6,
+		"generators": true
+	}
+}
