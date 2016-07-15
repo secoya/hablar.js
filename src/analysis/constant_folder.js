@@ -39,7 +39,11 @@ function constantMultiplyOp(
 	) {
 		const lhsType = typeof (lhs);
 		const rhsType = typeof (rhs);
-		throw new Error(`Could not constant fold expression: '${originalText}'. Multiply operation between ${lhsType} and ${rhsType}. Only allowed between 2 numbers.`);
+		throw new Error(
+			`Could not constant fold expression: '${originalText}'. ` +
+			`Multiply operation between ${lhsType} and ${rhsType}. ` +
+			'Only allowed between 2 numbers.'
+		);
 	}
 	return lhs * rhs;
 }
@@ -60,7 +64,11 @@ function constantBinaryOp(
 			) {
 				const lhsType = typeof (lhs);
 				const rhsType = typeof (rhs);
-				throw new Error(`Could not constant fold expression: '${originalText}'. Minus operation between ${lhsType} and ${rhsType}. Only allowed between 2 numbers.`);
+				throw new Error(
+					`Could not constant fold expression: '${originalText}'. ` +
+					`Minus operation between ${lhsType} and ${rhsType}. ` +
+					'Only allowed between 2 numbers.'
+				);
 			}
 			return lhs - rhs;
 		}
@@ -71,7 +79,11 @@ function constantBinaryOp(
 		) {
 				const lhsType = typeof (lhs);
 				const rhsType = typeof (rhs);
-				throw new Error(`Could not constant fold expression: '${originalText}'. Divide operation between ${lhsType} and ${rhsType}. Only allowed between 2 numbers.`);
+				throw new Error(
+					`Could not constant fold expression: '${originalText}'. ` +
+					`Divide operation between ${lhsType} and ${rhsType}. ` +
+					'Only allowed between 2 numbers.'
+				);
 			}
 			return lhs / rhs;
 		}
@@ -144,7 +156,10 @@ function constantFoldExpression(expr: Node, originalText: string) : Node {
 			const val = constantFoldExpression(expr.op, originalText);
 			if (isConstantExpression(val)) {
 				if (typeof (val) !== 'number') {
-					throw new Error(`Could not constant fold expression: '${originalText}'. Unary minus with a string. It is only allowed on numbers`);
+					throw new Error(
+						`Could not constant fold expression: '${originalText}'. ` +
+						'Unary minus with a string. It is only allowed on numbers'
+					);
 				}
 				return {
 					type: 'number',

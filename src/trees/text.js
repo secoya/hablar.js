@@ -7,28 +7,28 @@ import type {
 } from './expression';
 
 export type Pos = {
-	firstLine: number;
-	firstColumn: number;
-	lastLine: number;
-	lastColumn: number;
+	firstLine: number,
+	firstColumn: number,
+	lastLine: number,
+	lastColumn: number,
  };
 
 export type LiteralNode = {
-	type: 'literal';
-	value: string;
-	pos: Pos;
+	type: 'literal',
+	value: string,
+	pos: Pos,
 };
 
 export type VariableNode = {
-	type: 'variable';
-	value: string;
-	pos: Pos;
+	type: 'variable',
+	value: string,
+	pos: Pos,
 };
 
 export type ExprNode = {
-	type: 'expr';
-	value: ExpressionNode;
-	pos: Pos;
+	type: 'expr',
+	value: ExpressionNode,
+	pos: Pos,
 };
 
 export type Node =

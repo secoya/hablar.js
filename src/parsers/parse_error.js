@@ -5,15 +5,15 @@
 export default function ParseError(
 	message: string,
 	hash?: {
-		text: string;
-		token: string;
-		line: number;
+		text: string,
+		token: string,
+		line: number,
 		loc: {
-			first_line: number;
-			last_line: number;
-			last_column: number;
-		};
-		expected: string[];
+			first_line: number,
+			last_line: number,
+			last_column: number,
+		},
+		expected: string[],
 	}
 ) : ParseError {
 	// $FlowFixMe I cannot get ES6 subclasses to work.

@@ -6,7 +6,7 @@ import type * as Expr from './expression';
 
 export type InferredType = 'unknown' | 'gender' | 'enum' | 'number-or-string' | 'number' | 'string' | 'error';
 
-type TypeInfo = { type: InferredType};
+type TypeInfo = { expressionType: InferredType};
 
 export type BinaryOpPlusNode = Expr.BinaryOpPlusNode & TypeInfo;
 
@@ -25,11 +25,11 @@ export type BinaryOpNode =
 export type UnaryMinusNode = Expr.UnaryMinusNode & TypeInfo;
 
 export type NumberNode = Expr.NumberNode & {
-	type: 'number';
+	type: 'number',
 };
 
 export type StringLiteralNode = Expr.StringLiteralNode & {
-	type: 'string';
+	type: 'string',
 };
 
 export type VariableNode = Expr.VariableNode & TypeInfo;

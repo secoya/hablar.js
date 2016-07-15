@@ -8,7 +8,7 @@ import getParser from './get_parser';
 const constraintParser = getParser('constraint');
 
 export default function parse(input: string) : {
-	constraints: Node[];
+	constraints: Node[],
 	variables: string[]
 } {
 	const parsed = constraintParser.parse(input);

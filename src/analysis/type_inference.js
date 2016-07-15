@@ -19,31 +19,31 @@ import type {
 } from '../trees/constraint';
 
 export type ConstraintTypeUsage = {
-	nodeType: 'constraint';
-	node: ConstraintNode;
+	nodeType: 'constraint',
+	node: ConstraintNode,
 	location: {
-		constraintNodes: ConstraintNode[];
-	};
-	type: 'gender' | 'enum' | 'number';
+		constraintNodes: ConstraintNode[],
+	},
+	type: 'gender' | 'enum' | 'number',
 };
 
 export type ExpressionTypeUsage = {
-	nodeType: 'expression';
-	node: TypedExpressionNode;
+	nodeType: 'expression',
+	node: TypedExpressionNode,
 	location: {
-		constraintNodes: ?ConstraintNode[];
-	};
-	type: 'unknown' | 'number-or-string' | 'number' | 'string';
+		constraintNodes: ?ConstraintNode[],
+	},
+	type: 'unknown' | 'number-or-string' | 'number' | 'string',
 }
 
 export type TextTypeUsage = {
-	nodeType: 'text';
-	node: TypedTextNode;
+	nodeType: 'text',
+	node: TypedTextNode,
 	location: {
-		textNodes: TypedTextNode[];
-		constraintNodes: ?ConstraintNode[];
-	};
-	type: 'unknown';
+		textNodes: TypedTextNode[],
+		constraintNodes: ?ConstraintNode[],
+	},
+	type: 'unknown',
 }
 
 export type TypeUsage =
@@ -54,13 +54,17 @@ export type TypeUsage =
 type InferredType = 'unknown' | 'gender' | 'enum' | 'number-or-string' | 'number' | 'string' | 'error';
 
 export type TypeInfo = {
-	usages: TypeUsage[];
-	type: InferredType;
+	usages: TypeUsage[],
+	type: InferredType,
 };
 
 export type TypeMap = Map<string, TypeInfo>;
 
-function addConstraintTypeUsageForNode(typeMap: TypeMap, node: ConstraintNode, constraintNodes: ConstraintNode[]) : void {
+function addConstraintTypeUsageForNode(
+	typeMap: TypeMap,
+	node: ConstraintNode,
+	constraintNodes: ConstraintNode[]
+) : void {
 	const location = {
 		constraintNodes,
 	};
@@ -178,6 +182,10 @@ export function makeTypeMap() : TypeMap {
 	return new Map();
 }
 
-export function inferTextTypes(typeMap: TypeMap, nodes: TextNode[], constraints?: ConstraintNode[]): TypedTextNode[] {
+export function inferTextTypes(
+	typeMap: TypeMap,
+	nodes: TextNode[],
+	constraints?: ConstraintNode[]
+): TypedTextNode[] {
 	return [];
 }

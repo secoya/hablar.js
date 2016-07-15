@@ -19,10 +19,10 @@ import type {
 } from '../trees/expression';
 
 type InitialExprNode = {
-	type: 'expr';
-	value: string;
-	pos: Pos;
-	valuePos: Pos;
+	type: 'expr',
+	value: string,
+	pos: Pos,
+	valuePos: Pos,
 };
 
 export type InitialNode =
@@ -32,9 +32,9 @@ export type InitialNode =
 ;
 
 export type TextParserResult = {
-	exprs: Node[];
-	variables: string[];
-	functions: string[];
+	exprs: Node[],
+	variables: string[],
+	functions: string[],
 };
 
 export function parseOnlyTextExpression(input: string) : InitialNode[] {
@@ -48,14 +48,14 @@ function fixupPositionInformation(
 	walkNode(node, (n) => {
 		// Note: Lines are 1 indexed
 		if (n.pos.firstLine === 1) {
-			n.pos.firstColumn = n.pos.firstColumn + exprNode.valuePos.firstColumn;
+			n.pos.firstColumn += exprNode.valuePos.firstColumn;
 		} else {
-			n.pos.firstLine = n.pos.firstLine + exprNode.valuePos.firstLine - 1;
+			n.pos.firstLine += exprNode.valuePos.firstLine - 1;
 		}
 		if (n.pos.lastLine === 1) {
-			n.pos.lastColumn = n.pos.lastColumn + exprNode.valuePos.firstColumn;
+			n.pos.lastColumn += exprNode.valuePos.firstColumn;
 		} else {
-			n.pos.lastLine = n.pos.lastLine + exprNode.valuePos.firstLine - 1;
+			n.pos.lastLine += exprNode.valuePos.firstLine - 1;
 		}
 	});
 	return node;

@@ -20,7 +20,7 @@ function monkeyPatchParserWithProperParseError(parser: any) : any {
 }
 
 export default function getParser(name: string) : {
-	parse(input: string) : any;
+	parse(input: string) : any,
 } {
 	try {
 		// $FlowFixMe: This is a valid path, I know flow can't resolve it

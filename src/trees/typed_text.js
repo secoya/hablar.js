@@ -6,10 +6,10 @@ import type * as Text from './text';
 
 export type InferredType = 'unknown' | 'gender' | 'enum' | 'number-or-string' | 'number' | 'string' | 'error';
 
-type TypeInfo = { type: InferredType};
+type TypeInfo = { expressionType: InferredType};
 
 export type LiteralNode = Text.LiteralNode & {
-	type: 'text';
+	type: 'text',
 };
 
 export type VariableNode = Text.VariableNode & TypeInfo;
