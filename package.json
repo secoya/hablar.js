@@ -4,13 +4,15 @@
   "description": "A JavaScript library useful for compiling i18n translations in a custom language to JavaScript functions.",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "rm -rf lib && babel src --out-dir lib && mkdir lib/parsers/grammars && (cd lib/parsers/grammars; find ../../../src/parsers/grammars -iname '*.jison' -exec jison -m commonjs {} \\;)",
-    "test": "./mocha.sh"
+    "prepublish": "eslint src test && flow check && ./mocha.sh && rm -rf lib && babel src --out-dir lib && mkdir lib/parsers/grammars && (cd lib/parsers/grammars; find ../../../src/parsers/grammars -iname '*.jison' -exec jison -m commonjs {} \\;)",
+    "lint": "eslint src test",
+    "test": "./mocha.sh",
+    "verify": "eslint src test && flow check && ./mocha.sh"
   },
   "author": "Kaare Hoff Skovgaard <khs@secoya.dk>",
   "license": "Apache-2.0",
   "dependencies": {
-    "babel-runtime": "6.9.2"
+    "babel-runtime": "^6.9.2"
   },
   "devDependencies": {
     "babel": "6.5.2",
