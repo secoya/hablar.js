@@ -3,20 +3,18 @@
  */
 
 import type {
-	Node as TypedTextNode,
-} from '../trees/typed_text';
-
-import type {
 	Node as TextNode,
+	VariableNode as TextVariableNode,
 } from '../trees/text';
-
-import type {
-	Node as TypedExpressionNode,
-} from '../trees/typed_expression';
 
 import type {
 	Node as ConstraintNode,
 } from '../trees/constraint';
+
+import type {
+	Node as ExprNode,
+	VariableNode as ExprVariableNode,
+} from '../trees/expression';
 
 export type ConstraintTypeUsage = {
 	nodeType: 'constraint',
@@ -27,20 +25,23 @@ export type ConstraintTypeUsage = {
 	type: 'gender' | 'enum' | 'number',
 };
 
+export type ExprLocation = {
+	textNodes: TextNode[],
+	constraintNodes: ?ConstraintNode[],
+};
+
 export type ExpressionTypeUsage = {
 	nodeType: 'expression',
-	node: TypedExpressionNode,
-	location: {
-		constraintNodes: ?ConstraintNode[],
-	},
+	node: ExprNode,
+	location: ExprLocation,
 	type: 'unknown' | 'number-or-string' | 'number' | 'string',
 }
 
 export type TextTypeUsage = {
 	nodeType: 'text',
-	node: TypedTextNode,
+	node: TextNode,
 	location: {
-		textNodes: TypedTextNode[],
+		textNodes: TextNode[],
 		constraintNodes: ?ConstraintNode[],
 	},
 	type: 'unknown',
@@ -91,12 +92,6 @@ function addConstraintTypeUsageForNode(
 		const variable = node.lhs.name;
 		const type = node.rhs.type;
 		addTypeInfo(variable, type);
-	}
-}
-
-export function inferConstraintTypes(typeMap: TypeMap, constraints: ConstraintNode[]) {
-	for (const constraint of constraints) {
-		addConstraintTypeUsageForNode(typeMap, constraint, constraints);
 	}
 }
 
@@ -182,10 +177,139 @@ export function makeTypeMap() : TypeMap {
 	return new Map();
 }
 
+export function inferConstraintTypes(typeMap: TypeMap, constraints: ConstraintNode[]) {
+	for (const constraint of constraints) {
+		addConstraintTypeUsageForNode(typeMap, constraint, constraints);
+	}
+}
+
+function addExprTypeInfo(
+	typeMap: TypeMap,
+	variable: ExprVariableNode,
+	type: InferredType,
+	location: ExprLocation
+) : InferredType {
+	const usage = getTypeInfoForVariable(typeMap, variable.name);
+	usage.type = mergeTypeInfo(usage.type, type);
+	usage.usages.push({
+		nodeType: 'expression',
+		variable,
+		location,
+		type,
+	});
+	return usage.type;
+}
+
+function inferExprType(
+	typeMap: TypeMap,
+	node: ExprNode,
+	location: ExprLocation,
+	resultType?: InferredType
+) : InferredType {
+	switch (node.type) {
+		case 'unary_minus':
+			inferExprType(typeMap, node.op, location, 'number');
+			return 'number';
+		case 'variable': {
+			if (resultType != null) {
+				const type = addExprTypeInfo(typeMap, node, resultType, location);
+				if (type === 'gender' || type === 'enum') {
+					return 'string';
+				}
+				return type;
+			}
+			const type = addExprTypeInfo(typeMap, node, 'unknown', location);
+			if (type === 'gender' || type === 'enum') {
+				return 'string';
+			}
+
+			return type;
+		}
+		case 'number':
+			return 'number';
+		case 'string_literal':
+			return 'string';
+		case 'function_invocation':
+			// In the future we might want a register of functions
+			// noting their type information. For now we can't say much about them.
+
+			// We will however continue our inference phase and pass it down to
+			// the arguments.
+
+			for (const param of node.parameters) {
+				inferExprType(typeMap, param, location);
+			}
+			return 'unknown';
+		case 'binary_op': {
+			switch (node.op) {
+				case 'plus': {
+					const lhs = inferExprType(typeMap, node.lhs, location, resultType);
+					const rhs = inferExprType(typeMap, node.rhs, location, resultType);
+
+					if (lhs !== rhs) {
+						return 'number-or-string';
+					}
+
+					if (lhs === 'number') {
+						return 'number';
+					} else if (lhs === 'string') {
+						return 'string';
+					}
+
+					return lhs;
+				}
+				case 'minus':
+				case 'divide':
+				case 'multiply':
+					inferExprType(typeMap, node.lhs, location, 'number');
+					inferExprType(typeMap, node.rhs, location, 'number');
+					return 'number';
+				default:
+					throw new Error('Unknown binary operator: ' + node.op);
+			}
+		}
+		default:
+			throw new Error('Unknown expression type: ' + node.type);
+	}
+}
+
+export function inferExpressionTypes(
+	typeMap: TypeMap,
+	node: ExprNode,
+	location: ExprLocation
+) {
+	inferExprType(typeMap, node, location);
+}
+
 export function inferTextTypes(
 	typeMap: TypeMap,
-	nodes: TextNode[],
-	constraints?: ConstraintNode[]
-): TypedTextNode[] {
-	return [];
+	textNodes: TextNode[],
+	constraintNodes?: ConstraintNode[]
+) {
+	const location = {
+		constraintNodes,
+		textNodes,
+	};
+
+	const addVariableTypeInfo = (node: TextVariableNode, type: InferredType) => {
+		const usage = getTypeInfoForVariable(typeMap, node.value);
+		usage.type = mergeTypeInfo(usage.type, type);
+		usage.usages.push({
+			nodeType: 'text',
+			node,
+			location,
+			type,
+		});
+	};
+
+	for (const node of textNodes) {
+		switch (node.type) {
+			case 'variable':
+				addVariableTypeInfo(node, 'number-or-string');
+				break;
+			case 'expr':
+				inferExpressionTypes(typeMap, node.value, location);
+				break;
+		}
+	}
 }
