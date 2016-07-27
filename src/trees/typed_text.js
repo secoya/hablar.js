@@ -2,19 +2,30 @@
  *
  */
 
-import type * as Text from './text';
+import type {Pos} from './text';
 
-export type InferredType = 'unknown' | 'gender' | 'enum' | 'number-or-string' | 'number' | 'string' | 'error';
+import type {InferredType} from '../type_map';
 
-type TypeInfo = { expressionType: InferredType};
+export type LiteralNode = {
+	type: 'literal',
+	value: string,
+	pos: Pos,
+	expressionType: InferredType,
+}
 
-export type LiteralNode = Text.LiteralNode & {
-	type: 'text',
+export type VariableNode = {
+	type: 'variable',
+	value: string,
+	pos: Pos,
+	expressionType: InferredType,
 };
 
-export type VariableNode = Text.VariableNode & TypeInfo;
-
-export type ExprNode = Text.ExprNode & TypeInfo;
+export type ExprNode = {
+	type: 'expr',
+	value: ExpressionNode,
+	pos: Pos,
+	expressionType: InferredType,
+};
 
 export type Node =
 	| LiteralNode

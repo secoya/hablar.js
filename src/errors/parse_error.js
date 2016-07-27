@@ -41,4 +41,4 @@ export default function ParseError(
 }
 
 ParseError.prototype = Object.create(Error.prototype);
-ParseError.prototype.name = 'ParseError';
+ParseError.prototype.name = 'ParseError'; // eslint-disable-line no-extend-native

@@ -5,7 +5,7 @@
 import {assert} from 'chai';
 
 import expressionParser from '../../src/parsers/expression';
-import ParseError from '../../src/parsers/parse_error';
+import ParseError from '../../src/errors/parse_error';
 
 describe('Expression parser', function() {
 	describe('Literals', function() {

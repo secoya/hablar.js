@@ -3,7 +3,7 @@
  */
 import path from 'path';
 import fs from 'fs';
-import ParseError from './parse_error';
+import ParseError from '../errors/parse_error';
 
 function monkeyPatchParserWithProperParseError(parser: any) : any {
 	const parse = parser.parse;

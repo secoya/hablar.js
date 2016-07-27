@@ -5,7 +5,7 @@
 import {assert} from 'chai';
 
 import fullTextParser, {parseOnlyTextExpression as textParser} from '../../src/parsers/text';
-import ParseError from '../../src/parsers/parse_error';
+import ParseError from '../../src/errors/parse_error';
 
 describe('Text parser', function() {
 	describe('Simple text literals', function() {

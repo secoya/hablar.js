@@ -2,18 +2,44 @@
  *
  */
 
-import type * as Expr from './expression';
+import type {Pos} from './expression';
 
-export type InferredType = 'unknown' | 'gender' | 'enum' | 'number-or-string' | 'number' | 'string' | 'error';
+import type {InferredType} from '../type_map';
 
-type TypeInfo = { expressionType: InferredType};
+export type BinaryOpPlusNode = {
+	type: 'binary_op',
+	op: 'plus',
+	lhs: Node,
+	rhs: Node,
+	pos: Pos,
+	expressionType: InferredType,
+}
 
-export type BinaryOpPlusNode = Expr.BinaryOpPlusNode & TypeInfo;
+export type BinaryOpMinusNode = {
+	type: 'binary_op',
+	op: 'minus',
+	lhs: Node,
+	rhs: Node,
+	pos: Pos,
+	expressionType: InferredType,
+}
+export type BinaryOpDivideNode = {
+	type: 'binary_op',
+	op: 'divide',
+	lhs: Node,
+	rhs: Node,
+	pos: Pos,
+	expressionType: InferredType,
+}
 
-export type BinaryOpMinusNode = Expr.BinaryOpMinusNode & TypeInfo;
-export type BinaryOpDivideNode = Expr.BinaryOpDivideNode & TypeInfo;
-
-export type BinaryOpMultiplyNode = Expr.BinaryOpMultiplyNode & TypeInfo;
+export type BinaryOpMultiplyNode = {
+	type: 'binary_op',
+	op: 'multiply',
+	lhs: Node,
+	rhs: Node,
+	pos: Pos,
+	expressionType: InferredType,
+}
 
 export type BinaryOpNode =
 	| BinaryOpPlusNode
@@ -22,19 +48,41 @@ export type BinaryOpNode =
 	| BinaryOpMultiplyNode
 ;
 
-export type UnaryMinusNode = Expr.UnaryMinusNode & TypeInfo;
+export type UnaryMinusNode = {
+	type: 'unary_minus',
+	op: Node,
+	pos: Pos,
+	expressionType: InferredType,
+}
 
-export type NumberNode = Expr.NumberNode & {
+export type NumberNode = {
 	type: 'number',
+	value: number,
+	pos: Pos,
+	expressionType: 'number',
+}
+
+export type StringLiteralNode = {
+	type: 'string_literal',
+	value: string,
+	pos: Pos,
+	expressionType: 'string',
+}
+
+export type VariableNode = {
+	type: 'variable',
+	name: string,
+	pos: Pos,
+	expressionType: InferredType,
 };
 
-export type StringLiteralNode = Expr.StringLiteralNode & {
-	type: 'string',
-};
-
-export type VariableNode = Expr.VariableNode & TypeInfo;
-
-export type FunctionInvocationNode = Expr.FunctionInvocationNode & TypeInfo;
+export type FunctionInvocationNode = {
+	type: 'function_invocation',
+	name: string,
+	parameters: Node[],
+	pos: Pos,
+	expressionType: 'error' | 'string',
+}
 
 export type Node =
 	| BinaryOpNode

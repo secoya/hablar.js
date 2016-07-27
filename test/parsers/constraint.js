@@ -5,7 +5,7 @@
 import {assert} from 'chai';
 
 import constraintParser from '../../src/parsers/constraint';
-import ParseError from '../../src/parsers/parse_error';
+import ParseError from '../../src/errors/parse_error';
 
 describe('Constraint parser', function() {
 	describe('Numeric constraints', function() {

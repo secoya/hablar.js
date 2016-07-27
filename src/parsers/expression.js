@@ -5,7 +5,7 @@
 import type {Node} from '../trees/expression';
 
 import getParser from './get_parser';
-import ParseError from './parse_error';
+import ParseError from '../errors/parse_error';
 const expressionParser = getParser('expression');
 
 export function walkNode(node: Node, callback: (node: Node) => void) : void {

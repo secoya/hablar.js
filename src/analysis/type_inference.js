@@ -16,50 +16,17 @@ import type {
 	VariableNode as ExprVariableNode,
 } from '../trees/expression';
 
-export type ConstraintTypeUsage = {
-	nodeType: 'constraint',
-	node: ConstraintNode,
-	location: {
-		constraintNodes: ConstraintNode[],
-	},
-	type: 'gender' | 'enum' | 'number',
-};
+import type {
+	TypedExpressionNode,
+} from '../trees/typed_expression';
 
-export type ExprLocation = {
-	textNodes: TextNode[],
-	constraintNodes: ?ConstraintNode[],
-};
+import TypeError from '../errors/type_error';
 
-export type ExpressionTypeUsage = {
-	nodeType: 'expression',
-	node: ExprNode,
-	location: ExprLocation,
-	type: 'unknown' | 'number-or-string' | 'number' | 'string',
-}
-
-export type TextTypeUsage = {
-	nodeType: 'text',
-	node: TextNode,
-	location: {
-		textNodes: TextNode[],
-		constraintNodes: ?ConstraintNode[],
-	},
-	type: 'unknown',
-}
-
-export type TypeUsage =
-	| ConstraintTypeUsage
-	| ExpressionTypeUsage
-	| TextTypeUsage
-
-type InferredType = 'unknown' | 'gender' | 'enum' | 'number-or-string' | 'number' | 'string' | 'error';
-
-export type TypeInfo = {
-	usages: TypeUsage[],
-	type: InferredType,
-};
-
-export type TypeMap = Map<string, TypeInfo>;
+import type {
+	default as TypeMap,
+	InferredType,
+	ExprLocation,
+} from '../type_map';
 
 function addConstraintTypeUsageForNode(
 	typeMap: TypeMap,
@@ -70,10 +37,8 @@ function addConstraintTypeUsageForNode(
 		constraintNodes,
 	};
 
-	const addTypeInfo = (variable: string, type: InferredType) => {
-		const usage = getTypeInfoForVariable(typeMap, variable);
-		usage.type = mergeTypeInfo(usage.type, type);
-		usage.usages.push({
+	const addTypeInfo = (variable: string, type: 'unknown' | 'gender' | 'enum' | 'number') => {
+		typeMap.addTypeUsage(variable, type, {
 			nodeType: 'constraint',
 			node,
 			location,
@@ -95,88 +60,6 @@ function addConstraintTypeUsageForNode(
 	}
 }
 
-function mergeTypeInfo(existingType: InferredType, newType: InferredType) : InferredType {
-	if (newType === 'unknown') {
-		return existingType;
-	}
-	switch (existingType) {
-		case 'unknown':
-			return newType;
-		case 'error':
-			return 'error';
-		case 'number-or-string':
-			switch (newType) {
-				case 'number-or-string': // FALLTHROUGH
-				case 'number': // FALLTHROUGH
-				case 'string': // FALLTHROUGH
-				case 'enum': // / FALLTHROUGH
-				case 'gender':
-					return newType;
-				default:
-					return 'error';
-			}
-		case 'string':
-			switch (newType) {
-				case 'number-or-string': // FALLTHROUGH
-				case 'string':
-					return 'string';
-				case 'enum':
-					return 'enum';
-				case 'gender':
-					return 'gender';
-				default:
-					return 'error';
-			}
-		case 'enum':
-			switch (newType) {
-				case 'number-or-string': // FALLTHROUGH
-				case 'string': // FALLTHROUGH
-				case 'enum':
-					return 'enum';
-				default:
-					return 'error';
-			}
-		case 'gender':
-			switch (newType) {
-				case 'number-or-string': // FALLTHROUGH
-				case 'string': // FALLTHROUGH
-				case 'gender':
-					return 'gender';
-				default:
-					return 'error';
-			}
-		case 'number':
-			switch (newType) {
-				case 'number': // FALLTHROUGH
-				case 'number-or-string': // FALLTHROUGH
-					return 'number';
-				default:
-					return 'error';
-			}
-		default:
-			throw new Error('Unknown existing type: ' + existingType);
-	}
-}
-
-function getTypeInfoForVariable(typeMap: TypeMap, variable: string) : TypeInfo {
-	let result = typeMap.get(variable);
-	if (result != null) {
-		return result;
-	}
-
-	result = {
-		usages: [],
-		type: 'unknown',
-	};
-	typeMap.set(variable, result);
-
-	return result;
-}
-
-export function makeTypeMap() : TypeMap {
-	return new Map();
-}
-
 export function inferConstraintTypes(typeMap: TypeMap, constraints: ConstraintNode[]) {
 	for (const constraint of constraints) {
 		addConstraintTypeUsageForNode(typeMap, constraint, constraints);
@@ -189,15 +72,16 @@ function addExprTypeInfo(
 	type: InferredType,
 	location: ExprLocation
 ) : InferredType {
-	const usage = getTypeInfoForVariable(typeMap, variable.name);
-	usage.type = mergeTypeInfo(usage.type, type);
-	usage.usages.push({
-		nodeType: 'expression',
-		variable,
-		location,
+	return typeMap.addTypeUsage(
+		variable.name,
 		type,
-	});
-	return usage.type;
+		{
+			nodeType: 'expression',
+			variable,
+			location,
+			type,
+		}
+	);
 }
 
 function inferExprType(
@@ -294,25 +178,248 @@ export function inferTextTypes(
 		textNodes,
 	};
 
-	const addVariableTypeInfo = (node: TextVariableNode, type: InferredType) => {
-		const usage = getTypeInfoForVariable(typeMap, node.value);
-		usage.type = mergeTypeInfo(usage.type, type);
-		usage.usages.push({
-			nodeType: 'text',
-			node,
-			location,
-			type,
-		});
+	const addVariableTypeInfo = (node: TextVariableNode) => {
+		typeMap.addTypeUsage(
+			node.value,
+			'number-or-string',
+			{
+				nodeType: 'text',
+				node,
+				location,
+				type: 'number-or-string',
+			}
+		);
 	};
 
 	for (const node of textNodes) {
 		switch (node.type) {
 			case 'variable':
-				addVariableTypeInfo(node, 'number-or-string');
+				addVariableTypeInfo(node);
 				break;
 			case 'expr':
 				inferExpressionTypes(typeMap, node.value, location);
 				break;
 		}
 	}
+}
+
+function makeTypedExpressionNode(
+	node: ExprNode,
+	typeMap: TypeMap,
+	addError: (
+		expectedType: InferredType | InferredType[],
+		foundType: InferredType,
+		node: ExprNode
+	) => void,
+) : TypedExpressionNode {
+	switch (node.type) {
+		case 'string_literal':
+			return {
+				...node,
+				expressionType: 'string',
+			};
+		case 'number':
+			return {
+				...node,
+				expressionType: 'number',
+			};
+		case 'variable': {
+			if (!typeMap.hasInfoForType(node.name)) {
+				throw new Error(
+						`Type for variable ${node.name} not found in type map.` +
+						'Are you sure you ran the type inference phase first?'
+					);
+			}
+
+			let type = typeMap.getVariableType(node.name);
+
+			if (type === 'gender' || type === 'enum') {
+				// Expressions don't deal with these type of variables.
+				// This might need changing if the functions
+				// get support for declaring types as well.
+				type = 'string';
+			}
+
+			return {
+				...node,
+				expressionType: type,
+			};
+		}
+		case 'unary_minus': {
+			const typedOp = makeTypedExpressionNode(node.op, typeMap, addError);
+
+			let exprType = typedOp.expressionType;
+			if (
+				typedOp.expressionType !== 'number'
+			)	{
+				addError('number', typedOp.expressionType, node.op);
+				exprType = 'error';
+			}
+
+			return {
+				...node,
+				op: typedOp,
+				expressionType: exprType,
+			};
+		}
+		case 'binary_op': {
+			const typedLhs = makeTypedExpressionNode(node.lhs, typeMap, addError);
+			const lhsType = typedLhs.expressionType;
+			const typedRhs = makeTypedExpressionNode(node.rhs, typeMap, addError);
+			const rhsType = typedRhs.expressionType;
+
+			switch (node.op) {
+				case 'plus': {
+					if (
+						lhsType === 'string' ||
+						lhsType === 'number-or-string'
+					) {
+						if (
+						rhsType === 'number' ||
+						rhsType === 'number-or-string' ||
+						rhsType === 'string'
+					) {
+							return {
+								...node,
+								lhs: typedLhs,
+								rhs: typedRhs,
+								expressionType:
+								// Attempt to find the most specific type of both sides
+								// Basicly if either side is a string, the result
+								// is also a string. Otherwise it is number-or-string
+								lhsType === 'number-or-string' ||
+								rhsType === 'number-or-string' ? 'number-or-string' : 'string',
+							};
+						}
+						addError(['number', 'string'], rhsType, node.rhs);
+						return {
+							...node,
+							lhs: typedLhs,
+							rhs: typedRhs,
+							expressionType: 'error',
+						};
+					} else if (lhsType === 'number') {
+						if (
+						rhsType === 'number' ||
+						rhsType === 'number-or-string' ||
+						rhsType === 'string'
+					) {
+							return {
+								...node,
+								lhs: typedLhs,
+								rhs: typedRhs,
+								expressionType: rhsType,
+							};
+						}
+						addError(['number', 'string'], rhsType, node.rhs);
+						return {
+							...node,
+							lhs: typedLhs,
+							rhs: typedRhs,
+							expressionType: 'error',
+						};
+					}
+
+					addError(['number', 'string'], lhsType, node.lhs);
+					return {
+						...node,
+						lhs: typedLhs,
+						rhs: typedRhs,
+						expressionType: 'error',
+					};
+				}
+				case 'minus':
+				case 'divide':
+				case 'multiply': {
+					if (lhsType !== 'number') {
+						addError('number', lhsType, node.lhs);
+						return {
+							...node,
+							lhs: typedLhs,
+							rhs: typedRhs,
+							expressionType: 'error',
+						};
+					}
+					if (rhsType !== 'number') {
+						addError('number', rhsType, node.rhs);
+						return {
+							...node,
+							lhs: typedLhs,
+							rhs: typedRhs,
+							expressionType: 'error',
+						};
+					}
+
+					return {
+						...node,
+						lhs: typedLhs,
+						rhs: typedRhs,
+						expressionType: 'number',
+					};
+				}
+				default:
+					throw new Error('Unknown binary operator: ' + node.op);
+			}
+		}
+		case 'function_invocation': {
+			// For simplicity's sake. We state that functions
+			// may only return strings. This should be *ok* as
+			// any potential calculations can be done inside the function.
+			// And in any case in general they should be used
+			// to return some kind of escaped markup.
+
+			let hasError = false;
+
+			const parameters = node.parameters.map(
+				(node) => {
+					const n = makeTypedExpressionNode(node, typeMap, addError);
+
+					if (n.expressionType === 'error') {
+						hasError = true;
+					}
+					return n;
+				});
+
+			return {
+				...node,
+				parameters,
+				expressionType: hasError ? 'error' : 'string',
+			};
+		}
+		default:
+			throw new Error('Unknown expression type: ' + node.type);
+	}
+}
+
+export function makeTypedExpressionTree(
+	typeMap: TypeMap,
+	node: ExprNode,
+	location: ExprLocation
+) : {
+	node: TypedExpressionNode,
+	errors: TypeError[],
+} {
+	const errors = [];
+	const typedNode = makeTypedExpressionNode(node, typeMap, (
+		expectedTypes: InferredType | InferredType[],
+		foundType: InferredType,
+		node: ExprNode
+	) => {
+		if (foundType === 'error') {
+			// We only log the error at the leaf of the expression
+			// tree. So avoid reporting it all the way up the tree.
+			return;
+		}
+		const nodeInfo = {
+			type: 'expression',
+			location,
+			node,
+		};
+		errors.push(new TypeError(expectedTypes, foundType, typeMap, nodeInfo));
+	});
+
+	return {
+		node: typedNode,
+		errors: errors,
+	};
 }
