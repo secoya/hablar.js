@@ -40,25 +40,25 @@ expressions
 expr
     : func_invoc_expr
     | var_read_expr
-    | expr PLUS expr { $$ = { "type": "binary_op", "op": "plus", "lhs": $1, "rhs": $3, pos: { firstLine: $1.pos.firstLine, firstColumn: $1.pos.firstColumn, lastLine: $3.pos.lastLine, lastColumn: $3.pos.lastColumn } }; }
-    | expr MINUS expr { $$ = { "type": "binary_op", "op": "minus", "lhs": $1, "rhs": $3, pos: { firstLine: $1.pos.firstLine, firstColumn: $1.pos.firstColumn, lastLine: $3.pos.lastLine, lastColumn: $3.pos.lastColumn } }; }
-    | expr DIVIDE expr { $$ = { "type": "binary_op", "op": "divide", "lhs": $1, "rhs": $3, pos: { firstLine: $1.pos.firstLine, firstColumn: $1.pos.firstColumn, lastLine: $3.pos.lastLine, lastColumn: $3.pos.lastColumn } }; }
-    | expr MULTIPLY expr { $$ = { "type": "binary_op", "op": "multiply", "lhs": $1, "rhs": $3, pos: { firstLine: $1.pos.firstLine, firstColumn: $1.pos.firstColumn, lastLine: $3.pos.lastLine, lastColumn: $3.pos.lastColumn } }; }
-    | MINUS expr %prec UMINUS { $$ = {"type": "unary_minus", "op": $2, pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @2.last_line, lastColumn: @2.last_column } }; }
-    | NUMBER { $$ = { "type": "number", "value": Number($1), pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
-    | STRING_LITERAL { $$ = { "type": "string_literal", "value": $1, pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
+    | expr PLUS expr { $$ = { "exprNodeType": "binary_op", "binaryOp": "plus", "lhs": $1, "rhs": $3, pos: { firstLine: $1.pos.firstLine, firstColumn: $1.pos.firstColumn, lastLine: $3.pos.lastLine, lastColumn: $3.pos.lastColumn } }; }
+    | expr MINUS expr { $$ = { "exprNodeType": "binary_op", "binaryOp": "minus", "lhs": $1, "rhs": $3, pos: { firstLine: $1.pos.firstLine, firstColumn: $1.pos.firstColumn, lastLine: $3.pos.lastLine, lastColumn: $3.pos.lastColumn } }; }
+    | expr DIVIDE expr { $$ = { "exprNodeType": "binary_op", "binaryOp": "divide", "lhs": $1, "rhs": $3, pos: { firstLine: $1.pos.firstLine, firstColumn: $1.pos.firstColumn, lastLine: $3.pos.lastLine, lastColumn: $3.pos.lastColumn } }; }
+    | expr MULTIPLY expr { $$ = { "exprNodeType": "binary_op", "binaryOp": "multiply", "lhs": $1, "rhs": $3, pos: { firstLine: $1.pos.firstLine, firstColumn: $1.pos.firstColumn, lastLine: $3.pos.lastLine, lastColumn: $3.pos.lastColumn } }; }
+    | MINUS expr %prec UMINUS { $$ = {"exprNodeType": "unary_minus", "op": $2, pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @2.last_line, lastColumn: @2.last_column } }; }
+    | NUMBER { $$ = { "exprNodeType": "number", "value": Number($1), pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
+    | STRING_LITERAL { $$ = { "exprNodeType": "string_literal", "value": $1, pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
     | OPEN_PAREN expr CLOSE_PAREN {{ $$ = $2; }}
     ;
 
 var_read_expr
-    : VARIABLE { $$ = { "type": "variable", "name": $1.substring(1), pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
+    : VARIABLE { $$ = { "exprNodeType": "variable", "name": $1.substring(1), pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
     ;
 
 func_invoc_expr
     : IDENTIFIER OPEN_PAREN expr_list CLOSE_PAREN
-      { $$ = { "type": "function_invocation", "name": $1, "parameters": $3, pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @4.last_line, lastColumn: @4.last_column } }; }
+      { $$ = { "exprNodeType": "function_invocation", "name": $1, "parameters": $3, pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @4.last_line, lastColumn: @4.last_column } }; }
     | IDENTIFIER OPEN_PAREN CLOSE_PAREN
-      { $$ = { "type": "function_invocation", "name": $1, "parameters": [], pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @3.last_line, lastColumn: @3.last_column } }; }
+      { $$ = { "exprNodeType": "function_invocation", "name": $1, "parameters": [], pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @3.last_line, lastColumn: @3.last_column } }; }
     ;
 
 expr_list

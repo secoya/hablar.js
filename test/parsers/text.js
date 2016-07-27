@@ -14,7 +14,7 @@ describe('Text parser', function() {
 			const res = textParser(exp);
 
 			assert.deepEqual([{
-				type: 'literal',
+				textNodeType: 'literal',
 				value: 'Hello',
 				pos: {
 					firstLine: 1,
@@ -30,7 +30,7 @@ describe('Text parser', function() {
 			const res = textParser(exp);
 
 			assert.deepEqual([{
-				type: 'literal',
+				textNodeType: 'literal',
 				value: 'Hello world',
 				pos: {
 					firstLine: 1,
@@ -48,7 +48,7 @@ describe('Text parser', function() {
 			const res = textParser(exp);
 
 			assert.deepEqual([{
-				type: 'variable',
+				textNodeType: 'variable',
 				value: 'hello',
 				pos: {
 					firstLine: 1,
@@ -66,7 +66,7 @@ describe('Text parser', function() {
 			assert.deepEqual(
 				[
 					{
-						type: 'variable',
+						textNodeType: 'variable',
 						value: 'hello',
 						pos: {
 							firstLine: 1,
@@ -76,7 +76,7 @@ describe('Text parser', function() {
 						},
 					},
 					{
-						type: 'literal',
+						textNodeType: 'literal',
 						value: ' world',
 						pos: {
 							firstLine: 1,
@@ -95,7 +95,7 @@ describe('Text parser', function() {
 			assert.deepEqual(
 				[
 					{
-						type: 'literal',
+						textNodeType: 'literal',
 						value: 'hello ',
 						pos: {
 							firstLine: 1,
@@ -105,7 +105,7 @@ describe('Text parser', function() {
 						},
 					},
 					{
-						type: 'variable',
+						textNodeType: 'variable',
 						value: 'world',
 						pos: {
 							firstLine: 1,
@@ -124,7 +124,7 @@ describe('Text parser', function() {
 			assert.deepEqual(
 				[
 					{
-						type: 'literal',
+						textNodeType: 'literal',
 						value: 'hello ',
 						pos: {
 							firstLine: 1,
@@ -134,7 +134,7 @@ describe('Text parser', function() {
 						},
 					},
 					{
-						type: 'variable',
+						textNodeType: 'variable',
 						value: 'world',
 						pos: {
 							firstLine: 1,
@@ -144,7 +144,7 @@ describe('Text parser', function() {
 						},
 					},
 					{
-						type: 'literal',
+						textNodeType: 'literal',
 						value: '!',
 						pos: {
 							firstLine: 1,
@@ -165,7 +165,7 @@ describe('Text parser', function() {
 			assert.deepEqual(
 				[
 					{
-						type: 'expr',
+						textNodeType: 'expr',
 						value: '5',
 						pos: {
 							firstLine: 1,
@@ -192,7 +192,7 @@ describe('Text parser', function() {
 			assert.deepEqual(
 				[
 					{
-						type: 'expr',
+						textNodeType: 'expr',
 						value: '5*10+"hello"*myFunction($world, "lol", 50.4)',
 						pos: {
 							firstLine: 1,
@@ -219,7 +219,7 @@ describe('Text parser', function() {
 			assert.deepEqual(
 				[
 					{
-						type: 'literal',
+						textNodeType: 'literal',
 						value: 'Hello ',
 						pos: {
 							firstLine: 1,
@@ -229,7 +229,7 @@ describe('Text parser', function() {
 						},
 					},
 					{
-						type: 'expr',
+						textNodeType: 'expr',
 						value: '"world"',
 						pos: {
 							firstLine: 1,
@@ -279,7 +279,7 @@ $test
 			assert.deepEqual(
 				[
 					{
-						type: 'literal',
+						textNodeType: 'literal',
 						value: 'Hello ',
 						pos: {
 							firstLine: 1,
@@ -289,7 +289,7 @@ $test
 						},
 					},
 					{
-						type: 'expr',
+						textNodeType: 'expr',
 						pos: {
 							firstLine: 1,
 							firstColumn: 6,
@@ -297,10 +297,10 @@ $test
 							lastColumn: 2,
 						},
 						value: {
-							type: 'binary_op',
-							op: 'plus',
+							exprNodeType: 'binary_op',
+							binaryOp: 'plus',
 							lhs: {
-								type: 'string_literal',
+								exprNodeType: 'string_literal',
 								value: 'world',
 								pos: {
 									firstLine: 1,
@@ -310,7 +310,7 @@ $test
 								},
 							},
 							rhs: {
-								type: 'variable',
+								exprNodeType: 'variable',
 								name: 'test',
 								pos: {
 									firstLine: 2,
@@ -328,7 +328,7 @@ $test
 						},
 					},
 					{
-						type: 'literal',
+						textNodeType: 'literal',
 						value: ' ',
 						pos: {
 							firstLine: 4,
@@ -338,9 +338,9 @@ $test
 						},
 					},
 					{
-						type: 'expr',
+						textNodeType: 'expr',
 						value: {
-							type: 'function_invocation',
+							exprNodeType: 'function_invocation',
 							name: 'func',
 							parameters: [],
 							pos: {

@@ -14,19 +14,19 @@ export type Pos = {
  };
 
 export type LiteralNode = {
-	type: 'literal',
+	textNodeType: 'literal',
 	value: string,
 	pos: Pos,
 };
 
 export type VariableNode = {
-	type: 'variable',
+	textNodeType: 'variable',
 	value: string,
 	pos: Pos,
 };
 
 export type ExprNode = {
-	type: 'expr',
+	textNodeType: 'expr',
 	value: ExpressionNode,
 	pos: Pos,
 };

@@ -19,7 +19,7 @@ import type {
 } from '../trees/expression';
 
 type InitialExprNode = {
-	type: 'expr',
+	textNodeType: 'expr',
 	value: string,
 	pos: Pos,
 	valuePos: Pos,
@@ -71,16 +71,16 @@ export default function parse(input: string) : TextParserResult {
 	const result : Node[] = [];
 
 	for (const fragment of parsed) {
-		if (fragment.type === 'literal' && last != null && last.type === 'literal') {
+		if (fragment.textNodeType === 'literal' && last != null && last.textNodeType === 'literal') {
 			last.value += fragment.value;
-		} else if (fragment.type === 'expr') {
+		} else if (fragment.textNodeType === 'expr') {
 			const newNode = {
-				type: 'expr',
+				textNodeType: 'expr',
 				value: fixupPositionInformation(expressionParser(fragment.value), fragment),
 				pos: fragment.pos,
 			};
 			walkNode(newNode.value, (node) => {
-				switch (node.type) {
+				switch (node.exprNodeType) {
 					case 'variable':
 						variables.set(node.name, true);
 						break;
@@ -91,10 +91,10 @@ export default function parse(input: string) : TextParserResult {
 			});
 			result.push(newNode);
 			last = newNode;
-		} else if (fragment.type === 'variable') {
+		} else if (fragment.textNodeType === 'variable') {
 			result.push(fragment);
 			variables.set(fragment.value, true);
-		} else if (fragment.type === 'literal') {
+		} else if (fragment.textNodeType === 'literal') {
 			result.push(fragment);
 		}
 	}

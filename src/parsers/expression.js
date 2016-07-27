@@ -10,7 +10,7 @@ const expressionParser = getParser('expression');
 
 export function walkNode(node: Node, callback: (node: Node) => void) : void {
 	callback(node);
-	switch (node.type) {
+	switch (node.exprNodeType) {
 		case 'function_invocation':
 			for (const param of node.parameters) {
 				walkNode(param, callback);
@@ -31,7 +31,7 @@ function substituteStringLiterals(
 	originalText: string
 ) : Node {
 	walkNode(node, (expr) : void => {
-		if (expr.type === 'string_literal') {
+		if (expr.exprNodeType === 'string_literal') {
 			try {
 				const v = JSON.parse(expr.value);
 				expr.value = v;

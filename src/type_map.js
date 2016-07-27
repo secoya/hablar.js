@@ -14,6 +14,16 @@ import type {
 	Node as ExprNode,
 } from './trees/expression';
 
+export type InferredType =
+	| 'unknown'
+	| 'gender'
+	| 'enum'
+	| 'number-or-string'
+	| 'number'
+	| 'string'
+	| 'error'
+;
+
 export type ConstraintTypeUsage = {
 	nodeType: 'constraint',
 	node: ConstraintNode,
@@ -32,7 +42,7 @@ export type ExpressionTypeUsage = {
 	nodeType: 'expression',
 	node: ExprNode,
 	location: ExprLocation,
-	type: 'unknown' | 'number-or-string' | 'number' | 'string',
+	type:  'unknown' | 'number-or-string' | 'number' | 'string',
 }
 
 export type TextTypeUsage = {
@@ -58,16 +68,6 @@ export type TypeUsage =
 	| ExpressionTypeUsage
 	| TextTypeUsage
 	| CustomTypeUsage
-
-export type InferredType =
-	| 'unknown'
-	| 'gender'
-	| 'enum'
-	| 'number-or-string'
-	| 'number'
-	| 'string'
-	| 'error'
-;
 
 export type TypeInfo = {
 	usages: TypeUsage[],

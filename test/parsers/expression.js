@@ -15,7 +15,7 @@ describe('Expression parser', function() {
 				const res = expressionParser(exp);
 
 				assert.deepEqual({
-					type: 'number',
+					exprNodeType: 'number',
 					value: 5,
 					pos: {
 						firstLine: 1,
@@ -31,7 +31,7 @@ describe('Expression parser', function() {
 				const res = expressionParser(exp);
 
 				assert.deepEqual({
-					type: 'number',
+					exprNodeType: 'number',
 					value: 5.24,
 					pos: {
 						firstLine: 1,
@@ -56,7 +56,7 @@ describe('Expression parser', function() {
 				const res = expressionParser(exp);
 
 				assert.deepEqual({
-					type: 'string_literal',
+					exprNodeType: 'string_literal',
 					value: 'Some string',
 					pos: {
 						firstLine: 1,
@@ -72,7 +72,7 @@ describe('Expression parser', function() {
 				const res = expressionParser(exp);
 
 				assert.deepEqual({
-					type: 'string_literal',
+					exprNodeType: 'string_literal',
 					value: 'Some "string"',
 					pos: {
 						firstLine: 1,
@@ -88,7 +88,7 @@ describe('Expression parser', function() {
 				const res = expressionParser(exp);
 
 				assert.deepEqual({
-					type: 'string_literal',
+					exprNodeType: 'string_literal',
 					value: 'Some \n\t\f\rstring',
 					pos: {
 						firstLine: 1,
@@ -114,7 +114,7 @@ describe('Expression parser', function() {
 			const res = expressionParser(exp);
 
 			assert.deepEqual({
-				type: 'variable',
+				exprNodeType: 'variable',
 				name: 'hello',
 				pos: {
 					firstLine: 1,
@@ -130,7 +130,7 @@ describe('Expression parser', function() {
 			const res = expressionParser(exp);
 
 			assert.deepEqual({
-				type: 'variable',
+				exprNodeType: 'variable',
 				name: 'helloWorld',
 				pos: {
 					firstLine: 1,
@@ -146,7 +146,7 @@ describe('Expression parser', function() {
 			const res = expressionParser(exp);
 
 			assert.deepEqual({
-				type: 'variable',
+				exprNodeType: 'variable',
 				name: 'hello_world',
 				pos: {
 					firstLine: 1,
@@ -172,9 +172,9 @@ describe('Expression parser', function() {
 			const res = expressionParser(exp);
 
 			assert.deepEqual({
-				type: 'unary_minus',
+				exprNodeType: 'unary_minus',
 				op: {
-					type: 'number',
+					exprNodeType: 'number',
 					value: 5,
 					pos: {
 						firstLine: 1,
@@ -197,9 +197,9 @@ describe('Expression parser', function() {
 			const res = expressionParser(exp);
 
 			assert.deepEqual({
-				type: 'unary_minus',
+				exprNodeType: 'unary_minus',
 				op: {
-					type: 'variable',
+					exprNodeType: 'variable',
 					name: 'n',
 					pos: {
 						firstLine: 1,
@@ -222,9 +222,9 @@ describe('Expression parser', function() {
 			const res = expressionParser(exp);
 
 			assert.deepEqual({
-				type: 'unary_minus',
+				exprNodeType: 'unary_minus',
 				op: {
-					type: 'number',
+					exprNodeType: 'number',
 					value: 5,
 					pos: {
 						firstLine: 1,
@@ -256,7 +256,7 @@ describe('Expression parser', function() {
 			const res = expressionParser(exp);
 
 			assert.deepEqual({
-				type: 'function_invocation',
+				exprNodeType: 'function_invocation',
 				name: 'hello',
 				parameters: [],
 				pos: {
@@ -274,11 +274,11 @@ describe('Expression parser', function() {
 
 			assert.deepEqual(
 				{
-					type: 'function_invocation',
+					exprNodeType: 'function_invocation',
 					name: 'hello',
 					parameters: [
 						{
-							type: 'number',
+							exprNodeType: 'number',
 							value: 10,
 							pos: {
 								firstLine: 1,
@@ -305,11 +305,11 @@ describe('Expression parser', function() {
 
 			assert.deepEqual(
 				{
-					type: 'function_invocation',
+					exprNodeType: 'function_invocation',
 					name: 'hello',
 					parameters: [
 						{
-							type: 'number',
+							exprNodeType: 'number',
 							value: 10,
 							pos: {
 								firstLine: 1,
@@ -319,7 +319,7 @@ describe('Expression parser', function() {
 							},
 						},
 						{
-							type: 'variable',
+							exprNodeType: 'variable',
 							name: 'world',
 							pos: {
 								firstLine: 1,
@@ -329,7 +329,7 @@ describe('Expression parser', function() {
 							},
 						},
 						{
-							type: 'string_literal',
+							exprNodeType: 'string_literal',
 							value: 'some string',
 							pos: {
 								firstLine: 1,
@@ -356,11 +356,11 @@ describe('Expression parser', function() {
 
 			assert.deepEqual(
 				{
-					type: 'function_invocation',
+					exprNodeType: 'function_invocation',
 					name: 'hello',
 					parameters: [
 						{
-							type: 'number',
+							exprNodeType: 'number',
 							value: 10,
 							pos: {
 								firstLine: 1,
@@ -411,10 +411,10 @@ describe('Expression parser', function() {
 
 			assert.deepEqual(
 				{
-					type: 'binary_op',
-					op: 'plus',
+					exprNodeType: 'binary_op',
+					binaryOp: 'plus',
 					lhs: {
-						type: 'number',
+						exprNodeType: 'number',
 						value: 5,
 						pos: {
 							firstLine: 1,
@@ -424,7 +424,7 @@ describe('Expression parser', function() {
 						},
 					},
 					rhs: {
-						type: 'number',
+						exprNodeType: 'number',
 						value: 10,
 						pos: {
 							firstLine: 1,
@@ -450,10 +450,10 @@ describe('Expression parser', function() {
 
 			assert.deepEqual(
 				{
-					type: 'binary_op',
-					op: 'minus',
+					exprNodeType: 'binary_op',
+					binaryOp: 'minus',
 					lhs: {
-						type: 'number',
+						exprNodeType: 'number',
 						value: 5,
 						pos: {
 							firstLine: 1,
@@ -463,7 +463,7 @@ describe('Expression parser', function() {
 						},
 					},
 					rhs: {
-						type: 'number',
+						exprNodeType: 'number',
 						value: 10,
 						pos: {
 							firstLine: 1,
@@ -489,10 +489,10 @@ describe('Expression parser', function() {
 
 			assert.deepEqual(
 				{
-					type: 'binary_op',
-					op: 'divide',
+					exprNodeType: 'binary_op',
+					binaryOp: 'divide',
 					lhs: {
-						type: 'number',
+						exprNodeType: 'number',
 						value: 5,
 						pos: {
 							firstLine: 1,
@@ -502,7 +502,7 @@ describe('Expression parser', function() {
 						},
 					},
 					rhs: {
-						type: 'number',
+						exprNodeType: 'number',
 						value: 10,
 						pos: {
 							firstLine: 1,
@@ -528,10 +528,10 @@ describe('Expression parser', function() {
 
 			assert.deepEqual(
 				{
-					type: 'binary_op',
-					op: 'multiply',
+					exprNodeType: 'binary_op',
+					binaryOp: 'multiply',
 					lhs: {
-						type: 'number',
+						exprNodeType: 'number',
 						value: 5,
 						pos: {
 							firstLine: 1,
@@ -541,7 +541,7 @@ describe('Expression parser', function() {
 						},
 					},
 					rhs: {
-						type: 'number',
+						exprNodeType: 'number',
 						value: 10,
 						pos: {
 							firstLine: 1,
@@ -568,13 +568,13 @@ describe('Expression parser', function() {
 
 				assert.deepEqual(
 					{
-						type: 'binary_op',
-						op: 'multiply',
+						exprNodeType: 'binary_op',
+						binaryOp: 'multiply',
 						lhs: {
-							type: 'binary_op',
-							op: 'multiply',
+							exprNodeType: 'binary_op',
+							binaryOp: 'multiply',
 							lhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 5,
 								pos: {
 									firstLine: 1,
@@ -584,7 +584,7 @@ describe('Expression parser', function() {
 								},
 							},
 							rhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 10,
 								pos: {
 									firstLine: 1,
@@ -601,7 +601,7 @@ describe('Expression parser', function() {
 							},
 						},
 						rhs: {
-							type: 'number',
+							exprNodeType: 'number',
 							value: 20,
 							pos: {
 								firstLine: 1,
@@ -627,13 +627,13 @@ describe('Expression parser', function() {
 
 				assert.deepEqual(
 					{
-						type: 'binary_op',
-						op: 'divide',
+						exprNodeType: 'binary_op',
+						binaryOp: 'divide',
 						lhs: {
-							type: 'binary_op',
-							op: 'divide',
+							exprNodeType: 'binary_op',
+							binaryOp: 'divide',
 							lhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 5,
 								pos: {
 									firstLine: 1,
@@ -643,7 +643,7 @@ describe('Expression parser', function() {
 								},
 							},
 							rhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 10,
 								pos: {
 									firstLine: 1,
@@ -660,7 +660,7 @@ describe('Expression parser', function() {
 							},
 						},
 						rhs: {
-							type: 'number',
+							exprNodeType: 'number',
 							value: 20,
 							pos: {
 								firstLine: 1,
@@ -686,10 +686,10 @@ describe('Expression parser', function() {
 
 				assert.deepEqual(
 					{
-						type: 'binary_op',
-						op: 'multiply',
+						exprNodeType: 'binary_op',
+						binaryOp: 'multiply',
 						lhs: {
-							type: 'number',
+							exprNodeType: 'number',
 							value: 5,
 							pos: {
 								firstLine: 1,
@@ -699,10 +699,10 @@ describe('Expression parser', function() {
 							},
 						},
 						rhs: {
-							type: 'binary_op',
-							op: 'multiply',
+							exprNodeType: 'binary_op',
+							binaryOp: 'multiply',
 							lhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 10,
 								pos: {
 									firstLine: 1,
@@ -712,7 +712,7 @@ describe('Expression parser', function() {
 								},
 							},
 							rhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 20,
 								pos: {
 									firstLine: 1,
@@ -745,10 +745,10 @@ describe('Expression parser', function() {
 
 				assert.deepEqual(
 					{
-						type: 'binary_op',
-						op: 'plus',
+						exprNodeType: 'binary_op',
+						binaryOp: 'plus',
 						lhs: {
-							type: 'number',
+							exprNodeType: 'number',
 							value: 5,
 							pos: {
 								firstLine: 1,
@@ -758,10 +758,10 @@ describe('Expression parser', function() {
 							},
 						},
 						rhs: {
-							type: 'binary_op',
-							op: 'multiply',
+							exprNodeType: 'binary_op',
+							binaryOp: 'multiply',
 							lhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 10,
 								pos: {
 									firstLine: 1,
@@ -771,7 +771,7 @@ describe('Expression parser', function() {
 								},
 							},
 							rhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 20,
 								pos: {
 									firstLine: 1,
@@ -804,10 +804,10 @@ describe('Expression parser', function() {
 
 				assert.deepEqual(
 					{
-						type: 'binary_op',
-						op: 'plus',
+						exprNodeType: 'binary_op',
+						binaryOp: 'plus',
 						lhs: {
-							type: 'number',
+							exprNodeType: 'number',
 							value: 5,
 							pos: {
 								firstLine: 1,
@@ -817,10 +817,10 @@ describe('Expression parser', function() {
 							},
 						},
 						rhs: {
-							type: 'binary_op',
-							op: 'divide',
+							exprNodeType: 'binary_op',
+							binaryOp: 'divide',
 							lhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 10,
 								pos: {
 									firstLine: 1,
@@ -830,7 +830,7 @@ describe('Expression parser', function() {
 								},
 							},
 							rhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 20,
 								pos: {
 									firstLine: 1,
@@ -863,10 +863,10 @@ describe('Expression parser', function() {
 
 				assert.deepEqual(
 					{
-						type: 'binary_op',
-						op: 'minus',
+						exprNodeType: 'binary_op',
+						binaryOp: 'minus',
 						lhs: {
-							type: 'number',
+							exprNodeType: 'number',
 							value: 5,
 							pos: {
 								firstLine: 1,
@@ -876,10 +876,10 @@ describe('Expression parser', function() {
 							},
 						},
 						rhs: {
-							type: 'binary_op',
-							op: 'multiply',
+							exprNodeType: 'binary_op',
+							binaryOp: 'multiply',
 							lhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 10,
 								pos: {
 									firstLine: 1,
@@ -889,7 +889,7 @@ describe('Expression parser', function() {
 								},
 							},
 							rhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 20,
 								pos: {
 									firstLine: 1,
@@ -922,10 +922,10 @@ describe('Expression parser', function() {
 
 				assert.deepEqual(
 					{
-						type: 'binary_op',
-						op: 'minus',
+						exprNodeType: 'binary_op',
+						binaryOp: 'minus',
 						lhs: {
-							type: 'number',
+							exprNodeType: 'number',
 							value: 5,
 							pos: {
 								firstLine: 1,
@@ -935,10 +935,10 @@ describe('Expression parser', function() {
 							},
 						},
 						rhs: {
-							type: 'binary_op',
-							op: 'divide',
+							exprNodeType: 'binary_op',
+							binaryOp: 'divide',
 							lhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 10,
 								pos: {
 									firstLine: 1,
@@ -948,7 +948,7 @@ describe('Expression parser', function() {
 								},
 							},
 							rhs: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 20,
 								pos: {
 									firstLine: 1,
@@ -981,12 +981,12 @@ describe('Expression parser', function() {
 
 				assert.deepEqual(
 					{
-						type: 'binary_op',
-						op: 'multiply',
+						exprNodeType: 'binary_op',
+						binaryOp: 'multiply',
 						lhs: {
-							type: 'unary_minus',
+							exprNodeType: 'unary_minus',
 							op: {
-								type: 'number',
+								exprNodeType: 'number',
 								value: 5,
 								pos: {
 									firstLine: 1,
@@ -1003,12 +1003,12 @@ describe('Expression parser', function() {
 							},
 						},
 						rhs: {
-							type: 'unary_minus',
+							exprNodeType: 'unary_minus',
 							op: {
-								type: 'binary_op',
-								op: 'minus',
+								exprNodeType: 'binary_op',
+								binaryOp: 'minus',
 								lhs: {
-									type: 'number',
+									exprNodeType: 'number',
 									value: 10,
 									pos: {
 										firstLine: 1,
@@ -1018,9 +1018,9 @@ describe('Expression parser', function() {
 									},
 								},
 								rhs: {
-									type: 'unary_minus',
+									exprNodeType: 'unary_minus',
 									op: {
-										type: 'number',
+										exprNodeType: 'number',
 										value: 20,
 										pos: {
 											firstLine: 1,

@@ -1,6 +1,8 @@
 /**
- *
+ * @flow
  */
+
+import type {InferredType} from '../type_map';
 
 export type Pos = {
 	firstLine: number,
@@ -9,75 +11,89 @@ export type Pos = {
 	lastColumn: number,
 };
 
-export type BinaryOpPlusNode = {
-	type: 'binary_op',
-	op: 'plus',
+export type BinaryOpNode = {
+	exprNodeType: 'binary_op',
+	binaryOp: 'plus' | 'multiply' | 'divide' | 'minus',
 	lhs: Node,
 	rhs: Node,
 	pos: Pos,
 };
 
-export type BinaryOpMinusNode = {
-	type: 'binary_op',
-	op: 'minus',
-	lhs: Node,
-	rhs: Node,
+export type TypedBinaryOpNode = {
+	exprNodeType: 'binary_op',
+	binaryOp: 'plus' | 'multiply' | 'divide' | 'minus',
+	lhs: TypedNode,
+	rhs: TypedNode,
 	pos: Pos,
-};
-
-export type BinaryOpDivideNode = {
-	type: 'binary_op',
-	op: 'divide',
-	lhs: Node,
-	rhs: Node,
-	pos: Pos,
-};
-
-export type BinaryOpMultiplyNode = {
-	type: 'binary_op',
-	op: 'multiply',
-	lhs: Node,
-	rhs: Node,
-	pos: Pos,
-};
-
-export type BinaryOpNode =
-	| BinaryOpPlusNode
-	| BinaryOpMinusNode
-	| BinaryOpDivideNode
-	| BinaryOpMultiplyNode
-;
+	exprType: InferredType,
+}
 
 export type UnaryMinusNode = {
-	type: 'unary_minus',
+	exprNodeType: 'unary_minus',
 	op: Node,
 	pos: Pos,
 };
 
+export type TypedUnaryMinusNode = {
+	exprNodeType: 'unary_minus',
+	op: TypedNode,
+	pos: Pos,
+	exprType: InferredType,
+}
+
 export type NumberNode = {
-	type: 'number',
+	exprNodeType: 'number',
 	value: number,
 	pos: Pos,
 };
 
+export type TypedNumberNode = {
+	exprNodeType: 'number',
+	value: number,
+	pos: Pos,
+	exprType: 'number',
+}
+
 export type StringLiteralNode = {
-	type: 'string_literal',
+	exprNodeType: 'string_literal',
 	value: string,
 	pos: Pos,
 };
 
+export type TypedStringLiteralNode = {
+	exprNodeType: 'string_literal',
+	value: string,
+	pos: Pos,
+	exprType: 'string',
+}
+
 export type VariableNode = {
-	type: 'variable',
+	exprNodeType: 'variable',
 	name: string,
 	pos: Pos,
 };
 
+export type TypedVariableNode = {
+	exprNodeType: 'variable',
+	name: string,
+	pos: Pos,
+	exprType: InferredType,
+};
+
 export type FunctionInvocationNode = {
-	type: 'function_invocation',
+	exprNodeType: 'function_invocation',
 	name: string,
 	parameters: Node[],
 	pos: Pos,
 };
+
+export type TypedFunctionInvocationNode = {
+	exprNodeType: 'function_invocation',
+	name: string,
+	parameters: TypedNode[],
+	pos: Pos,
+	exprType: 'error' | 'string',
+}
 
 export type Node =
 	| BinaryOpNode
@@ -86,4 +102,13 @@ export type Node =
 	| StringLiteralNode
 	| VariableNode
 	| FunctionInvocationNode
+;
+
+export type TypedNode =
+	| TypedBinaryOpNode
+	| TypedUnaryMinusNode
+	| TypedNumberNode
+	| TypedStringLiteralNode
+	| TypedVariableNode
+	| TypedFunctionInvocationNode
 ;

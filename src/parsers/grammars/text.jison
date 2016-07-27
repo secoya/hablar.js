@@ -29,7 +29,7 @@ expressions
     : expr_list EOF
         { return $1; }
     | EOF
-        { return [{"type": "literal", "value": "", pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }]; }
+        { return [{"textNodeType": "literal", "value": "", pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }]; }
     ;
 
 expr_list
@@ -44,9 +44,9 @@ text
     ;
 
 expr
-    : text { $$ = {"type": "literal", "value": $1.text, pos: $1.pos }; }
-    | VARIABLE { $$ = {"type": "variable", "value": $1.substring(1), pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
-    | OPEN_EXPR in_expr_combined CLOSE_EXPR { $$ = {"type": "expr", "value": $2.text, valuePos: $2.pos, pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @3.last_line, lastColumn: @3.last_column }}; }
+    : text { $$ = {"textNodeType": "literal", "value": $1.text, pos: $1.pos }; }
+    | VARIABLE { $$ = {"textNodeType": "variable", "value": $1.substring(1), pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
+    | OPEN_EXPR in_expr_combined CLOSE_EXPR { $$ = {"textNodeType": "expr", "value": $2.text, valuePos: $2.pos, pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @3.last_line, lastColumn: @3.last_column }}; }
     ;
 
 /*

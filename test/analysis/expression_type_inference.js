@@ -20,21 +20,17 @@ import type {
 	StringLiteralNode,
 	VariableNode,
 	UnaryMinusNode,
-	BinaryOpPlusNode,
-	BinaryOpMinusNode,
+	BinaryOpNode,
 	FunctionInvocationNode,
-} from '../../src/trees/expression';
 
-import type {
-	Node as TypedNode,
-	NumberNode as TypedNumberNode,
-	StringLiteralNode as TypedStringLiteralNode,
-	VariableNode as TypedVariableNode,
-	BinaryOpPlusNode as TypedBinaryOpPlusNode,
-	BinaryOpMinusNode as TypedBinaryOpMinusNode,
-	FunctionInvocationNode as TypedFunctionInvocationNode,
-	UnaryMinusNode as TypedUnaryMinusNode,
-} from '../../src/trees/typed_expression';
+	TypedNode,
+	TypedNumberNode,
+	TypedStringLiteralNode,
+	TypedVariableNode,
+	TypedUnaryMinusNode,
+	TypedBinaryOpNode,
+	TypedFunctionInvocationNode,
+} from '../../src/trees/expression';
 
 const makeEmptyPos = () => ({
 	firstLine: 1,
@@ -59,7 +55,7 @@ function getTypeInfo(typeMap: TypeMap, variable: string) : TypeInfo {
 
 function makeVariableNode(name: string) : VariableNode {
 	return {
-		type: 'variable',
+		exprNodeType: 'variable',
 		pos: makeEmptyPos(),
 		name: name,
 	};
@@ -67,14 +63,16 @@ function makeVariableNode(name: string) : VariableNode {
 
 function makeTypedVariableNode(name: string, type: InferredType) : TypedVariableNode {
 	return {
-		...makeVariableNode(name),
-		expressionType: type,
+		exprNodeType: 'variable',
+		pos: makeEmptyPos(),
+		name: name,
+		exprType: type,
 	};
 }
 
 function makeNumberNode(val: number) : NumberNode {
 	return {
-		type: 'number',
+		exprNodeType: 'number',
 		pos: makeEmptyPos(),
 		value: val,
 	};
@@ -84,8 +82,10 @@ function makeTypedNumberNode(
 	val: number
 ) : TypedNumberNode {
 	return {
-		...makeNumberNode(val),
-		expressionType: 'number',
+		exprNodeType: 'number',
+		pos: makeEmptyPos(),
+		value: val,
+		exprType: 'number',
 	};
 }
 
@@ -93,7 +93,7 @@ function makeUnaryMinusNode(
 	op: Node
 ) : UnaryMinusNode {
 	return {
-		type: 'unary_minus',
+		exprNodeType: 'unary_minus',
 		pos: makeEmptyPos(),
 		op: op,
 	};
@@ -104,14 +104,16 @@ function makeTypedUnaryMinusNode(
 	type: InferredType
 ) : TypedUnaryMinusNode {
 	return {
-		...makeUnaryMinusNode(op),
-		expressionType: type,
+		exprNodeType: 'unary_minus',
+		pos: makeEmptyPos(),
+		op: op,
+		exprType: type,
 	};
 }
 
 function makeStringLiteralNode(val: string) : StringLiteralNode {
 	return {
-		type: 'string_literal',
+		exprNodeType: 'string_literal',
 		pos: makeEmptyPos(),
 		value: val,
 	};
@@ -121,18 +123,20 @@ function makeTypedStringLiteralNode(
 	val: string
 ) : TypedStringLiteralNode {
 	return {
-		...makeStringLiteralNode(val),
-		expressionType: 'string',
+		exprNodeType: 'string_literal',
+		pos: makeEmptyPos(),
+		value: val,
+		exprType: 'string',
 	};
 }
 
 function makeBinaryPlusNode(
 	lhs: Node,
 	rhs: Node
-) : BinaryOpPlusNode {
+) : BinaryOpNode {
 	return {
-		type: 'binary_op',
-		op: 'plus',
+		exprNodeType: 'binary_op',
+		binaryOp: 'plus',
 		pos: makeEmptyPos(),
 		lhs: lhs,
 		rhs: rhs,
@@ -143,18 +147,22 @@ function makeTypedBinaryPlusNode(
 	lhs: TypedNode,
 	rhs: TypedNode,
 	type: InferredType
-) : TypedBinaryOpPlusNode {
+) : TypedBinaryOpNode {
 	return {
-		...makeBinaryPlusNode(lhs, rhs),
-		expressionType: type,
+		exprNodeType: 'binary_op',
+		binaryOp: 'plus',
+		pos: makeEmptyPos(),
+		lhs: lhs,
+		rhs: rhs,
+		exprType: type,
 	};
 }
 
 
-function makeBinaryNumberNode(lhs: Node, rhs: Node) : BinaryOpMinusNode {
+function makeBinaryNumberNode(lhs: Node, rhs: Node) : BinaryOpNode {
 	return {
-		type: 'binary_op',
-		op: 'minus',
+		exprNodeType: 'binary_op',
+		binaryOp: 'minus',
 		pos: makeEmptyPos(),
 		lhs: lhs,
 		rhs: rhs,
@@ -165,10 +173,14 @@ function makeTypedBinaryNumberNode(
 	lhs: TypedNode,
 	rhs: TypedNode,
 	type: InferredType
-) : TypedBinaryOpMinusNode {
+) : TypedBinaryOpNode {
 	return {
-		...makeBinaryNumberNode(lhs, rhs),
-		expressionType: type,
+		exprNodeType: 'binary_op',
+		binaryOp: 'minus',
+		pos: makeEmptyPos(),
+		lhs: lhs,
+		rhs: rhs,
+		exprType: type,
 	};
 }
 
@@ -177,7 +189,7 @@ function makeFunctionInvocationNode(
 	parameters: Node[],
 ) : FunctionInvocationNode {
 	return {
-		type: 'function_invocation',
+		exprNodeType: 'function_invocation',
 		name: name,
 		pos: makeEmptyPos(),
 		parameters,
@@ -187,11 +199,14 @@ function makeFunctionInvocationNode(
 function makeTypedFunctionInvocationNode(
 	name: string,
 	parameters: TypedNode[],
-	type: InferredType
+	type: 'error' | 'string'
 ) : TypedFunctionInvocationNode {
 	return {
-		...makeFunctionInvocationNode(name, parameters),
-		expressionType: type,
+		exprNodeType: 'function_invocation',
+		name: name,
+		pos: makeEmptyPos(),
+		parameters,
+		exprType: type,
 	};
 }
 
