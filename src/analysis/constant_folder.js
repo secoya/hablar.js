@@ -1,7 +1,7 @@
 /**
  * @flow
  */
-
+/*
 import type {Node} from '../trees/expression';
 import type {Node as TextNode, Pos} from '../trees/text';
 
@@ -220,3 +220,4 @@ export default function constantFoldExpressionList(nodes: TextNode[], originalTe
 
 	return result;
 }
+*/
