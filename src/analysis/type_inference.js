@@ -243,6 +243,9 @@ function inferExprType(
 		case 'binary_op': {
 			switch (node.op) {
 				case 'plus': {
+					if (resultType !== 'number' || resultType == null) {
+						resultType = 'number-or-string';
+					}
 					const lhs = inferExprType(typeMap, node.lhs, location, resultType);
 					const rhs = inferExprType(typeMap, node.rhs, location, resultType);
 
