@@ -6,9 +6,9 @@
   "scripts": {
     "build": "rm -rf lib && babel src --out-dir lib && mkdir lib/parsers/grammars && (cd lib/parsers/grammars; find ../../../src/parsers/grammars -iname '*.jison' -exec jison -m commonjs {} \\;)",
     "prepublish": "npm run verify && npm run build",
-    "lint": "eslint src test",
+    "lint": "eslint src test flow-typed",
     "test": "./mocha.sh",
-    "verify": "eslint src test && flow check && ./mocha.sh"
+    "verify": "npm run lint && flow check && npm test"
   },
   "author": "Kaare Hoff Skovgaard <khs@secoya.dk>",
   "license": "Apache-2.0",
