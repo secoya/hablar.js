@@ -76,7 +76,39 @@ export type TypeInfo = {
 
 export default class TypeMap {
 	_map: Map<string, TypeInfo>;
+	_frozen: boolean;
 	size: number;
+
+	constructor() {
+		Object.defineProperty(
+			this,
+			'_map',
+			{
+				configurable: false,
+				enumerable: false,
+				value: new Map(),
+				writable: false,
+			}
+		);
+
+		// Flow thinks this is invalid as value undefined
+		// is not a number. However the getter will always
+		// return a correct value.
+		// $FlowFixMe
+		Object.defineProperty(
+			this,
+			'size',
+			{
+				configurable: false,
+				enumerable: false,
+				get: () => {
+					return this._map.size;
+				},
+			}
+		);
+
+		this._frozen = false;
+	}
 
 	static mergeTypeInfo(existingType: InferredType, newType: InferredType) : InferredType {
 		if (newType === 'unknown') {
@@ -141,32 +173,10 @@ export default class TypeMap {
 		}
 	}
 
-	constructor() {
-		Object.defineProperty(
-			this,
-			'_map',
-			{
-				configurable: false,
-				enumerable: false,
-				value: new Map(),
-				writable: false,
-			}
-		);
-
-		// Flow thinks this is invalid as value undefined
-		// is not a number. However the getter will always
-		// return a correct value.
-		// $FlowFixMe
-		Object.defineProperty(
-			this,
-			'size',
-			{
-				configurable: false,
-				enumerable: false,
-				get: () => {
-					return this._map.size;
-				},
-			});
+	_throwIfFrozen(errMsg: string) : void {
+		if (this._frozen) {
+			throw new Error(errMsg);
+		}
 	}
 
 	getVariableTypeInfo(variable: string) : TypeInfo {
@@ -175,6 +185,8 @@ export default class TypeMap {
 		if (usage != null) {
 			return usage;
 		}
+
+		this._throwIfFrozen('Trying to get type info for unknown type: ' + variable);
 
 		usage = {
 			usages: [],
@@ -197,11 +209,22 @@ export default class TypeMap {
 		return Array.from(this._map.keys());
 	}
 
+	freeze() : void {
+		this._frozen = true;
+	}
+
+	isFrozen() : boolean {
+		return this._frozen;
+	}
+
 	addTypeUsage(
 		variable: string,
 		type: InferredType,
 		usage: TypeUsage
 	) : InferredType {
+		this._throwIfFrozen(
+			`Cannot add type usage for ${variable} when type map is frozen`
+		);
 		const info = this.getVariableTypeInfo(variable);
 		info.type = TypeMap.mergeTypeInfo(info.type, type);
 		info.usages.push(usage);
