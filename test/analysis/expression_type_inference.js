@@ -222,6 +222,7 @@ describe('Type inference', function() {
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('number-or-string', info.type);
@@ -250,6 +251,7 @@ describe('Type inference', function() {
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('number-or-string', info.type);
@@ -276,6 +278,7 @@ describe('Type inference', function() {
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('number-or-string', info.type);
@@ -307,6 +310,7 @@ describe('Type inference', function() {
 				});
 
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('number', info.type);
@@ -333,6 +337,7 @@ describe('Type inference', function() {
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('number', info.type);
@@ -358,6 +363,7 @@ describe('Type inference', function() {
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('number', info.type);
@@ -386,6 +392,7 @@ describe('Type inference', function() {
 			const typeMap = new TypeMap();
 
 			infer.inferExpressionTypes(typeMap, node, location);
+			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
 
@@ -413,6 +420,7 @@ describe('Type inference', function() {
 			const typeMap = new TypeMap();
 
 			infer.inferExpressionTypes(typeMap, node, location);
+			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
 			assert.equal('number', info.type);
@@ -443,6 +451,7 @@ describe('Type inference', function() {
 
 			const typeMap = new TypeMap();
 			infer.inferExpressionTypes(typeMap, node, location);
+			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
 			assert.equal('number', info.type);
@@ -477,6 +486,7 @@ describe('Type inference', function() {
 				});
 
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('error', info.type);
@@ -506,6 +516,7 @@ describe('Type inference', function() {
 				});
 
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('error', info.type);
@@ -536,6 +547,7 @@ describe('Type inference', function() {
 				});
 
 				infer.inferExpressionTypes(typeMap, node, location);
+				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
 				assert.equal('error', info.type);
@@ -564,6 +576,7 @@ describe('Type inference', function() {
 			const typeMap = new TypeMap();
 
 			infer.inferExpressionTypes(typeMap, node, location);
+			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
 			assert.equal('unknown', info.type);
@@ -593,6 +606,7 @@ describe('Type inference', function() {
 
 			const typeMap = new TypeMap();
 			infer.inferExpressionTypes(typeMap, node, location);
+			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
 			assert.equal('unknown', info.type);

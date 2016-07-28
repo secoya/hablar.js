@@ -385,8 +385,12 @@ export function makeTypedExpressionTree(
 	node: TypedExprNode,
 	errors: TypeError[],
 } {
+	if (!typeMap.isFrozen()) {
+		throw new Error('Type map passed must be frozen. Use TypeMap.freeze()');
+	}
 	const errors = [];
-	const typedNode = makeTypedExpressionNode(node, typeMap, (
+
+	const addError = (
 		expectedTypes: InferredType | InferredType[],
 		foundType: InferredType,
 		node: ExprNode
@@ -402,7 +406,9 @@ export function makeTypedExpressionTree(
 			node,
 		};
 		errors.push(new TypeError(expectedTypes, foundType, typeMap, nodeInfo));
-	});
+	};
+
+	const typedNode = makeTypedExpressionNode(node, typeMap, addError);
 
 	return {
 		node: typedNode,
