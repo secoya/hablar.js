@@ -1,0 +1,34 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "quotemark": [true, "single", "avoid-escape"],
+        "indent": [true, "tabs"],
+        "ordered-imports": [
+            true,
+            {
+                "import-sourced-order": "lowercase-first",
+                "named-imports-order": "lowercase-first"
+            }
+        ],
+        "no-var-requires": true,
+        "no-unsafe-finally": true,
+        "triple-equals": [
+            true,
+            "allow-null-check"
+        ],
+        "linebreak-style": [true, "LF"],
+        "arrow-parens": true,
+        "comment-format": [
+            true,
+            "check-space"
+        ],
+        "class-name": true,
+        "new-parens": true,
+        "jsdoc-format": true,
+        "no-angle-bracket-type-assertion": true,
+        "object-literal-key-quotes": [
+            true,
+            "as-needed"
+        ]
+    }
+}

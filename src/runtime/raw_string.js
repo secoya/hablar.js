@@ -1,18 +1,14 @@
-/**
- * @flow
- */
-
-function RawString(str: string) : RawString {
+function RawString(str) {
 	this._contents = str;
 
 	return this;
 }
 
-RawString.prototype.toString = function() : string {
+RawString.prototype.toString = function() {
 	return this._contents;
 };
 
-RawString.prototype.valueOf = function() : string {
+RawString.prototype.valueOf = function() {
 	return this._contents;
 };
 

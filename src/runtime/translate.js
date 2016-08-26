@@ -1,10 +1,6 @@
-/**
- * @flow
- */
-
 type TranslationContext = {
 	encode: (str: string) => string,
-	isSafeString: (str: mixed) => bool,
+	isSafeString: (str: mixed) => boolean,
 	convertSafeString: (str: mixed) => string,
 	makeSafeString: (str: string) => mixed
 };

@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "strictNullChecks": true,
+        "module": "commonjs",
+        "target": "es6",
+        "declaration": true,
+        "noEmit": false,
+        "newLine": "LF",
+        "outDir": "lib",
+        "noImplicitAny": true,
+        "allowJs": false,
+        "moduleResolution": "node"
+    },
+    "files": [
+        "types/ast-types.d.ts",
+        "types/recast.d.ts",
+        "types/jison.d.ts",
+        "src/index.ts"
+    ]
+}

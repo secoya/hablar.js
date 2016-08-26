@@ -7,4 +7,4 @@
 mocha="./node_modules/.bin/mocha"
 substitution='s/\x1b\[90m/\x1b[92m/g'
 
-$mocha -c --recursive test > >(perl -pe "$substitution") 2> >(perl -pe "$substitution" 1>&2)
+$mocha --harmony --es-staging -c --recursive test > >(perl -pe "$substitution") 2> >(perl -pe "$substitution" 1>&2)

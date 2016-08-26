@@ -1,9 +1,5 @@
-/**
- * @flow
- */
-
 const RawString = require('./raw_string');
 
-module.exports = function(maybeRawString: mixed) : boolean {
+module.exports = function(maybeRawString) {
 	return maybeRawString instanceof RawString;
 };
