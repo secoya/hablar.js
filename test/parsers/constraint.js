@@ -45,9 +45,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple numeric greater than or equals constraint', function() {
@@ -86,9 +85,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple numeric less than constraint', function() {
@@ -127,9 +125,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple numeric less than or equals constraint', function() {
@@ -168,9 +165,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple numeric equals constraint', function() {
@@ -209,9 +205,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple numeric not-equals constraint', function() {
@@ -250,9 +245,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		describe('Floats', function() {
@@ -292,9 +286,8 @@ describe('Constraint parser', function() {
 							},
 						},
 					],
-					parsed.constraints
+					parsed
 				);
-				assert.sameMembers(['n'], parsed.variables);
 			});
 			describe('Fail cases', function() {
 				it('Should reject floating point number in scientific notation', function() {
@@ -353,9 +346,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple gender maskulin equals constraint', function() {
@@ -394,9 +386,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple gender neutral equals constraint', function() {
@@ -435,9 +426,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple gender not-equals constraint', function() {
@@ -477,9 +467,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		describe('Fail cases', function() {
@@ -532,9 +521,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse simple string-enum not-equals constraint', function() {
@@ -574,9 +562,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		describe('Fail cases', function() {
@@ -630,9 +617,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 	});
 
@@ -702,9 +688,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n'], parsed.variables);
 		});
 
 		it('Should parse multiple constraints with multiple variables', function() {
@@ -772,9 +757,8 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed.constraints
+				parsed
 			);
-			assert.sameMembers(['n', 'i'], parsed.variables);
 		});
 
 		describe('Fail cases', function() {

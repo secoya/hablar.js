@@ -46,7 +46,7 @@ describe('Emitting - Type guards', function() {
 			const stmt = getTypeGuardStatement('myVar', 'string', ctx);
 
 			const expected =
-				`if (typeof(vars.myVar) !== "string") {
+				`if (typeof(vars.myVar) !== "string" && !ctx.isSafeString(vars.myVar)) {
     throw new Error("Variable myVar must be of type string");
 }`
 			;
@@ -72,7 +72,7 @@ describe('Emitting - Type guards', function() {
 			const stmt = getTypeGuardStatement('myVar', 'number-or-string', ctx);
 
 			const expected =
-				`if (!((_ = typeof(vars.myVar)) === "string" || _ === "number")) {
+				`if (!((_ = typeof(vars.myVar)) === "string" || _ === "number" || ctx.isSafeString(vars.myVar))) {
     throw new Error("Variable myVar must be of type number-or-string");
 }`
 			;

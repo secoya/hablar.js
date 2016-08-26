@@ -4,6 +4,7 @@
 
 import type {
 	Node as TextNode,
+	TypedNode as TypedTextNode,
 	VariableNode as TextVariableNode,
 } from '../trees/text';
 
@@ -24,6 +25,7 @@ import type {
 	default as TypeMap,
 	InferredType,
 	ExprLocation,
+	TextLocation,
 } from '../type_map';
 
 function addConstraintTypeUsageForNode(
@@ -425,6 +427,88 @@ export function makeTypedExpressionTree(
 
 	return {
 		node: typedNode,
+		errors: errors,
+	};
+}
+
+export function makeTypedExpressionList(typeMap: TypeMap, nodes: TextNode[], constraintNodes?: ConstraintNode[]) : {
+	translation: TypedTextNode[],
+	errors: TypeError[],
+} {
+	const location : TextLocation = {
+		textNodes: nodes,
+		constraintNodes: constraintNodes,
+	};
+
+	if (!typeMap.isFrozen()) {
+		throw new Error('Type map passed must be frozen. Use TypeMap.freeze()');
+	}
+
+	let errors = [];
+	const result = [];
+
+	const addError = (
+		expectedTypes: InferredType | InferredType[],
+		foundType: InferredType,
+		node: TextNode
+	) => {
+		if (foundType === 'error') {
+			// We only log the error at the leaf of the expression
+			// tree. So avoid reporting it all the way up the tree.
+			return;
+		}
+		const nodeInfo = {
+			type: 'text',
+			location,
+			node,
+		};
+		errors.push(new TypeError(expectedTypes, foundType, typeMap, nodeInfo));
+	};
+
+	for (const node of nodes) {
+		if (node.textNodeType === 'literal') {
+			result.push({
+				textNodeType: 'literal',
+				pos: node.pos,
+				typed: true,
+				textType: 'string',
+				value: node.value,
+			});
+		} else if (node.textNodeType === 'variable') {
+			const type = typeMap.getVariableType(node.value);
+
+			if (type !== 'number' && type !== 'number-or-string' && type !== 'string') {
+				addError(['string', 'number', 'number-or-string'], type, node);
+			}
+
+			result.push({
+				textNodeType: 'variable',
+				pos: node.pos,
+				typed: true,
+				textType: type,
+				value: node.value,
+			});
+		} else if (node.textNodeType === 'expr') {
+			const exprRes = makeTypedExpressionTree(typeMap, node.value, location);
+
+			if (exprRes.errors.length > 0) {
+				errors = errors.concat(exprRes.errors);
+			}
+
+			result.push({
+				textNodeType: 'expr',
+				pos: node.pos,
+				typed: true,
+				textType: exprRes.node.exprType,
+				value: exprRes.node,
+			});
+		} else {
+			throw new Error('Unknown text node type: ' + node.textType);
+		}
+	}
+
+	return {
+		translation: result,
 		errors: errors,
 	};
 }

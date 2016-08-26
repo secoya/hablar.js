@@ -6,7 +6,7 @@
 import {assert} from 'chai';
 
 import {
-	emitTranslation,
+	emitSimpleTranslation,
 	emitConstrainedTranslations,
 } from '../../src/emitting/translation';
 import type {
@@ -134,7 +134,7 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
 
 		assert.equal('"Some text"', res.code);
 	});
@@ -150,10 +150,10 @@ describe('Emitting - translation', function() {
 
 		const ctx = new Context();
 
-		const res = prettyPrint(emitTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
 
 		const expected = `function(vars, fns, ctx) {
-    if (typeof(vars.myVar) !== "string") {
+    if (typeof(vars.myVar) !== "string" && !ctx.isSafeString(vars.myVar)) {
         throw new Error("Variable myVar must be of type string");
     }
 
@@ -173,12 +173,12 @@ describe('Emitting - translation', function() {
 
 		const ctx = new Context();
 
-		const res = prettyPrint(emitTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
 
 		const expected = `function(vars, fns, ctx) {
     var _;
 
-    if (!((_ = typeof(vars.myVar)) === "string" || _ === "number")) {
+    if (!((_ = typeof(vars.myVar)) === "string" || _ === "number" || ctx.isSafeString(vars.myVar))) {
         throw new Error("Variable myVar must be of type number-or-string");
     }
 
@@ -194,10 +194,10 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
 
 		const expected = `function(vars, fns, ctx) {
-    return "" + vars.myVar;
+    return ctx.encode("" + vars.myVar);
 }`;
 		assert.equal(expected, res.code);
 	});
@@ -210,10 +210,10 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
 
 		const expected = `function(vars, fns, ctx) {
-    return ctx.encode("Some number: ") + vars.myVar;
+    return ctx.encode("Some number: " + vars.myVar);
 }`;
 		assert.equal(expected, res.code);
 	});
@@ -226,10 +226,10 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
 
 		const expected = `function(vars, fns, ctx) {
-    return ctx.encode("Some number: ") + vars.myVar;
+    return ctx.encode("Some number: " + vars.myVar);
 }`;
 		assert.equal(expected, res.code);
 	});
@@ -242,10 +242,10 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
 
 		const expected = `function(vars, fns, ctx) {
-    return "" + vars.myOtherVar + vars.myVar;
+    return ctx.encode("" + vars.myOtherVar + vars.myVar);
 }`;
 		assert.equal(expected, res.code);
 	});
@@ -257,7 +257,7 @@ describe('Emitting - translation', function() {
 					constraints: [
 						cignore('someVar'),
 					],
-					nodes: [
+					translation: [
 						tn('Some translation'),
 					],
 				},
@@ -279,7 +279,7 @@ describe('Emitting - translation', function() {
 					constraints: [
 						ceq('=', 'someVar', 5),
 					],
-					nodes: [
+					translation: [
 						tn('Some translation'),
 					],
 				},
@@ -307,7 +307,7 @@ describe('Emitting - translation', function() {
 					constraints: [
 						ceq('=', 'someVar', 5),
 					],
-					nodes: [
+					translation: [
 						tn('Some translation'),
 					],
 				},
@@ -315,7 +315,7 @@ describe('Emitting - translation', function() {
 					constraints: [
 						ceq('=', 'someVar', 10),
 					],
-					nodes: [
+					translation: [
 						tn('Some other translation'),
 					],
 				},
@@ -323,7 +323,7 @@ describe('Emitting - translation', function() {
 					constraints: [
 						cignore('someVar'),
 					],
-					nodes: [
+					translation: [
 						tn('Some default translation'),
 					],
 				},

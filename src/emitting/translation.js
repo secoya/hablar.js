@@ -60,7 +60,8 @@ export function emitNodeListExpression(
 ) : Expression {
 	const exprs : Array<{
 		type: 'string' | 'number',
-		exp: Expression
+		exp: Expression,
+		isConstant: bool,
 	}> = [];
 
 	for (const node of nodes) {
@@ -68,7 +69,8 @@ export function emitNodeListExpression(
 			case 'literal':
 				exprs.push({
 					type: 'string',
-					exp: encodeString(b.literal(node.value), ctx),
+					exp: b.literal(node.value),
+					isConstant: true,
 				});
 				break;
 			case 'variable': {
@@ -81,11 +83,12 @@ export function emitNodeListExpression(
 				if (
 					node.textType !== 'number'
 				) {
-					varExp = encodeIfString(varExp, ctx);
+					varExp = varExp;
 				}
 				exprs.push({
 					type: node.textType === 'number' ? 'number' : 'string',
 					exp: varExp,
+					isConstant: false,
 				});
 				break;
 			}
@@ -98,6 +101,7 @@ export function emitNodeListExpression(
 				exprs.push({
 					type: node.value.exprType === 'number' ? 'number' : 'string',
 					exp: varExp,
+					isConstant: false,
 				});
 				break;
 			}
@@ -106,43 +110,46 @@ export function emitNodeListExpression(
 		}
 	}
 
-	const res = exprs.reduce((acc, info) => {
-		if (acc === null) {
-			return info;
+	const encodeGroup = (group: Expression) : Expression => {
+		return encodeString(group, ctx);
+	};
+
+	const encodedExprGroups : Expression[] = [];
+	let currentGroup : ? Expression = null;
+	for (const expr of exprs) {
+		if (currentGroup == null) {
+			if (expr.type === 'number') {
+				currentGroup = b.binaryExpression('+', b.literal(''), expr.exp);
+			} else if (expr.isConstant) {
+				currentGroup = expr.exp;
+			} else {
+				encodedExprGroups.push(encodeIfString(expr.exp, ctx));
+			}
+			continue;
 		}
 
-		const accExp = acc.type === 'number' && info.type === 'number' ?
-			b.binaryExpression(
-				'+',
-				b.literal(''),
-				acc.exp
-			) :
-			acc.exp;
-		return {
-			type: 'string',
-			exp: b.binaryExpression(
-				'+',
-				accExp,
-				info.exp
-			),
-		};
-	}, null);
-
-	if (res === null) {
-		return b.literal('');
+		if (expr.isConstant || expr.type === 'number') {
+			currentGroup = b.binaryExpression('+', currentGroup, expr.exp);
+		} else {
+			encodedExprGroups.push(encodeGroup(currentGroup));
+			currentGroup = null;
+			encodedExprGroups.push(encodeIfString(expr.exp, ctx));
+		}
 	}
 
-	// This can only happen when only a single expression/varaible
-	// was present, that is a number
-	if (res.type === 'number') {
-		res.exp = b.binaryExpression(
-			'+',
-			b.literal(''),
-			res.exp
-		);
+	if (currentGroup != null) {
+		encodedExprGroups.push(encodeGroup(currentGroup));
 	}
 
-	return res.exp;
+	const init = b.literal('');
+
+	return encodedExprGroups.reduce((acc, e) => {
+		if (acc === init) {
+			return e;
+		}
+
+		return b.binaryExpression('+', acc, e);
+	}, init);
 }
 
 function getTypeGuards(
@@ -173,7 +180,7 @@ function getTypeGuards(
 export function emitConstrainedTranslations(
 	translations: Array<{
 		constraints: ConstraintNode[],
-		nodes: TypedNode[],
+		translation: TypedNode[],
 	}>,
 	ctx: Context,
 	typeMap: TypeMap
@@ -186,7 +193,7 @@ export function emitConstrainedTranslations(
 
 	let unconditionallyReturned = false;
 	for (const translation of translations) {
-		const expr = emitNodeListExpression(translation.nodes, ctx);
+		const expr = emitNodeListExpression(translation.translation, ctx);
 
 		const stmt = emitConstrainedTranslation(translation.constraints, expr, ctx);
 
@@ -221,7 +228,7 @@ export function emitConstrainedTranslations(
 	);
 }
 
-export function emitTranslation(
+export function emitSimpleTranslation(
 	nodes: TypedNode[],
 	ctx: Context,
 	typeMap: TypeMap
@@ -249,4 +256,31 @@ export function emitTranslation(
 		],
 		b.blockStatement(statements)
 	);
+}
+
+export type SimpleTranslation = TypedNode[];
+// $FlowFixMe: Flow cannot deal with this union
+export type ConstraintTranslation = Array<{
+	constraints: ConstraintNode[],
+	translation: TypedNode[]
+}>;
+
+export type Translation = SimpleTranslation | ConstraintTranslation;
+
+export function emitTranslation(
+	translation: Translation,
+	ctx: Context,
+	typeMap: TypeMap
+) : Expression {
+	if (translation.length === 0) {
+		return b.literal('');
+	}
+
+	if (translation[0].textNodeType !== undefined) {
+		const tr : SimpleTranslation = translation;
+		return emitSimpleTranslation(tr, ctx, typeMap);
+	} else {
+		const tr : ConstraintTranslation = translation;
+		return emitConstrainedTranslations(tr, ctx, typeMap);
+	}
 }

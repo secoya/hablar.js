@@ -38,6 +38,11 @@ export type ExprLocation = {
 	constraintNodes: ?ConstraintNode[],
 };
 
+export type TextLocation = {
+	textNodes: TextNode[],
+	constraintNodes: ?ConstraintNode[],
+};
+
 export type ExpressionTypeUsage = {
 	nodeType: 'expression',
 	node: ExprNode,
@@ -48,10 +53,7 @@ export type ExpressionTypeUsage = {
 export type TextTypeUsage = {
 	nodeType: 'text',
 	node: TextNode,
-	location: {
-		textNodes: TextNode[],
-		constraintNodes: ?ConstraintNode[],
-	},
+	location: TextLocation,
 	type: 'number-or-string',
 }
 

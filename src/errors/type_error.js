@@ -55,6 +55,18 @@ type NodeInfo =
 
 import type TypeMap from '../type_map';
 
+function printTypes(t: InferredType | InferredType[]) : string {
+	if (Array.isArray(t)) {
+		return t.map(printType).join(', ');
+	}
+
+	return printType(t);
+}
+
+function printType(t: InferredType) : string {
+	return t;
+}
+
 export default function TypeError(
 	expectedTypes: InferredType | InferredType[],
 	foundType: InferredType,
@@ -62,8 +74,11 @@ export default function TypeError(
 	nodeInfo: NodeInfo
 ) : TypeError {
 	// $FlowFixMe I cannot get ES6 subclasses to work.
-	Error.call(this, 'Fix some future error message here');
+	Error.call(this);
 	Error.captureStackTrace(this, TypeError);
+	this.message = '' +
+		`Caught type error. Expected one of types: ${printTypes(expectedTypes)}. ` +
+		`Found type ${printType(foundType)}. At node: ${JSON.stringify(nodeInfo.node)}`;
 	return this;
 }
 

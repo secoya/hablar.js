@@ -1,7 +1,8 @@
 declare module 'chai' {
 	declare var assert: {
 		equal<T>(expected: T, actual: T, errMsg?: string) : void,
-		throws<T>(fn: () => T) : void,
+		throws<T>(fn: () => T, constructor?: Function) : void,
+		doesNotThrow<T>(fn: () => T, constructor?: Function) : void,
 		deepEqual<T>(expected: T, actual: T, errMsg?: string) : void,
 		sameMembers<T>(expected: T[], actual: T[], errMsg?: string) : void,
 		isTrue(actual: bool, errMsg?: string) : void,

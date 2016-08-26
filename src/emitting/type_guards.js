@@ -52,8 +52,46 @@ function getNegativeTypeTest(
 			);
 			return b.unaryExpression('!', hasOwnProperty, true);
 		}
-		case 'string': // FALLTHROUGH
-		case 'enum':
+		case 'string': {
+			const paramExpr = b.memberExpression(
+				ctx.varsExpr,
+				b.identifier(varName),
+				false
+			);
+
+			const typeOf = b.callExpression(
+				b.identifier('typeof'),
+				[paramExpr]
+			);
+
+			const isString = b.binaryExpression(
+				'!==',
+				typeOf,
+				b.literal('string')
+			);
+
+			const isSafeString = b.callExpression(
+				b.memberExpression(
+					ctx.ctxExpr,
+					b.identifier('isSafeString'),
+					false
+				),
+				[paramExpr]
+			);
+
+			const isNotSafeString = b.unaryExpression(
+				'!',
+				isSafeString,
+				true
+			);
+
+			return b.logicalExpression(
+				'&&',
+				isString,
+				isNotSafeString
+			);
+		}
+		case 'enum': // FALLTHROUGH
 		case 'number': {
 			const paramExpr = b.memberExpression(
 				ctx.varsExpr,
@@ -114,11 +152,22 @@ function getNegativeTypeTest(
 				isNumber
 			);
 
-			return b.unaryExpression(
-				'!',
-				numberOrString,
-				true
+			const isSafeString = b.callExpression(
+				b.memberExpression(
+					ctx.ctxExpr,
+					b.identifier('isSafeString'),
+					false
+				),
+				[paramExpr]
 			);
+
+			const isGoodValue = b.logicalExpression(
+				'||',
+				numberOrString,
+				isSafeString
+			);
+
+			return b.unaryExpression('!', isGoodValue, true);
 		}
 		case 'gender': {
 			const paramExpr = b.memberExpression(
