@@ -100,7 +100,7 @@ function makeEnumNode(variable: string, op: '=' | '!=' = '=') : Node {
 function makeGenderNode(variable: string, op: '=' | '!=' = '=') : Node {
 	const genderNode : GenderNode = {
 		type: 'gender',
-		gender: 'F',
+		value: 'F',
 		pos: makeEmptyPos(),
 	};
 

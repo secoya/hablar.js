@@ -51,9 +51,9 @@ ineq_op
     ;
 
 gender_expr
-    : GENDER_FEMINUM { $$ = {type: 'gender', gender: 'F', pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
-    | GENDER_MASKULINUM { $$ = {type: 'gender', gender: 'M', pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
-    | GENDER_NEUTRUM { $$ = {type: 'gender', gender: 'N', pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
+    : GENDER_FEMINUM { $$ = {type: 'gender', value: 'F', pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
+    | GENDER_MASKULINUM { $$ = {type: 'gender', value: 'M', pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
+    | GENDER_NEUTRUM { $$ = {type: 'gender', value: 'N', pos: { firstLine: @1.first_line, firstColumn: @1.first_column, lastLine: @1.last_line, lastColumn: @1.last_column } }; }
     ;
 
 id

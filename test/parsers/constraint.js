@@ -337,7 +337,7 @@ describe('Constraint parser', function() {
 						},
 						rhs: {
 							type: 'gender',
-							gender: 'F',
+							value: 'F',
 							pos: {
 								firstLine: 1,
 								firstColumn: 2,
@@ -378,7 +378,7 @@ describe('Constraint parser', function() {
 						},
 						rhs: {
 							type: 'gender',
-							gender: 'M',
+							value: 'M',
 							pos: {
 								firstLine: 1,
 								firstColumn: 2,
@@ -419,7 +419,7 @@ describe('Constraint parser', function() {
 						},
 						rhs: {
 							type: 'gender',
-							gender: 'N',
+							value: 'N',
 							pos: {
 								firstLine: 1,
 								firstColumn: 2,
@@ -461,7 +461,7 @@ describe('Constraint parser', function() {
 						},
 						rhs: {
 							type: 'gender',
-							gender: 'M',
+							value: 'M',
 							pos: {
 								firstLine: 1,
 								firstColumn: 5,

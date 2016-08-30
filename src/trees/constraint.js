@@ -22,7 +22,7 @@ export type IdentifierNode = {
 
 export type GenderNode = {
 	type: 'gender',
-	gender: 'F' | 'N' | 'M',
+	value: 'F' | 'N' | 'M',
 	pos: Pos,
 }
 
