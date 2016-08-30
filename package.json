@@ -6,14 +6,15 @@
   "scripts": {
     "build": "rm -rf lib && babel src --out-dir lib && mkdir lib/parsers/grammars && (cd lib/parsers/grammars; find ../../../src/parsers/grammars -iname '*.jison' -exec jison -m commonjs {} \\;)",
     "prepublish": "npm run verify && npm run build",
-    "lint": "eslint src test flow-typed",
+    "lint": "eslint src test",
     "test": "./mocha.sh",
     "verify": "npm run lint && flow check && npm test"
   },
   "author": "Kaare Hoff Skovgaard <khs@secoya.dk>",
   "license": "Apache-2.0",
   "dependencies": {
-    "babel-runtime": "^6.9.2"
+    "babel-runtime": "^6.9.2",
+    "recast": "0.11.10"
   },
   "devDependencies": {
     "babel": "6.5.2",
