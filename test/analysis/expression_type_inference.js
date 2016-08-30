@@ -240,6 +240,8 @@ describe('Type inference', function() {
 
 				assert.deepEqual(typedNode, typeInfo.node);
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 
 			it('Should infer var+"hello" as number-or-string', function() {
@@ -266,6 +268,8 @@ describe('Type inference', function() {
 
 				assert.deepEqual(typedNode, typeInfo.node);
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 
 			it('Should infer both vars in var+var2 as number-or-string', function() {
@@ -295,6 +299,8 @@ describe('Type inference', function() {
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 				assert.deepEqual(typedNode, typeInfo.node);
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 
 			it('Should infer var+5 where var is number as number', function() {
@@ -324,6 +330,8 @@ describe('Type inference', function() {
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 				assert.deepEqual(typedNode, typeInfo.node);
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 		});
 
@@ -351,6 +359,8 @@ describe('Type inference', function() {
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 				assert.deepEqual(typedNode, typeInfo.node);
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 
 			it('Should infers both vars in var-var2 as number', function() {
@@ -380,6 +390,8 @@ describe('Type inference', function() {
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 				assert.deepEqual(typedNode, typeInfo.node);
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 		});
 	});
@@ -406,6 +418,8 @@ describe('Type inference', function() {
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 			assert.deepEqual(typedNode, typeInfo.node);
 			assert.equal(0, typeInfo.errors.length);
+
+			assert.equal(0, Array.from(typeMap.functionNames()).length);
 		});
 
 		it('Should infer -(var+5) as number', function() {
@@ -437,6 +451,8 @@ describe('Type inference', function() {
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 			assert.deepEqual(typedNode, typeInfo.node);
 			assert.equal(0, typeInfo.errors.length);
+
+			assert.equal(0, Array.from(typeMap.functionNames()).length);
 		});
 
 		it('Should infer both vars in -(var+var2) as number', function() {
@@ -471,6 +487,8 @@ describe('Type inference', function() {
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 			assert.deepEqual(typedNode, typeInfo.node);
 			assert.equal(0, typeInfo.errors.length);
+
+			assert.equal(0, Array.from(typeMap.functionNames()).length);
 		});
 
 		describe('Fail cases', function() {
@@ -502,6 +520,8 @@ describe('Type inference', function() {
 				// variables and sees if their type is error.
 				// And logs that as an error, but for now this is not implemented.
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 
 			it('Should fail to unify number with enum', function() {
@@ -532,6 +552,8 @@ describe('Type inference', function() {
 				// variables and sees if their type is error.
 				// And logs that as an error, but for now this is not implemented.
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 
 			it('Should fail to unify number with gender', function() {
@@ -563,6 +585,8 @@ describe('Type inference', function() {
 				// variables and sees if their type is error.
 				// And logs that as an error, but for now this is not implemented.
 				assert.equal(0, typeInfo.errors.length);
+
+				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 		});
 	});
@@ -590,6 +614,8 @@ describe('Type inference', function() {
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 			assert.deepEqual(typedNode, typeInfo.node);
 			assert.equal(0, typeInfo.errors.length);
+
+			assert.sameMembers(['fn'], Array.from(typeMap.functionNames()));
 		});
 
 		it('Will infer unknown for multiple variables used as parameters', function() {
@@ -626,6 +652,8 @@ describe('Type inference', function() {
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
 			assert.deepEqual(typedNode, typeInfo.node);
 			assert.equal(0, typeInfo.errors.length);
+
+			assert.sameMembers(['fn'], Array.from(typeMap.functionNames()));
 		});
 	});
 });

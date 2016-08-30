@@ -76,6 +76,7 @@ export type TypeInfo = {
 
 export default class TypeMap {
 	_map: Map<string, TypeInfo>;
+	_functions: Set<string>;
 	_frozen: boolean;
 	size: number;
 
@@ -100,10 +101,21 @@ export default class TypeMap {
 			'size',
 			{
 				configurable: false,
-				enumerable: false,
+				enumerable: true,
 				get: () => {
 					return this._map.size;
 				},
+			}
+		);
+
+		Object.defineProperty(
+			this,
+			'_functions',
+			{
+				configurable: false,
+				enumerable: false,
+				writable: false,
+				value: new Set(),
 			}
 		);
 
@@ -230,5 +242,16 @@ export default class TypeMap {
 		info.usages.push(usage);
 
 		return info.type;
+	}
+
+	addFunction(functionName: string) : void {
+		this._throwIfFrozen(
+			`Cannot add function ${functionName} after map is frozen`
+		);
+		this._functions.add(functionName);
+	}
+
+	functionNames() : Iterator<string> {
+		return this._functions.values();
 	}
 }

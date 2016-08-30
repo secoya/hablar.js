@@ -128,6 +128,7 @@ function inferExprType(
 			for (const param of node.parameters) {
 				inferExprType(typeMap, param, location);
 			}
+			typeMap.addFunction(node.name);
 			return 'unknown';
 		case 'binary_op': {
 			switch (node.binaryOp) {
