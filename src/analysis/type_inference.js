@@ -224,6 +224,8 @@ function makeTypedExpressionNode(
 			value: node.value,
 			pos: node.pos,
 			exprType: 'string',
+			typed: true,
+			isConstant: true,
 		};
 	} else if (node.exprNodeType === 'number') {
 		return {
@@ -231,6 +233,8 @@ function makeTypedExpressionNode(
 			value: node.value,
 			pos: node.pos,
 			exprType: 'number',
+			typed: true,
+			isConstant: true,
 		};
 	} else if (node.exprNodeType === 'variable') {
 		if (!typeMap.hasInfoForType(node.name)) {
@@ -254,6 +258,8 @@ function makeTypedExpressionNode(
 			name: node.name,
 			pos: node.pos,
 			exprType: type,
+			typed: true,
+			isConstant: false,
 		};
 	} else if (node.exprNodeType === 'unary_minus') {
 		const typedOp = makeTypedExpressionNode(node.op, typeMap, addError);
@@ -271,6 +277,8 @@ function makeTypedExpressionNode(
 			op: typedOp,
 			pos: node.pos,
 			exprType: exprType,
+			typed: true,
+			isConstant: typedOp.isConstant,
 		};
 	} else if (node.exprNodeType === 'binary_op') {
 		const typedLhs = makeTypedExpressionNode(node.lhs, typeMap, addError);
@@ -286,6 +294,8 @@ function makeTypedExpressionNode(
 				rhs: typedRhs,
 				pos: node.pos,
 				exprType: type,
+				typed: true,
+				isConstant: typedLhs.isConstant && typedRhs.isConstant,
 			};
 		};
 
@@ -372,6 +382,8 @@ function makeTypedExpressionNode(
 			pos: node.pos,
 			name: node.name,
 			exprType: type,
+			typed: true,
+			isConstant: false,
 		};
 	} else {
 		throw new Error('Unknown expression type: ' + node.exprNodeType);

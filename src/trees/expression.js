@@ -17,6 +17,7 @@ export type BinaryOpNode = {
 	lhs: Node,
 	rhs: Node,
 	pos: Pos,
+	typed?: false,
 };
 
 export type TypedBinaryOpNode = {
@@ -26,12 +27,15 @@ export type TypedBinaryOpNode = {
 	rhs: TypedNode,
 	pos: Pos,
 	exprType: InferredType,
+	typed: true,
+	isConstant: bool,
 }
 
 export type UnaryMinusNode = {
 	exprNodeType: 'unary_minus',
 	op: Node,
 	pos: Pos,
+	typed?: false,
 };
 
 export type TypedUnaryMinusNode = {
@@ -39,12 +43,15 @@ export type TypedUnaryMinusNode = {
 	op: TypedNode,
 	pos: Pos,
 	exprType: InferredType,
+	typed: true,
+	isConstant: bool,
 }
 
 export type NumberNode = {
 	exprNodeType: 'number',
 	value: number,
 	pos: Pos,
+	typed?: false,
 };
 
 export type TypedNumberNode = {
@@ -52,12 +59,15 @@ export type TypedNumberNode = {
 	value: number,
 	pos: Pos,
 	exprType: 'number',
+	typed: true,
+	isConstant: true,
 }
 
 export type StringLiteralNode = {
 	exprNodeType: 'string_literal',
 	value: string,
 	pos: Pos,
+	typed?: false,
 };
 
 export type TypedStringLiteralNode = {
@@ -65,12 +75,15 @@ export type TypedStringLiteralNode = {
 	value: string,
 	pos: Pos,
 	exprType: 'string',
+	typed: true,
+	isConstant: true,
 }
 
 export type VariableNode = {
 	exprNodeType: 'variable',
 	name: string,
 	pos: Pos,
+	typed?: false,
 };
 
 export type TypedVariableNode = {
@@ -78,6 +91,8 @@ export type TypedVariableNode = {
 	name: string,
 	pos: Pos,
 	exprType: InferredType,
+	typed: true,
+	isConstant: false,
 };
 
 export type FunctionInvocationNode = {
@@ -85,6 +100,7 @@ export type FunctionInvocationNode = {
 	name: string,
 	parameters: Node[],
 	pos: Pos,
+	typed?: false,
 };
 
 export type TypedFunctionInvocationNode = {
@@ -93,6 +109,8 @@ export type TypedFunctionInvocationNode = {
 	parameters: TypedNode[],
 	pos: Pos,
 	exprType: 'error' | 'string',
+	typed: true,
+	isConstant: false,
 }
 
 export type Node =

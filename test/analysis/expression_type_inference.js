@@ -67,6 +67,8 @@ function makeTypedVariableNode(name: string, type: InferredType) : TypedVariable
 		pos: makeEmptyPos(),
 		name: name,
 		exprType: type,
+		typed: true,
+		isConstant: false,
 	};
 }
 
@@ -86,6 +88,8 @@ function makeTypedNumberNode(
 		pos: makeEmptyPos(),
 		value: val,
 		exprType: 'number',
+		typed: true,
+		isConstant: true,
 	};
 }
 
@@ -108,6 +112,8 @@ function makeTypedUnaryMinusNode(
 		pos: makeEmptyPos(),
 		op: op,
 		exprType: type,
+		typed: true,
+		isConstant: op.isConstant,
 	};
 }
 
@@ -127,6 +133,8 @@ function makeTypedStringLiteralNode(
 		pos: makeEmptyPos(),
 		value: val,
 		exprType: 'string',
+		typed: true,
+		isConstant: true,
 	};
 }
 
@@ -155,6 +163,8 @@ function makeTypedBinaryPlusNode(
 		lhs: lhs,
 		rhs: rhs,
 		exprType: type,
+		typed: true,
+		isConstant: lhs.isConstant && rhs.isConstant,
 	};
 }
 
@@ -181,6 +191,8 @@ function makeTypedBinaryNumberNode(
 		lhs: lhs,
 		rhs: rhs,
 		exprType: type,
+		typed: true,
+		isConstant: lhs.isConstant && rhs.isConstant,
 	};
 }
 
@@ -207,6 +219,8 @@ function makeTypedFunctionInvocationNode(
 		pos: makeEmptyPos(),
 		parameters,
 		exprType: type,
+		typed: true,
+		isConstant: false,
 	};
 }
 
