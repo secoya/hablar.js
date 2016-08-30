@@ -273,9 +273,6 @@ $test
     func()
 }}`;
 			const res = fullTextParser(exp);
-
-			assert.sameMembers(['test'], res.variables);
-			assert.sameMembers(['func'], res.functions);
 			assert.deepEqual(
 				[
 					{
@@ -358,7 +355,7 @@ $test
 						},
 					},
 				],
-				res.exprs
+				res
 			);
 		});
 	});

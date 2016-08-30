@@ -31,12 +31,6 @@ export type InitialNode =
 	| InitialExprNode
 ;
 
-export type TextParserResult = {
-	exprs: Node[],
-	variables: string[],
-	functions: string[],
-};
-
 export function parseOnlyTextExpression(input: string) : InitialNode[] {
 	return textParser.parse(input);
 }
@@ -61,11 +55,8 @@ function fixupPositionInformation(
 	return node;
 }
 
-export default function parse(input: string) : TextParserResult {
+export default function parse(input: string) : Node[] {
 	const parsed = parseOnlyTextExpression(input);
-
-	const variables : Map<string, boolean> = new Map();
-	const functions : Map<string, boolean> = new Map();
 
 	let last : ?Node = null;
 	const result : Node[] = [];
@@ -79,29 +70,14 @@ export default function parse(input: string) : TextParserResult {
 				value: fixupPositionInformation(expressionParser(fragment.value), fragment),
 				pos: fragment.pos,
 			};
-			walkNode(newNode.value, (node) => {
-				switch (node.exprNodeType) {
-					case 'variable':
-						variables.set(node.name, true);
-						break;
-					case 'function_invocation':
-						functions.set(node.name, true);
-						break;
-				}
-			});
 			result.push(newNode);
 			last = newNode;
 		} else if (fragment.textNodeType === 'variable') {
 			result.push(fragment);
-			variables.set(fragment.value, true);
 		} else if (fragment.textNodeType === 'literal') {
 			result.push(fragment);
 		}
 	}
 
-	return {
-		exprs: result,
-		variables: Array.from(variables.keys()),
-		functions: Array.from(functions.keys()),
-	};
+	return result;
 }
