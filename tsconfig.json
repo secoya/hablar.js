@@ -3,7 +3,7 @@
         "strictNullChecks": true,
         "module": "commonjs",
         "target": "es6",
-        "declaration": true,
+        "declaration": false,
         "noEmit": false,
         "newLine": "LF",
         "outDir": "lib",
@@ -12,9 +12,10 @@
         "moduleResolution": "node"
     },
     "files": [
-        "types/ast-types.d.ts",
-        "types/recast.d.ts",
-        "types/jison.d.ts",
+        "typings/index.d.ts",
         "src/index.ts"
+    ],
+    "exclude": [
+        "node_modules/recast/package.json"
     ]
 }
