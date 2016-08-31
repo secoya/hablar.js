@@ -246,6 +246,43 @@ describe('Text parser', function() {
 			);
 		});
 
+		it('Should extract relevant position information', function() {
+			const exp = 'Hello {{ world($hans, ) }}';
+			const res = textParser(exp);
+
+			assert.deepEqual(
+				[
+					{
+						pos: {
+							firstColumn: 0,
+							firstLine: 1,
+							lastColumn: 6,
+							lastLine: 1,
+						},
+						textNodeType: 'literal',
+						value: 'Hello ',
+					},
+					{
+						pos: {
+							firstColumn: 6,
+							firstLine: 1,
+							lastColumn: 26,
+							lastLine: 1,
+						},
+						textNodeType: 'expr',
+						value: ' world($hans, ) ',
+						valuePos: {
+							firstColumn: 8,
+							firstLine: 1,
+							lastColumn: 24,
+							lastLine: 1,
+						},
+					},
+				],
+				res
+			);
+		});
+
 		describe('Fail cases', function() {
 			it('Should reject empty expression', function() {
 				const exp = '{{}}';
@@ -355,6 +392,103 @@ $test
 					},
 				],
 				res
+			);
+		});
+
+		it('Should give good error message on mismatched curly\'s', function() {
+			assert.throws(
+				() => fullTextParser('Hello {{ world'),
+				ParseError,
+// tslint:disable:indent
+`Parse error on line 1:
+1: Hello {{ world
+   --------------^
+   Expecting: 'CHAR', 'CHARS', 'STRING_LITERAL', 'VARIABLE', 'CLOSE_EXPR' got 'EOF'`
+// tslint:enable:indent
+			);
+		});
+
+		it('Should support long input and pad line numbers in error message accordingly', function() {
+			assert.throws(
+				() => fullTextParser(
+`Line 1
+Line 2
+Line 3
+Line 4
+Line 5
+Line 6
+Line 7
+Line 8
+Line 9
+Line 10
+{{`
+				),
+				ParseError,
+// tslint:disable:indent
+`Parse error on line 11:
+1:  Line 1
+2:  Line 2
+3:  Line 3
+4:  Line 4
+5:  Line 5
+6:  Line 6
+7:  Line 7
+8:  Line 8
+9:  Line 9
+10: Line 10
+11: {{
+    --^
+    Expecting: 'CHAR', 'CHARS', 'STRING_LITERAL', 'VARIABLE' got 'EOF'`
+// tslint:enable:indent
+			);
+		});
+
+		it('Should give good error message with error inside expression parser at EOF', function() {
+			assert.throws(
+				() => fullTextParser('Hello {{ world( }}'),
+				ParseError,
+// tslint:disable:indent max-line-length
+`Parse error on line 1:
+1: Hello {{ world( }}
+   ----------------^
+   Expecting: 'MINUS', 'NUMBER', 'STRING_LITERAL', 'OPEN_PAREN', 'CLOSE_PAREN', 'VARIABLE', 'IDENTIFIER' got 'CLOSE_EXPR'`
+// tslint:enable:indent max-line-length
+			);
+		});
+
+		it('Should give good error message with error inside expression parser - in expr', function() {
+			assert.throws(
+				() => fullTextParser('Hello {{ world($hans, ) }}'),
+				ParseError,
+// tslint:disable:indent
+`Parse error on line 1:
+1: Hello {{ world($hans, ) }}
+   ----------------------^
+   Expecting: 'MINUS', 'NUMBER', 'STRING_LITERAL', 'OPEN_PAREN', 'VARIABLE', 'IDENTIFIER' got 'CLOSE_PAREN'`
+// tslint:enable:indent
+			);
+		});
+
+		it('Should give good error message when input spans multiple lines with error inside expression parser', function() {
+			assert.throws(
+				() => fullTextParser(
+`Hello there
+{{ world(
+
+}}
+Some other line`
+				),
+				ParseError,
+// tslint:disable:indent max-line-length
+`Parse error on line 4:
+1: Hello there
+2: {{ world(
+3: 
+4: }}
+   ^
+   Expecting: 'MINUS', 'NUMBER', 'STRING_LITERAL', 'OPEN_PAREN', 'CLOSE_PAREN', 'VARIABLE', 'IDENTIFIER' got 'CLOSE_EXPR'
+5: Some other line`
+// tslint:enable:indent max-line-length
 			);
 		});
 	});

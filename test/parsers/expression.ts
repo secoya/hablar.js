@@ -381,7 +381,36 @@ describe('Expression parser', function() {
 		describe('Fail cases', function() {
 			it('Should reject invocations with trailing comma', function() {
 				const exp = 'hello(10, 20,)';
-				assert.throws(() => expressionParser(exp), ParseError);
+				assert.throws(
+					() => expressionParser(exp),
+					ParseError,
+`Parse error on line 1:
+hello(10, 20,)
+-------------^
+Expecting 'MINUS', 'NUMBER', 'STRING_LITERAL', 'OPEN_PAREN', 'VARIABLE', 'IDENTIFIER', got 'CLOSE_PAREN'`
+				);
+			});
+
+			it('Should reject invocations with trailing comma - with leading whitespace', function() {
+				const exp = ' hello($hans, )';
+				let thrown = false;
+				try {
+					expressionParser(exp);
+				} catch (e) {
+					assert.instanceOf(e, ParseError);
+					const parseE = e as ParseError;
+					const expectedMessage =
+// tslint:disable:indent
+`Parse error on line 1:
+ hello($hans, )
+--------------^
+Expecting 'MINUS', 'NUMBER', 'STRING_LITERAL', 'OPEN_PAREN', 'VARIABLE', 'IDENTIFIER', got 'CLOSE_PAREN'`;
+// tslint:enable:indent
+					assert.equal(expectedMessage, e.message);
+					assert.equal(' hello($hans, '.length - 1, parseE.lastColumn);
+					thrown = true;
+				}
+				assert.isTrue(thrown, 'Expected exception to be thrown');
 			});
 
 			it('Should reject invocations without comma separator between arguments', function() {
