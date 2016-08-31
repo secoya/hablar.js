@@ -68,6 +68,7 @@ import {
 	analyzeOnlySimpleTranslation,
 	analyzeOnlyTranslation,
 	analyzeTranslation,
+	typeInferTranslation,
 } from './analysis/combined';
 import {
 	constantFoldExpression,
@@ -95,4 +96,5 @@ export const analysis = {
 	inferExpressionTypes,
 	inferTextTypes,
 	makeTypedExpressionTree,
+	typeInferTranslation,
 };
