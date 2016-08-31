@@ -1,8 +1,6 @@
-/// <reference path="../../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../../types/recast.d.ts" />
 import {assert} from 'chai';
-import {types} from 'recast';
-import {prettyPrint} from 'recast';
+import 'mocha';
+import {prettyPrint, types} from 'recast';
 
 import {
 	emitConstrainedTranslation,

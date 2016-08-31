@@ -1,7 +1,8 @@
-/// <reference path="../../node_modules/@types/mocha/index.d.ts" />
 import {assert} from 'chai';
+import 'mocha';
 
 import * as infer from '../../src/analysis/type_inference';
+
 import {
 	BinaryOpNode,
 	FunctionInvocationNode,

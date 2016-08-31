@@ -1,9 +1,9 @@
-/// <reference path="../node_modules/@types/mocha/index.d.ts" />
 import {
 	default as TypeMap,
 	CustomTypeUsage,
 	InferredType,
 } from '../src/type_map';
+import 'mocha';
 
 import {assert} from 'chai';
 

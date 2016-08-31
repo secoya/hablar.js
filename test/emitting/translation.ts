@@ -1,6 +1,5 @@
-/// <reference path="../../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../../types/recast.d.ts" />
 import {assert} from 'chai';
+import 'mocha';
 
 import Context from '../../src/emitting/context';
 import {

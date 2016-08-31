@@ -1,5 +1,5 @@
-/// <reference path="../../node_modules/@types/mocha/index.d.ts" />
 import {assert} from 'chai';
+import 'mocha';
 
 import ParseError from '../../src/errors/parse_error';
 import constraintParser from '../../src/parsers/constraint';
