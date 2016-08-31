@@ -144,6 +144,12 @@ export default class TypeMap {
 		this.frozen = false;
 	}
 
+	private _throwIfFrozen(errMsg: string): void {
+		if (this.frozen) {
+			throw new Error(errMsg);
+		}
+	}
+
 	public get size(): number {
 		return this.map.size;
 	}
@@ -165,6 +171,7 @@ export default class TypeMap {
 		this.map.set(variable, usage);
 		return usage;
 	}
+
 	public getVariableType(variable: string): InferredType {
 		return this.getVariableTypeInfo(variable).type;
 	}
@@ -209,11 +216,5 @@ export default class TypeMap {
 
 	public functionNames(): IterableIterator<string> {
 		return this.functions.values();
-	}
-
-	private _throwIfFrozen(errMsg: string): void {
-		if (this.frozen) {
-			throw new Error(errMsg);
-		}
 	}
 }
