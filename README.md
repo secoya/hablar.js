@@ -1,5 +1,8 @@
-# i18n
+# hablar.js
 A JavaScript library useful for compiling i18n translations written in a DSL to JavaScript functions.
+
+## This is very much still a work in progress
+With an API that is to be considered unstable.
 
 ## DSL
 The DSL is defined in JISON files (see src/parsers/grammars). But to illustrate the key parts of the language here is an example:
