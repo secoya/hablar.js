@@ -2,6 +2,7 @@ loaders/
 src/
 typings/
 test/
+.vscode/
 .babelrc
 .gitignore
 tsconfig.json
