@@ -1,6 +1,4 @@
 import ParseError from '../errors/parse_error';
-import * as fs from 'fs';
-import * as path from 'path';
 
 function monkeyPatchParserWithProperParseError(parser: any): any {
 	const parse = parser.parse;
@@ -16,14 +14,34 @@ function monkeyPatchParserWithProperParseError(parser: any): any {
 	return parser;
 }
 
-export default function getParser(name: string): {
+let getParser: (name: 'expression' | 'text' | 'constraint') => {
 	parse(input: string): any,
-} {
-	try {
-		// $FlowFixMe: This is a valid path, I know flow can't resolve it
-		const parser = require('./grammars/' + name).parser;
+};
+
+if (process.env.WEBPACK) {
+	const parsers: {[key: string]: {
+		parse(input: string): any,
+	}} = {
+		constraint: require('./grammars/constraint.jison'),
+		expression: require('./grammars/expression.jison'),
+		text: require('./grammars/text.jison'),
+	};
+
+	getParser = function(name: 'expression' | 'text' | 'constraint'): {
+		parse(input: string): any,
+	} {
+		if (name !== 'expression' && name !== 'text' && name !== 'constraint') {
+			throw new Error('Unknown parser: ' + name);
+		}
+		const parser = parsers[name];
 		return monkeyPatchParserWithProperParseError(parser);
-	} catch (e) {
+	};
+} else {
+	getParser = function(name: 'expression' | 'text' | 'constraint'): {
+		parse(input: string): any,
+	} {
+		const fs = require('fs');
+		const path = require('path');
 		const jison = require('jison');
 
 		const grammar = fs.readFileSync(
@@ -37,5 +55,7 @@ export default function getParser(name: string): {
 		const parser = new jison.Parser(grammar);
 
 		return monkeyPatchParserWithProperParseError(parser);
-	}
+	};
 }
+
+export default getParser;
