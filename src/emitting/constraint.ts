@@ -1,8 +1,6 @@
 import {Node} from '../trees/constraint';
 import Context from './context';
-import {types} from 'recast';
-
-const b = types.builders;
+import {builders as b} from 'ast-types';
 
 export function emitConstrainedTranslation(
 	constraints: Node[],

@@ -1,7 +1,4 @@
-/// <reference path="../../types/recast.d.ts" />
-import {types} from 'recast';
-
-const b = types.builders;
+import {builders as b} from 'ast-types';
 
 export default class Context {
 	public ctxExpr: ASTTypes.Identifier = b.identifier('ctx');

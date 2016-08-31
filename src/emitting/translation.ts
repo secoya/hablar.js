@@ -22,9 +22,7 @@ import {
 	emitExpression,
 } from './expression';
 
-import {types} from 'recast';
-
-const b = types.builders;
+import {builders as b} from 'ast-types';
 
 function encodeIfString(
 	exp: ASTTypes.Expression,

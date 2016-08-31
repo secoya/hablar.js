@@ -2,11 +2,9 @@ import {
 	default as TypeMap,
 	InferredType,
 } from '../type_map';
-import {types} from 'recast';
+import {builders as b} from 'ast-types';
 
 import Context from './context';
-
-const b = types.builders;
 
 function getTypeTestStatement(
 	ctx: Context,
