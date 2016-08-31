@@ -13,7 +13,7 @@
   "author": "Kaare Hoff Skovgaard <khs@secoya.dk>",
   "license": "Apache-2.0",
   "dependencies": {
-    "recast": "0.11.10"
+    "ast-types": "0.9.0"
   },
   "devDependencies": {
     "@types/chai": "3.4.32",
