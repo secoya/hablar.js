@@ -5,7 +5,6 @@ import {
 	ASTRoot as ConstraintAST,
 } from '../trees/constraint';
 import {
-	TypedFunctionInvocationNode,
 	TypedNode as TypedExprNode,
 } from '../trees/expression';
 import {
