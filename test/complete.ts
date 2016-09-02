@@ -188,6 +188,17 @@ describe('Full tests', function() {
 		);
 	});
 
+	it('Should allow known variable to be used', function() {
+		const text = 'Calculation: $myVar';
+
+		const ast = fullTextParser(text);
+
+		const typeMap = new TypeMap();
+		assert.doesNotThrow(
+			() => analyzeTranslation(ast, typeMap, ['myVar'], ['someFunction']),
+		);
+	});
+
 	it('Should generate pretty unknown function error', function() {
 		const text = 'Calculation: {{fn()}}';
 

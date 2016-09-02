@@ -41,7 +41,7 @@ export function ensureAllVariablesAndFunctionsAreAllowed(
 					expr,
 					(node) => {
 						switch (node.exprNodeType) {
-							case 'variable': {
+							case 'variable':
 								if (allowedVars != null && !allowedVars.has(node.name)) {
 									throw new UnknownVariableError(
 										node,
@@ -50,19 +50,17 @@ export function ensureAllVariablesAndFunctionsAreAllowed(
 										constraintAST,
 									);
 								}
-							}
-							case 'function_invocation': {
-								const funNode = node as TypedFunctionInvocationNode;
-								if (allowedFuns != null && !allowedFuns.has(funNode.name)) {
+								break;
+							case 'function_invocation':
+								if (allowedFuns != null && !allowedFuns.has(node.name)) {
 									throw new UnknownFunctionError(
-										funNode,
+										node,
 										Array.from(allowedFuns.values()),
 										ast,
 										constraintAST,
 									);
 								}
-							}
-							break;
+								break;
 							default: // We don't care about the remaining node types
 						}
 					}
