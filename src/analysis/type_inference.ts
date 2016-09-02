@@ -1,4 +1,5 @@
 import {
+	ASTRoot as ConstraintAST,
 	Node as ConstraintNode,
 } from '../trees/constraint';
 import {
@@ -8,27 +9,27 @@ import {
 	VariableNode as ExprVariableNode,
 } from '../trees/expression';
 import {
-	Node as TextNode,
+	ASTRoot,
+	TypedASTRoot,
 	TypedNode as TypedTextNode,
 	VariableNode as TextVariableNode,
 } from '../trees/text';
 
-import {default as TypeError, ExprNodeInfo, TextNodeInfo} from '../errors/type_error';
-
 import {
 	default as TypeMap,
-	ExprLocation,
 	InferredType,
-	TextLocation,
+	UsageLocation,
 } from '../type_map';
 
 function addConstraintTypeUsageForNode(
 	typeMap: TypeMap,
 	node: ConstraintNode,
-	constraintNodes: ConstraintNode[]
+	ast: ConstraintAST,
+	text: ASTRoot,
 ): void {
 	const location = {
-		constraintNodes,
+		constraints: ast,
+		text: text,
 	};
 
 	const addTypeInfo = (variable: string, type: 'unknown' | 'gender' | 'enum' | 'number') => {
@@ -54,9 +55,9 @@ function addConstraintTypeUsageForNode(
 	}
 }
 
-export function inferConstraintTypes(typeMap: TypeMap, constraints: ConstraintNode[]) {
-	for (const constraint of constraints) {
-		addConstraintTypeUsageForNode(typeMap, constraint, constraints);
+export function inferConstraintTypes(typeMap: TypeMap, ast: ConstraintAST, textAST: ASTRoot) {
+	for (const constraint of ast.nodes) {
+		addConstraintTypeUsageForNode(typeMap, constraint, ast, textAST);
 	}
 }
 
@@ -64,7 +65,7 @@ function addExprTypeInfo(
 	typeMap: TypeMap,
 	variable: ExprVariableNode,
 	type: InferredType,
-	location: ExprLocation
+	location: UsageLocation
 ): InferredType {
 	if (
 		type === 'error' ||
@@ -89,7 +90,7 @@ function addExprTypeInfo(
 function inferExprType(
 	typeMap: TypeMap,
 	node: ExprNode,
-	location: ExprLocation,
+	location: UsageLocation,
 	resultType?: InferredType
 ): InferredType {
 	const exprType = node.exprNodeType;
@@ -168,19 +169,19 @@ function inferExprType(
 export function inferExpressionTypes(
 	typeMap: TypeMap,
 	node: ExprNode,
-	location: ExprLocation
+	location: UsageLocation
 ) {
 	inferExprType(typeMap, node, location);
 }
 
 export function inferTextTypes(
 	typeMap: TypeMap,
-	textNodes: TextNode[],
-	constraintNodes?: ConstraintNode[]
+	textAST: ASTRoot,
+	constraintAST?: ConstraintAST
 ) {
-	const location: TextLocation = {
-		constraintNodes: constraintNodes || null,
-		textNodes,
+	const location = {
+		constraints: constraintAST,
+		text: textAST,
 	};
 
 	const addVariableTypeInfo = (node: TextVariableNode) => {
@@ -196,7 +197,7 @@ export function inferTextTypes(
 		);
 	};
 
-	for (const node of textNodes) {
+	for (const node of textAST.nodes) {
 		switch (node.textNodeType) {
 			case 'variable':
 				addVariableTypeInfo(node);
@@ -212,11 +213,6 @@ export function inferTextTypes(
 function makeTypedExpressionNode(
 	node: ExprNode,
 	typeMap: TypeMap,
-	addError: (
-		expectedType: InferredType | InferredType[],
-		foundType: InferredType,
-		node: ExprNode
-	) => void,
 ): TypedExprNode {
 	if (node.exprNodeType === 'string_literal') {
 		return {
@@ -262,15 +258,9 @@ function makeTypedExpressionNode(
 			typed: true,
 		};
 	} else if (node.exprNodeType === 'unary_minus') {
-		const typedOp = makeTypedExpressionNode(node.op, typeMap, addError);
+		const typedOp = makeTypedExpressionNode(node.op, typeMap);
 
 		let exprType = typedOp.exprType;
-		if (
-			typedOp.exprType !== 'number'
-		)	{
-			addError('number', typedOp.exprType, node.op);
-			exprType = 'error';
-		}
 
 		return {
 			exprNodeType: 'unary_minus',
@@ -281,9 +271,9 @@ function makeTypedExpressionNode(
 			typed: true,
 		};
 	} else if (node.exprNodeType === 'binary_op') {
-		const typedLhs = makeTypedExpressionNode(node.lhs, typeMap, addError);
+		const typedLhs = makeTypedExpressionNode(node.lhs, typeMap);
 		const lhsType = typedLhs.exprType;
-		const typedRhs = makeTypedExpressionNode(node.rhs, typeMap, addError);
+		const typedRhs = makeTypedExpressionNode(node.rhs, typeMap);
 		const rhsType = typedRhs.exprType;
 
 		const makeBinaryResult = (op: 'plus' | 'minus' | 'divide' | 'multiply', type: InferredType) : TypedBinaryOpNode => {
@@ -302,55 +292,24 @@ function makeTypedExpressionNode(
 		const binopType = node.binaryOp;
 		switch (node.binaryOp) {
 			case 'plus': {
-				if (
-					lhsType === 'string' ||
-					lhsType === 'number-or-string'
-				) {
-					if (
-					rhsType === 'number' ||
-					rhsType === 'number-or-string' ||
-					rhsType === 'string'
-				) {
-						// Attempt to find the most specific type of both sides
-						// Basicly if either side is a string, the result
-						// is also a string. Otherwise it is number-or-string
-						return makeBinaryResult(
-							'plus',
-							lhsType === 'number-or-string' ||
-							rhsType === 'number-or-string' ?
-								'number-or-string' :
-								'string'
-							);
-					}
-					addError(['number', 'string'], rhsType, node.rhs);
-					return makeBinaryResult(node.binaryOp, 'error');
-				} else if (lhsType === 'number') {
-					if (
-						rhsType === 'number' ||
-						rhsType === 'number-or-string' ||
-						rhsType === 'string'
-					) {
-						return makeBinaryResult(node.binaryOp, rhsType);
-					}
-					addError(['number', 'string'], rhsType, node.rhs);
-					return makeBinaryResult(node.binaryOp, 'error');
+				const bothNumbers = lhsType === 'number' && rhsType === 'number';
+				let type: InferredType = 'number-or-string';
+				if (bothNumbers) {
+					type = 'number';
+				} else if (lhsType === 'string' && rhsType === 'string') {
+					type = 'string';
 				}
-
-				addError(['number', 'string'], lhsType, node.lhs);
-				return makeBinaryResult(node.binaryOp, 'error');
+				// Attempt to find the most specific type of both sides
+				// Basicly if either side is a string, the result
+				// is also a string. Otherwise it is number-or-string
+				return makeBinaryResult(
+					'plus',
+					type,
+				);
 			}
 			case 'minus':
 			case 'divide':
 			case 'multiply': {
-				if (lhsType !== 'number') {
-					addError('number', lhsType, node.lhs);
-					return makeBinaryResult(node.binaryOp, 'error');
-				}
-				if (rhsType !== 'number') {
-					addError('number', rhsType, node.rhs);
-					return makeBinaryResult(node.binaryOp, 'error');
-				}
-
 				return makeBinaryResult(node.binaryOp, 'number');
 			}
 			default:
@@ -362,24 +321,13 @@ function makeTypedExpressionNode(
 		// any potential calculations can be done inside the function.
 		// And in any case in general they should be used
 		// to return some kind of escaped markup.
-
-		let hasError = false;
-
 		const parameters: TypedExprNode[] = node.parameters.map(
-			(n) => {
-				const typedNode = makeTypedExpressionNode(n, typeMap, addError);
-
-				if (typedNode.exprType === 'error') {
-					hasError = true;
-				}
-				return typedNode;
-			});
-
-		const type: 'error' | 'string' = hasError ? 'error' : 'string';
+			(n) => makeTypedExpressionNode(n, typeMap)
+		);
 
 		return {
 			exprNodeType: 'function_invocation',
-			exprType: type,
+			exprType: 'string',
 			isConstant: false,
 			name: node.name,
 			parameters: parameters,
@@ -393,78 +341,34 @@ function makeTypedExpressionNode(
 
 export function makeTypedExpressionTree(
 	typeMap: TypeMap,
-	node: ExprNode,
-	location: ExprLocation
-): {
-	errors: TypeError[],
-	node: TypedExprNode,
-} {
+	node: ExprNode
+): TypedExprNode {
 	if (!typeMap.isFrozen()) {
 		throw new Error('Type map passed must be frozen. Use TypeMap.freeze()');
 	}
-	const errors: TypeError[] = [];
 
-	const addError = (
-		expectedTypes: InferredType | InferredType[],
-		foundType: InferredType,
-		n: ExprNode
-	) => {
-		if (foundType === 'error') {
-			// We only log the error at the leaf of the expression
-			// tree. So avoid reporting it all the way up the tree.
-			return;
-		}
-		const nodeInfo: ExprNodeInfo = {
-			location,
-			node: n,
-			type: 'expression',
-		};
-		errors.push(new TypeError(expectedTypes, foundType, typeMap, nodeInfo));
-	};
+	if (typeMap.hasTypeErrors()) {
+		typeMap.throwTypeErrors();
+	}
 
-	const typedNode = makeTypedExpressionNode(node, typeMap, addError);
-
-	return {
-		errors: errors,
-		node: typedNode,
-	};
+	return makeTypedExpressionNode(node, typeMap);
 }
 
-export function makeTypedExpressionList(typeMap: TypeMap, nodes: TextNode[], constraintNodes?: ConstraintNode[]): {
-	errors: TypeError[],
-	translation: TypedTextNode[],
-} {
-	const location: ExprLocation = {
-		constraintNodes: constraintNodes || null,
-		textNodes: nodes,
-	};
-
+export function makeTypedExpressionList(
+	typeMap: TypeMap,
+	ast: ASTRoot,
+): TypedASTRoot {
 	if (!typeMap.isFrozen()) {
 		throw new Error('Type map passed must be frozen. Use TypeMap.freeze()');
 	}
 
-	let errors: TypeError[] = [];
+	if (typeMap.hasTypeErrors()) {
+		typeMap.throwTypeErrors();
+	}
+
 	const result: TypedTextNode[] = [];
 
-	const addError = (
-		expectedTypes: InferredType | InferredType[],
-		foundType: InferredType,
-		node: TextNode
-	) => {
-		if (foundType === 'error') {
-			// We only log the error at the leaf of the expression
-			// tree. So avoid reporting it all the way up the tree.
-			return;
-		}
-		const nodeInfo: TextNodeInfo = {
-			type: 'text',
-			location,
-			node,
-		};
-		errors.push(new TypeError(expectedTypes, foundType, typeMap, nodeInfo));
-	};
-
-	for (const node of nodes) {
+	for (const node of ast.nodes) {
 		const textType = node.textNodeType;
 		if (node.textNodeType === 'literal') {
 			result.push({
@@ -477,10 +381,6 @@ export function makeTypedExpressionList(typeMap: TypeMap, nodes: TextNode[], con
 		} else if (node.textNodeType === 'variable') {
 			const type = typeMap.getVariableType(node.value);
 
-			if (type !== 'number' && type !== 'number-or-string' && type !== 'string') {
-				addError(['string', 'number', 'number-or-string'], type, node);
-			}
-
 			result.push({
 				pos: node.pos,
 				textNodeType: 'variable',
@@ -492,18 +392,14 @@ export function makeTypedExpressionList(typeMap: TypeMap, nodes: TextNode[], con
 			// I don't know why typescript doesn't get that this is an expression.
 			// but this workaround does the trick.
 			const val = (node.value as any) as ExprNode;
-			const exprRes = makeTypedExpressionTree(typeMap, val, location);
-
-			if (exprRes.errors.length > 0) {
-				errors = errors.concat(exprRes.errors);
-			}
+			const exprRes = makeTypedExpressionTree(typeMap, val);
 
 			result.push({
 				pos: node.pos,
 				textNodeType: 'expr',
-				textType: exprRes.node.exprType,
+				textType: exprRes.exprType,
 				typed: true,
-				value: exprRes.node,
+				value: exprRes,
 			});
 		} else {
 			throw new Error('Unknown text node type: ' + textType);
@@ -511,7 +407,7 @@ export function makeTypedExpressionList(typeMap: TypeMap, nodes: TextNode[], con
 	}
 
 	return {
-		errors: errors,
-		translation: result,
+		input: ast.input,
+		nodes: result,
 	};
 }

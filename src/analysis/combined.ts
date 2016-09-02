@@ -1,11 +1,14 @@
 import {
-	Node as ConstraintNode,
+	ASTRoot as ConstraintAST,
 } from '../trees/constraint';
 import {
-	Node,
-	TypedNode,
+	ASTRoot,
+	TypedASTRoot,
 } from '../trees/text';
 import TypeMap from '../type_map';
+import {
+	ensureAllVariablesAndFunctionsAreAllowed,
+} from './allowed_symbols';
 import {
 	constantFoldExpressionList,
 } from './constant_folding';
@@ -15,17 +18,17 @@ import {
 	makeTypedExpressionList,
 } from './type_inference';
 
-export type SimpleTranslation = Node[];
+export type SimpleTranslation = ASTRoot;
 // $FlowFixMe: Flow is not happy that we use unions between two types that have no relations
 export type ConstraintTranslation = {
-	constraints: ConstraintNode[],
-	translation: Node[],
+	constraints: ConstraintAST,
+	translation: ASTRoot,
 }[];
 
-export type SimpleTypedTranslation = TypedNode[];
+export type SimpleTypedTranslation = TypedASTRoot;
 export type TypedConstraintTranslation = Array<{
-	constraints: ConstraintNode[],
-	translation: TypedNode[]
+	constraints: ConstraintAST,
+	translation: TypedASTRoot,
 }>;
 
 export type Translation = SimpleTranslation | ConstraintTranslation;
@@ -37,12 +40,9 @@ function workWithTranslation<TSimple, TConstraint>(
 	callbackSimple: (translation: SimpleTranslation) => TSimple,
 	callbackConstraint: (translation: ConstraintTranslation) => TConstraint
 ): TSimple | TConstraint {
-	if (translation.length === 0) {
-		return callbackSimple([]);
-	}
 	const simple = translation as SimpleTranslation;
 	const constraint = translation as ConstraintTranslation;
-	if (simple[0].textNodeType !== undefined) {
+	if (!Array.isArray(constraint)) {
 		return callbackSimple(simple);
 	} else {
 		return callbackConstraint(constraint);
@@ -58,7 +58,7 @@ export function typeInferTranslation(
 		(tr) => inferTextTypes(map, tr),
 		(tr) => {
 			for (const trans of tr) {
-				inferConstraintTypes(map, trans.constraints);
+				inferConstraintTypes(map, trans.constraints, trans.translation);
 				inferTextTypes(map, trans.translation, trans.constraints);
 			}
 		}
@@ -67,63 +67,73 @@ export function typeInferTranslation(
 
 export function analyzeOnlyTranslation(
 	translation: Translation,
-	map: TypeMap
+	map: TypeMap,
+	allowedVariables: string[] | null = null,
+	allowedFunctions: string[] | null = null,
 ): TypedTranslation {
 	return workWithTranslation(
 		translation,
-		(tr) : SimpleTypedTranslation => analyzeOnlySimpleTranslation(tr, map),
-		(tr) => analyzeOnlyConstraintTranslation(tr, map)
+		(tr) : SimpleTypedTranslation => analyzeOnlySimpleTranslation(tr, map, allowedVariables, allowedFunctions),
+		(tr) => analyzeOnlyConstraintTranslation(tr, map, allowedVariables, allowedFunctions)
 	);
 }
 
 export function analyzeTranslation(
 	translation: Translation,
-	map: TypeMap
+	map: TypeMap,
+	allowedVariables: string[] | null = null,
+	allowedFunctions: string[] | null = null
 ): TypedTranslation {
 	typeInferTranslation(translation, map);
 	map.freeze();
 
-	return analyzeOnlyTranslation(translation, map);
+	return analyzeOnlyTranslation(translation, map, allowedVariables, allowedFunctions);
 }
 
 export function analyzeOnlySimpleTranslation(
 	translation: SimpleTranslation,
 	map: TypeMap,
+	allowedVariables: string[] | null = null,
+	allowedFunctions: string[] | null = null,
 ): SimpleTypedTranslation {
 	const res = makeTypedExpressionList(map, translation);
 
-	if (res.errors.length > 0) {
-		throw new Error('Some type error');
+	if (allowedVariables != null || allowedFunctions != null) {
+		ensureAllVariablesAndFunctionsAreAllowed(
+			res,
+			null,
+			allowedVariables,
+			allowedFunctions,
+		);
 	}
 
-	return constantFoldExpressionList(res.translation);
+	return constantFoldExpressionList(res);
 }
 
 export function analyzeOnlyConstraintTranslation(
 	translations: ConstraintTranslation,
 	map: TypeMap,
+	allowedVariables: string[] | null = null,
+	allowedFunctions: string[] | null = null,
 ): TypedConstraintTranslation {
 	const res: TypedConstraintTranslation = [];
-	let errors: Error[] = [];
 
 	for (const translation of translations) {
 		const typed = makeTypedExpressionList(map, translation.translation);
 
-		if (typed.errors.length > 0) {
-			errors = errors.concat(typed.errors);
+		if (allowedVariables != null || allowedFunctions != null) {
+			ensureAllVariablesAndFunctionsAreAllowed(
+				typed,
+				translation.constraints,
+				allowedVariables,
+				allowedFunctions,
+			);
 		}
 
 		res.push({
 			constraints: translation.constraints,
-			translation: typed.translation,
+			translation: typed,
 		});
-	}
-
-	if (errors.length > 0) {
-		if (errors.length === 1) {
-			throw errors[0];
-		}
-		throw new Error(JSON.stringify(errors));
 	}
 
 	for (const tr of res) {

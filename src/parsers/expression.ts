@@ -1,9 +1,28 @@
 import ParseError from '../errors/parse_error';
-import {Node} from '../trees/expression';
+import {Node, TypedNode} from '../trees/expression';
 import getParser from './get_parser';
 const expressionParser = getParser('expression');
 
 export function walkNode(node: Node, callback: (node: Node) => void): void {
+	callback(node);
+	switch (node.exprNodeType) {
+		case 'function_invocation':
+			for (const param of node.parameters) {
+				walkNode(param, callback);
+			}
+			break;
+		case 'unary_minus':
+			walkNode(node.op, callback);
+			break;
+		case 'binary_op':
+			walkNode(node.lhs, callback);
+			walkNode(node.rhs, callback);
+			break;
+		default: // Not needed, no child nodes of other types
+	}
+}
+
+export function walkTypedNode(node: TypedNode, callback: (node: TypedNode) => void): void {
 	callback(node);
 	switch (node.exprNodeType) {
 		case 'function_invocation':

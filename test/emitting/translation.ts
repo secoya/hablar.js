@@ -129,7 +129,14 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(
+			{
+				input: 'Some text',
+				nodes: nodes,
+			},
+			ctx,
+			map,
+		));
 
 		assert.equal('"Some text"', res.code);
 	});
@@ -145,7 +152,14 @@ describe('Emitting - translation', function() {
 
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(
+			{
+				input: '$myVar',
+				nodes: nodes,
+			},
+			ctx,
+			map,
+		));
 
 		// tslint:disable:indent
 		const expected = `function(vars, fns, ctx) {
@@ -170,7 +184,14 @@ describe('Emitting - translation', function() {
 
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(
+			{
+				input: '$myVar',
+				nodes: nodes,
+			},
+			ctx,
+			map
+		));
 
 		// tslint:disable:indent
 		const expected = `function(vars, fns, ctx) {
@@ -193,7 +214,14 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(
+			{
+				input: '$myVar',
+				nodes: nodes,
+			},
+			ctx,
+			map
+		));
 
 		// tslint:disable:indent
 		const expected = `function(vars, fns, ctx) {
@@ -211,7 +239,14 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(
+			{
+				input: 'Some number: $myVar',
+				nodes: nodes,
+			},
+			ctx,
+			map,
+		));
 
 		// tslint:disable:indent
 		const expected = `function(vars, fns, ctx) {
@@ -229,7 +264,14 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(
+			{
+				input: 'Some number: $number',
+				nodes: nodes,
+			},
+			ctx,
+			map,
+		));
 
 		// tslint:disable:indent
 		const expected = `function(vars, fns, ctx) {
@@ -247,7 +289,14 @@ describe('Emitting - translation', function() {
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(nodes, ctx, map));
+		const res = prettyPrint(emitSimpleTranslation(
+			{
+				input: '{{$myOtherVar}}{{$myVar}}',
+				nodes: nodes,
+			},
+			ctx,
+			map,
+		));
 
 		// tslint:disable:indent
 		const expected = `function(vars, fns, ctx) {
@@ -261,12 +310,18 @@ describe('Emitting - translation', function() {
 		it('Should emit simple return on ignore constraint', function() {
 			const translations = [
 				{
-					constraints: [
-						cignore('someVar'),
-					],
-					translation: [
-						tn('Some translation'),
-					],
+					constraints: {
+						input: '!someVar',
+						nodes: [
+							cignore('someVar'),
+						],
+					},
+					translation: {
+						input: 'Some translation',
+						nodes: [
+							tn('Some translation'),
+						],
+					},
 				},
 			];
 			const map = new TypeMap();
@@ -285,12 +340,18 @@ describe('Emitting - translation', function() {
 		it('Should emit if statement with throw statement when not guarenteed to return', function() {
 			const translations = [
 				{
-					constraints: [
-						ceq('=', 'someVar', 5),
-					],
-					translation: [
-						tn('Some translation'),
-					],
+					constraints: {
+						input: 'someVar=5',
+						nodes: [
+							ceq('=', 'someVar', 5),
+						],
+					},
+					translation: {
+						input: 'Some translation',
+						nodes: [
+							tn('Some translation'),
+						],
+					},
 				},
 			];
 			const map = new TypeMap();
@@ -315,28 +376,46 @@ describe('Emitting - translation', function() {
 			'and not emit throw statement if unconstrained translation exists', function() {
 			const translations = [
 				{
-					constraints: [
-						ceq('=', 'someVar', 5),
-					],
-					translation: [
-						tn('Some translation'),
-					],
+					constraints: {
+						input: 'someVar=5',
+						nodes: [
+							ceq('=', 'someVar', 5),
+						],
+					},
+					translation: {
+						input: 'Some translation',
+						nodes: [
+							tn('Some translation'),
+						],
+					},
 				},
 				{
-					constraints: [
-						ceq('=', 'someVar', 10),
-					],
-					translation: [
-						tn('Some other translation'),
-					],
+					constraints: {
+						input: 'someVar=10',
+						nodes: [
+							ceq('=', 'someVar', 10),
+						],
+					},
+					translation: {
+						input: 'Some other translation',
+						nodes: [
+							tn('Some other translation'),
+						],
+					},
 				},
 				{
-					constraints: [
-						cignore('someVar'),
-					],
-					translation: [
-						tn('Some default translation'),
-					],
+					constraints: {
+						input: '!someVar',
+						nodes: [
+							cignore('someVar'),
+						],
+					},
+					translation: {
+						input: 'Some default translation',
+						nodes: [
+							tn('Some default translation'),
+						],
+					},
 				},
 			];
 			const map = new TypeMap();

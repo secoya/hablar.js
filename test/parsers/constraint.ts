@@ -10,6 +10,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n>5';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -42,7 +43,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -50,6 +51,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n>=5';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -82,7 +84,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -90,6 +92,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n<10';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -122,7 +125,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -130,6 +133,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n<=10';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -162,7 +166,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -170,6 +174,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n=10';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -202,7 +207,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -210,6 +215,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n!=10';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -242,7 +248,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -251,6 +257,7 @@ describe('Constraint parser', function() {
 				const constraint = 'n=10.24';
 				const parsed = constraintParser(constraint);
 
+				assert.equal(constraint, parsed.input);
 				assert.deepEqual(
 					[
 						{
@@ -283,7 +290,7 @@ describe('Constraint parser', function() {
 							},
 						},
 					],
-					parsed
+					parsed.nodes,
 				);
 			});
 			describe('Fail cases', function() {
@@ -311,6 +318,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n=\'F\'';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -343,7 +351,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -351,6 +359,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n=\'M\'';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -383,7 +392,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -391,6 +400,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n=\'N\'';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -423,7 +433,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -432,6 +442,7 @@ describe('Constraint parser', function() {
 
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -464,7 +475,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -486,6 +497,7 @@ describe('Constraint parser', function() {
 
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -518,7 +530,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -527,6 +539,7 @@ describe('Constraint parser', function() {
 
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -559,7 +572,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -582,6 +595,7 @@ describe('Constraint parser', function() {
 			5`;
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -614,7 +628,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 	});
@@ -624,6 +638,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n > 5, n < 2';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -685,7 +700,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 
@@ -693,6 +708,7 @@ describe('Constraint parser', function() {
 			const constraint = 'n > 5, i < 2';
 			const parsed = constraintParser(constraint);
 
+			assert.equal(constraint, parsed.input);
 			assert.deepEqual(
 				[
 					{
@@ -754,7 +770,7 @@ describe('Constraint parser', function() {
 						},
 					},
 				],
-				parsed
+				parsed.nodes,
 			);
 		});
 

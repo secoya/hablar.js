@@ -1,8 +1,8 @@
 import {
-	Node as ConstraintNode,
+	ASTRoot as ConstraintAST,
 } from '../trees/constraint';
 import {
-	TypedNode as TextNode,
+	TypedASTRoot as TextAST,
 } from '../trees/text';
 
 export default class DeadCodeError extends Error {
@@ -10,12 +10,12 @@ export default class DeadCodeError extends Error {
 	public constructor(
 		message: string,
 		translations: Array<{
-			constraints: ConstraintNode[],
-			translation: TextNode[],
+			constraints: ConstraintAST,
+			translation: TextAST,
 		}>,
 		deadTranslation: {
-			constraints: ConstraintNode[],
-			translation: TextNode[],
+			constraints: ConstraintAST,
+			translation: TextAST,
 		}
 	) {
 		super(message);

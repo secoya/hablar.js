@@ -4,6 +4,9 @@ import 'mocha';
 import * as infer from '../../src/analysis/type_inference';
 
 import {
+	Node as ConstraintNode,
+} from '../../src/trees/constraint';
+import {
 	BinaryOpNode,
 	FunctionInvocationNode,
 	Node,
@@ -19,6 +22,9 @@ import {
 	UnaryMinusNode,
 	VariableNode,
 } from '../../src/trees/expression';
+import {
+	Node as TextNode,
+} from '../../src/trees/text';
 import TypeMap from '../../src/type_map';
 import {
 	InferredType,
@@ -33,8 +39,14 @@ const makeEmptyPos = () => ({
 });
 
 const location = {
-	constraintNodes: [],
-	textNodes: [],
+	constraints: {
+		input: '',
+		nodes: ([] as ConstraintNode[]),
+	},
+	text: {
+		input: '',
+		nodes: ([] as TextNode[]),
+	},
 };
 
 function getTypeInfo(typeMap: TypeMap, variable: string): TypeInfo {
@@ -241,12 +253,9 @@ describe('Type inference', function() {
 				const typeInfo = infer.makeTypedExpressionTree(
 					typeMap,
 					node,
-					location
 				);
 
-				assert.deepEqual(typedNode, typeInfo.node);
-				assert.equal(0, typeInfo.errors.length);
-
+				assert.deepEqual(typedNode, typeInfo);
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 
@@ -270,10 +279,9 @@ describe('Type inference', function() {
 					'number-or-string'
 				);
 
-				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
+				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
 
-				assert.deepEqual(typedNode, typeInfo.node);
-				assert.equal(0, typeInfo.errors.length);
+				assert.deepEqual(typedNode, typeInfo);
 
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
@@ -302,10 +310,8 @@ describe('Type inference', function() {
 					'number-or-string'
 				);
 
-				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-				assert.deepEqual(typedNode, typeInfo.node);
-				assert.equal(0, typeInfo.errors.length);
-
+				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+				assert.deepEqual(typedNode, typeInfo);
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 
@@ -333,9 +339,8 @@ describe('Type inference', function() {
 					'number'
 				);
 
-				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-				assert.deepEqual(typedNode, typeInfo.node);
-				assert.equal(0, typeInfo.errors.length);
+				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+				assert.deepEqual(typedNode, typeInfo);
 
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
@@ -362,9 +367,8 @@ describe('Type inference', function() {
 					'number'
 				);
 
-				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-				assert.deepEqual(typedNode, typeInfo.node);
-				assert.equal(0, typeInfo.errors.length);
+				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+				assert.deepEqual(typedNode, typeInfo);
 
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
@@ -393,9 +397,8 @@ describe('Type inference', function() {
 					'number'
 				);
 
-				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-				assert.deepEqual(typedNode, typeInfo.node);
-				assert.equal(0, typeInfo.errors.length);
+				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+				assert.deepEqual(typedNode, typeInfo);
 
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
@@ -421,9 +424,8 @@ describe('Type inference', function() {
 				'number'
 			);
 
-			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-			assert.deepEqual(typedNode, typeInfo.node);
-			assert.equal(0, typeInfo.errors.length);
+			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+			assert.deepEqual(typedNode, typeInfo);
 
 			assert.equal(0, Array.from(typeMap.functionNames()).length);
 		});
@@ -454,10 +456,8 @@ describe('Type inference', function() {
 				'number'
 			);
 
-			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-			assert.deepEqual(typedNode, typeInfo.node);
-			assert.equal(0, typeInfo.errors.length);
-
+			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+			assert.deepEqual(typedNode, typeInfo);
 			assert.equal(0, Array.from(typeMap.functionNames()).length);
 		});
 
@@ -490,9 +490,8 @@ describe('Type inference', function() {
 				'number'
 			);
 
-			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-			assert.deepEqual(typedNode, typeInfo.node);
-			assert.equal(0, typeInfo.errors.length);
+			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+			assert.deepEqual(typedNode, typeInfo);
 
 			assert.equal(0, Array.from(typeMap.functionNames()).length);
 		});
@@ -513,19 +512,8 @@ describe('Type inference', function() {
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
+				assert.isTrue(typeMap.hasTypeErrors(), 'Should have type errors');
 				assert.equal('error', info.type);
-
-				const typedNode = makeTypedUnaryMinusNode(
-					makeTypedVariableNode(varName, 'error'),
-					'error'
-				);
-
-				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-				assert.deepEqual(typedNode, typeInfo.node);
-				// We need some kind of phase that looks through all
-				// variables and sees if their type is error.
-				// And logs that as an error, but for now this is not implemented.
-				assert.equal(0, typeInfo.errors.length);
 
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
@@ -545,19 +533,8 @@ describe('Type inference', function() {
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
+				assert.isTrue(typeMap.hasTypeErrors(), 'Should have type errors');
 				assert.equal('error', info.type);
-
-				const typedNode = makeTypedUnaryMinusNode(
-					makeTypedVariableNode(varName, 'error'),
-					'error'
-				);
-
-				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-				assert.deepEqual(typedNode, typeInfo.node);
-				// We need some kind of phase that looks through all
-				// variables and sees if their type is error.
-				// And logs that as an error, but for now this is not implemented.
-				assert.equal(0, typeInfo.errors.length);
 
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
@@ -578,20 +555,8 @@ describe('Type inference', function() {
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
+				assert.isTrue(typeMap.hasTypeErrors(), 'Should have type errors');
 				assert.equal('error', info.type);
-
-				const typedNode = makeTypedUnaryMinusNode(
-					makeTypedVariableNode(varName, 'error'),
-					'error'
-				);
-
-				const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-				assert.deepEqual(typedNode, typeInfo.node);
-				// We need some kind of phase that looks through all
-				// variables and sees if their type is error.
-				// And logs that as an error, but for now this is not implemented.
-				assert.equal(0, typeInfo.errors.length);
-
 				assert.equal(0, Array.from(typeMap.functionNames()).length);
 			});
 		});
@@ -617,9 +582,8 @@ describe('Type inference', function() {
 				'string'
 			);
 
-			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-			assert.deepEqual(typedNode, typeInfo.node);
-			assert.equal(0, typeInfo.errors.length);
+			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+			assert.deepEqual(typedNode, typeInfo);
 
 			assert.sameMembers(['fn'], Array.from(typeMap.functionNames()));
 		});
@@ -655,9 +619,8 @@ describe('Type inference', function() {
 				'string'
 			);
 
-			const typeInfo = infer.makeTypedExpressionTree(typeMap, node, location);
-			assert.deepEqual(typedNode, typeInfo.node);
-			assert.equal(0, typeInfo.errors.length);
+			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
+			assert.deepEqual(typedNode, typeInfo);
 
 			assert.sameMembers(['fn'], Array.from(typeMap.functionNames()));
 		});

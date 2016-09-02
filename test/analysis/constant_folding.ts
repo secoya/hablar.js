@@ -525,13 +525,17 @@ describe('Constant folding', function() {
 			));
 			const text2 = tn('!');
 
-			const folded = constantFoldExpressionList([text, varNode, expNode, text2]);
+			const folded = constantFoldExpressionList({
+				input: 'Some text: $var{{"Hello"+"world"}}!',
+				nodes: [text, varNode, expNode, text2],
+			});
 
+			assert.equal('Some text: $var{{"Hello"+"world"}}!', folded.input);
 			assert.deepEqual([
 				tn('Some text: '),
 				vn('var', 'string'),
 				tn('Hello world!'),
-			], folded);
+			], folded.nodes);
 		});
 
 		it('Can constant fold a complete constant expression', function() {
@@ -544,11 +548,14 @@ describe('Constant folding', function() {
 			));
 			const text2 = tn('!');
 
-			const folded = constantFoldExpressionList([text, expNode, text2]);
+			const folded = constantFoldExpressionList({
+				input: 'Some text: {{"Hello "+"world"}}!',
+				nodes: [text, expNode, text2],
+			});
 
 			assert.deepEqual([
 				tn('Some text: Hello world!'),
-			], folded);
+			], folded.nodes);
 		});
 	});
 });

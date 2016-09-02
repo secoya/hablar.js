@@ -147,7 +147,21 @@ describe('Type inference', function() {
 				const constraints = [makeIgnoreNode('i')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				const constraintAST = {
+					input: '!i',
+					nodes: constraints,
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -158,7 +172,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -171,7 +186,8 @@ describe('Type inference', function() {
 
 				const usage = assertConstraintUsage(typeInfo.usages[0]);
 				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assert.equal(constraintAST, usage.location.constraints);
+				assert.equal(textAST, usage.location.text);
 			});
 		});
 
@@ -180,7 +196,20 @@ describe('Type inference', function() {
 				const constraints = [makeNumberNode('n', '=')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'n=5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -191,7 +220,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -201,16 +231,27 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 
 			it('Should infer number not-equals as number', function() {
 				const constraints = [makeNumberNode('n', '!=')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'n!=5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -221,7 +262,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -231,9 +273,7 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 
 			it('Should infer number less-than as number', function() {
@@ -241,7 +281,20 @@ describe('Type inference', function() {
 
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'n<5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -252,7 +305,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -263,16 +317,27 @@ describe('Type inference', function() {
 					typeInfo
 				);
 
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 
 			it('Should infer number less-than-equals as number', function() {
 				const constraints = [makeNumberNode('n', '<=')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'n<=5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -283,7 +348,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -293,16 +359,27 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 
 			it('Should infer number greater-than as number', function() {
 				const constraints = [makeNumberNode('n', '>')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'n>5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -313,7 +390,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -323,16 +401,27 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 
 			it('Should infer number greater-than-equals as number', function() {
 				const constraints = [makeNumberNode('n', '>=')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'n>=5',
+					nodes: constraints,
+				};
+
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -343,7 +432,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -353,9 +443,7 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 		});
 
@@ -364,7 +452,20 @@ describe('Type inference', function() {
 				const constraints = [makeGenderNode('g', '=')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'g=5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -375,7 +476,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -385,16 +487,27 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 
 			it('Should infer gender not-equals as gender type', function() {
 				const constraints = [makeGenderNode('g', '!=')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'g!=5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -405,7 +518,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -415,9 +529,7 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 		});
 
@@ -426,7 +538,20 @@ describe('Type inference', function() {
 				const constraints = [makeEnumNode('e', '=')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'e=5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -437,7 +562,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -447,16 +573,27 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 
 			it('Should infer enum not-equals as enum type', function() {
 				const constraints = [makeEnumNode('e', '!=')];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'e!=5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(1, typeMap.size);
 
@@ -467,7 +604,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -477,9 +615,7 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 			});
 		});
 
@@ -491,7 +627,20 @@ describe('Type inference', function() {
 				];
 				const typeMap = new TypeMap();
 
-				infer.inferConstraintTypes(typeMap, constraints);
+				const constraintAST = {
+					input: 'e="enum", i=5',
+					nodes: constraints,
+				};
+				const textAST = {
+					input: 'test',
+					nodes: [],
+				};
+
+				infer.inferConstraintTypes(
+					typeMap,
+					constraintAST,
+					textAST,
+				);
 
 				assert.equal(2, typeMap.size);
 
@@ -502,7 +651,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[0],
 								nodeType: 'constraint',
@@ -512,9 +662,7 @@ describe('Type inference', function() {
 					},
 					typeInfo
 				);
-				const usage = assertConstraintUsage(typeInfo.usages[0]);
-				assert.equal(constraints[0], usage.node);
-				assert.equal(constraints, usage.location.constraintNodes);
+				assertConstraintUsage(typeInfo.usages[0]);
 				const numberTypeInfo = getTypeInfo(typeMap, 'i');
 				assert.deepEqual(
 					{
@@ -522,7 +670,8 @@ describe('Type inference', function() {
 						usages: [
 							{
 								location: {
-									constraintNodes: constraints,
+									constraints: constraintAST,
+									text: textAST,
 								},
 								node: constraints[1],
 								nodeType: 'constraint',
@@ -532,9 +681,7 @@ describe('Type inference', function() {
 					},
 					numberTypeInfo,
 				);
-				const numberUsage = assertConstraintUsage(numberTypeInfo.usages[0]);
-				assert.equal(constraints[1], numberUsage.node);
-				assert.equal(constraints, numberUsage.location.constraintNodes);
+				assertConstraintUsage(numberTypeInfo.usages[0]);
 			});
 		});
 
@@ -544,7 +691,19 @@ describe('Type inference', function() {
 					const constraints = [makeNumberNode('n'), makeNumberNode('n', '>')];
 					const typeMap = new TypeMap();
 
-					infer.inferConstraintTypes(typeMap, constraints);
+					const constraintAST = {
+						input: 'n=5, n>5',
+						nodes: constraints,
+					};
+					const textAST = {
+						input: 'test',
+						nodes: [],
+					};
+					infer.inferConstraintTypes(
+						typeMap,
+						constraintAST,
+						textAST,
+					);
 
 					assert.equal(1, typeMap.size);
 
@@ -555,7 +714,8 @@ describe('Type inference', function() {
 							usages: [
 								{
 									location: {
-										constraintNodes: constraints,
+										constraints: constraintAST,
+										text: textAST,
 									},
 									node: constraints[0],
 									nodeType: 'constraint',
@@ -563,7 +723,8 @@ describe('Type inference', function() {
 								},
 								{
 									location: {
-										constraintNodes: constraints,
+										constraints: constraintAST,
+										text: textAST,
 									},
 									node: constraints[1],
 									nodeType: 'constraint',
@@ -573,20 +734,28 @@ describe('Type inference', function() {
 						},
 						typeInfo
 					);
-					const usage = assertConstraintUsage(typeInfo.usages[0]);
-					assert.equal(constraints[0], usage.node);
-					assert.equal(constraints, usage.location.constraintNodes);
-
-					const secondUsage = assertConstraintUsage(typeInfo.usages[1]);
-					assert.equal(constraints[1], secondUsage.node);
-					assert.equal(constraints, secondUsage.location.constraintNodes);
+					assertConstraintUsage(typeInfo.usages[0]);
+					assertConstraintUsage(typeInfo.usages[1]);
 				});
 
 				it('Is number when used as ignore', function() {
 					const constraints = [makeNumberNode('n'), makeIgnoreNode('n')];
 					const typeMap = new TypeMap();
 
-					infer.inferConstraintTypes(typeMap, constraints);
+					const constraintAST = {
+						input: 'n=5,!n',
+						nodes: constraints,
+					};
+					const textAST = {
+						input: 'test',
+						nodes: [],
+					};
+
+					infer.inferConstraintTypes(
+						typeMap,
+						constraintAST,
+						textAST,
+					);
 
 					assert.equal(1, typeMap.size);
 
@@ -597,7 +766,8 @@ describe('Type inference', function() {
 							usages: [
 								{
 									location: {
-										constraintNodes: constraints,
+										constraints: constraintAST,
+										text: textAST,
 									},
 									node: constraints[0],
 									nodeType: 'constraint',
@@ -605,7 +775,8 @@ describe('Type inference', function() {
 								},
 								{
 									location: {
-										constraintNodes: constraints,
+										constraints: constraintAST,
+										text: textAST,
 									},
 									node: constraints[1],
 									nodeType: 'constraint',
@@ -615,13 +786,8 @@ describe('Type inference', function() {
 						},
 						typeInfo
 					);
-					const usage = assertConstraintUsage(typeInfo.usages[0]);
-					assert.equal(constraints[0], usage.node);
-					assert.equal(constraints, usage.location.constraintNodes);
-
-					const secondUsage = assertConstraintUsage(typeInfo.usages[1]);
-					assert.equal(constraints[1], secondUsage.node);
-					assert.equal(constraints, secondUsage.location.constraintNodes);
+					assertConstraintUsage(typeInfo.usages[0]);
+					assertConstraintUsage(typeInfo.usages[1]);
 				});
 			});
 
@@ -630,7 +796,19 @@ describe('Type inference', function() {
 					const constraints = [makeNumberNode('n'), makeEnumNode('n')];
 					const typeMap = new TypeMap();
 
-					infer.inferConstraintTypes(typeMap, constraints);
+					const constraintAST = {
+						input: 'n=5,n="enum"',
+						nodes: constraints,
+					};
+					const textAST = {
+						input: 'test',
+						nodes: [],
+					};
+					infer.inferConstraintTypes(
+						typeMap,
+						constraintAST,
+						textAST,
+					);
 
 					assert.equal(1, typeMap.size);
 
@@ -641,7 +819,8 @@ describe('Type inference', function() {
 							usages: [
 								{
 									location: {
-										constraintNodes: constraints,
+										constraints: constraintAST,
+										text: textAST,
 									},
 									node: constraints[0],
 									nodeType: 'constraint',
@@ -649,7 +828,8 @@ describe('Type inference', function() {
 								},
 								{
 									location: {
-										constraintNodes: constraints,
+										constraints: constraintAST,
+										text: textAST,
 									},
 									node: constraints[1],
 									nodeType: 'constraint',
@@ -660,20 +840,28 @@ describe('Type inference', function() {
 						typeInfo
 					);
 
-					const usage = assertConstraintUsage(typeInfo.usages[0]);
-					assert.equal(constraints[0], usage.node);
-					assert.equal(constraints, usage.location.constraintNodes);
-
-					const secondUsage = assertConstraintUsage(typeInfo.usages[1]);
-					assert.equal(constraints[1], secondUsage.node);
-					assert.equal(constraints, secondUsage.location.constraintNodes);
+					assertConstraintUsage(typeInfo.usages[0]);
+					assertConstraintUsage(typeInfo.usages[1]);
 				});
 
 				it('Cannot reconcile with gender', function() {
 					const constraints = [makeNumberNode('n'), makeGenderNode('n')];
 					const typeMap = new TypeMap();
 
-					infer.inferConstraintTypes(typeMap, constraints);
+					const constraintAST = {
+						input: 'n=5,n=\'F\'',
+						nodes: constraints,
+					};
+					const textAST = {
+						input: 'test',
+						nodes: [],
+					};
+
+					infer.inferConstraintTypes(
+						typeMap,
+						constraintAST,
+						textAST,
+					);
 
 					assert.equal(1, typeMap.size);
 
@@ -684,7 +872,8 @@ describe('Type inference', function() {
 							usages: [
 								{
 									location: {
-										constraintNodes: constraints,
+										constraints: constraintAST,
+										text: textAST,
 									},
 									node: constraints[0],
 									nodeType: 'constraint',
@@ -692,7 +881,8 @@ describe('Type inference', function() {
 								},
 								{
 									location: {
-										constraintNodes: constraints,
+										constraints: constraintAST,
+										text: textAST,
 									},
 									node: constraints[1],
 									nodeType: 'constraint',
@@ -703,13 +893,8 @@ describe('Type inference', function() {
 						typeInfo
 					);
 
-					const usage = assertConstraintUsage(typeInfo.usages[0]);
-					assert.equal(constraints[0], usage.node);
-					assert.equal(constraints, usage.location.constraintNodes);
-
-					const secondUsage = assertConstraintUsage(typeInfo.usages[1]);
-					assert.equal(constraints[1], secondUsage.node);
-					assert.equal(constraints, secondUsage.location.constraintNodes);
+					assertConstraintUsage(typeInfo.usages[0]);
+					assertConstraintUsage(typeInfo.usages[1]);
 				});
 			});
 		});

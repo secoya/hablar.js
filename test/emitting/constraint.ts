@@ -95,7 +95,10 @@ describe('Emitting - Constraints', function() {
 	it('Emits simple return statement with no constraints', function() {
 		const ctx = new Context();
 
-		const res = prettyPrint(emitConstrainedTranslation([], nullExpr, ctx));
+		const res = prettyPrint(emitConstrainedTranslation({
+			input: '',
+			nodes: [],
+		}, nullExpr, ctx));
 
 		assert.equal('return null;', res.code);
 	});
@@ -104,9 +107,12 @@ describe('Emitting - Constraints', function() {
 		const ctx = new Context();
 
 		const res = prettyPrint(emitConstrainedTranslation(
-			[
-				makeIgnoreConstraint('someVar'),
-			],
+			{
+				input: '!someVar',
+				nodes: [
+					makeIgnoreConstraint('someVar'),
+				],
+			},
 			nullExpr,
 			ctx
 		));
@@ -118,9 +124,12 @@ describe('Emitting - Constraints', function() {
 		const ctx = new Context();
 
 		const res = prettyPrint(emitConstrainedTranslation(
-			[
-				makeEqualityConstraint('someVar', 5),
-			],
+			{
+				input: 'someVar=5',
+				nodes: [
+					makeEqualityConstraint('someVar', 5),
+				],
+			},
 			nullExpr,
 			ctx
 		));
@@ -139,10 +148,13 @@ describe('Emitting - Constraints', function() {
 		const ctx = new Context();
 
 		const res = prettyPrint(emitConstrainedTranslation(
-			[
-				makeEqualityConstraint('someVar', 5),
-				makeIgnoreConstraint('someOtherVar'),
-			],
+			{
+				input: 'someVar=5,!someOtherVar',
+				nodes: [
+					makeEqualityConstraint('someVar', 5),
+					makeIgnoreConstraint('someOtherVar'),
+				],
+			},
 			nullExpr,
 			ctx
 		));
@@ -161,10 +173,13 @@ describe('Emitting - Constraints', function() {
 		const ctx = new Context();
 
 		const res = prettyPrint(emitConstrainedTranslation(
-			[
-				makeEqualityConstraint('someVar', 5),
-				makeInequalityConstraint('someOtherVar', 10),
-			],
+			{
+				input: 'someVar=5,someOtherVar<10',
+				nodes: [
+					makeEqualityConstraint('someVar', 5),
+					makeInequalityConstraint('someOtherVar', 10),
+				],
+			},
 			five,
 			ctx
 		));

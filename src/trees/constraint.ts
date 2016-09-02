@@ -57,3 +57,8 @@ export type Node = IgnoreNode
 	| EqualityNode
 	| IneqNode
 ;
+
+export type ASTRoot = {
+	input: string,
+	nodes: Node[],
+};

@@ -68,3 +68,13 @@ export type TypedNode = TypedLiteralNode
 	| TypedVariableNode
 	| TypedExprNode
 ;
+
+export type ASTRoot = {
+	input: string,
+	nodes: Node[],
+};
+
+export type TypedASTRoot = {
+	input: string,
+	nodes: TypedNode[],
+};

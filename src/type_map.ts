@@ -1,14 +1,18 @@
 import {
+	ASTRoot,
 	Node as TextNode,
 } from './trees/text';
 
 import {
+	ASTRoot as ConstraintAST,
 	Node as ConstraintNode,
 } from './trees/constraint';
 
 import {
 	Node as ExprNode,
 } from './trees/expression';
+
+import TypeError from './errors/type_error';
 
 export type InferredType = 'enum'
 	| 'error'
@@ -19,36 +23,29 @@ export type InferredType = 'enum'
 	| 'unknown'
 ;
 
+export type UsageLocation = {
+	text: ASTRoot,
+	constraints?: ConstraintAST,
+};
+
 export type ConstraintTypeUsage = {
 	nodeType: 'constraint',
 	node: ConstraintNode,
-	location: {
-		constraintNodes: ConstraintNode[],
-	},
+	location: UsageLocation,
 	type: 'unknown' | 'gender' | 'enum' | 'number',
-};
-
-export type ExprLocation = {
-	textNodes: TextNode[],
-	constraintNodes: ConstraintNode[] | null,
-};
-
-export type TextLocation = {
-	textNodes: TextNode[],
-	constraintNodes: ConstraintNode[] | null,
 };
 
 export type ExpressionTypeUsage = {
 	nodeType: 'expression',
 	node: ExprNode,
-	location: ExprLocation,
+	location: UsageLocation,
 	type: 'unknown' | 'number-or-string' | 'number' | 'string',
 }
 
 export type TextTypeUsage = {
 	nodeType: 'text',
 	node: TextNode,
-	location: TextLocation,
+	location: UsageLocation,
 	type: 'number-or-string',
 }
 
@@ -137,11 +134,15 @@ export default class TypeMap {
 	private map: Map<string, TypeInfo>;
 	private functions: Set<string>;
 	private frozen: boolean;
+	private hasError: boolean;
+	private typeErrors: TypeError[];
 
 	public constructor() {
 		this.map = new Map<string, TypeInfo>();
 		this.functions = new Set<string>();
 		this.frozen = false;
+		this.hasError = false;
+		this.typeErrors = [];
 	}
 
 	private _throwIfFrozen(errMsg: string): void {
@@ -192,17 +193,44 @@ export default class TypeMap {
 		return this.frozen;
 	}
 
+	public hasTypeErrors(): boolean {
+		return this.hasError;
+	}
+
+	public throwTypeErrors(): never {
+		if (!this.hasError) {
+			throw new Error('No type errors found!');
+		}
+		// Perhaps figure out a way to throw all of them in some combined error
+		throw this.typeErrors[0];
+	}
+
 	public addTypeUsage(
 		variable: string,
 		type: InferredType,
-		usage: TypeUsage
+		usage: TypeUsage,
 	): InferredType {
 		this._throwIfFrozen(
 			`Cannot add type usage for ${variable} when type map is frozen`
 		);
 		const info = this.getVariableTypeInfo(variable);
+		const existingType = info.type;
 		info.type = TypeMap.mergeTypeInfo(info.type, type);
 		info.usages.push(usage);
+
+		if (info.type === 'error') {
+			const loc = (usage as TextTypeUsage).location;
+			this.hasError = true;
+			this.typeErrors.push(new TypeError(
+				existingType,
+				type,
+				this,
+				(usage as (TextTypeUsage | ConstraintTypeUsage | ExpressionTypeUsage)).node || null,
+				loc != null ? loc.text.input : '',
+				loc.constraints != null ? loc.constraints.input : null,
+				variable,
+			));
+		}
 
 		return info.type;
 	}

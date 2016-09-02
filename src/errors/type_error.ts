@@ -6,37 +6,10 @@ import {
 } from '../trees/expression';
 import {
 	Node as TextNode,
+	Pos,
 } from '../trees/text';
 
-export type ExprNodeInfo = {
-	type: 'expression',
-	node: ExprNode,
-	location: {
-		textNodes: TextNode[],
-		constraintNodes: ConstraintNode[] | null,
-	}
-};
-
-export type TextNodeInfo = {
-	type: 'text',
-	node: TextNode,
-	location: {
-		textNodes: TextNode[],
-		constraintNodes: ConstraintNode[] | null,
-	}
-};
-
-export type ConstraintNodeInfo = {
-	type: 'constraint',
-	node: ConstraintNode,
-	location: {
-		constraintNodes: ConstraintNode[] | null,
-	}
-};
-
-export type NodeInfo = ExprNodeInfo
-	| TextNodeInfo
-	| ConstraintNodeInfo;
+import {showErrorLocation} from './util';
 
 import {default as TypeMap, InferredType} from '../type_map';
 
@@ -52,25 +25,139 @@ function printType(t: InferredType): string {
 	return t;
 }
 
+function getLocation(node: ExprNode | ConstraintNode | TextNode): Pos {
+	return node.pos;
+}
+
+function getErrorMessageForSimpleText(
+	line: number,
+	column: number,
+	variable: string,
+	expectedType: string,
+	foundType: string,
+	input: string,
+): string {
+	return (
+		`Type error at line ${line}:\n` +
+		showErrorLocation(
+			input,
+			`Variable \$${variable} was expected to have type: ${expectedType}, ` +
+			`found: ${foundType}.`,
+			line,
+			column
+		)
+	);
+}
+
+function getErrorMessageForConstraintError(
+	line: number,
+	column: number,
+	variable: string,
+	expectedType: string,
+	foundType: string,
+	constraintInput: string,
+	textInput: string,
+): string {
+	return (
+		`Type error at line ${line}:\n` +
+		showErrorLocation(
+			constraintInput,
+			`Variable \$${variable} was expected to have type: ${expectedType}, ` +
+			`found: ${foundType}.`,
+			line,
+			column
+		)
+	);
+}
+
+function getErrorMessageConstraintTextError(
+	line: number,
+	column: number,
+	variable: string,
+	expectedType: string,
+	foundType: string,
+	constraintInput: string,
+	textInput: string,
+): string {
+	return (
+		`Type error at line ${line}:\n` +
+		showErrorLocation(
+			textInput,
+			`Variable \$${variable} was expected to have type: ${expectedType}, ` +
+			`found: ${foundType}.`,
+			line,
+			column
+		)
+	);
+}
+
 export default class TypeError extends Error {
-	public expectedTypes: InferredType | InferredType[];
+	public expectedType: InferredType;
 	public foundType: InferredType;
-	public nodeInfo: NodeInfo;
+	public text: string;
+	public constraintText: string | null;
+	public node: ConstraintNode | TextNode | ExprNode | null;
+	public position: Pos;
 	public typeMap: TypeMap;
+	public variable: string;
 
 	public constructor(
-		expectedTypes: InferredType | InferredType[],
+		expectedType: InferredType,
 		foundType: InferredType,
 		typeMap: TypeMap,
-		nodeInfo: NodeInfo
+		node: ConstraintNode | TextNode | ExprNode | null,
+		text: string,
+		constraintText: string | null,
+		variable: string,
 	) {
-		super('' +
-			`Caught type error. Expected one of types: ${printTypes(expectedTypes)}. ` +
-			`Found type ${printType(foundType)}. At node: ${JSON.stringify(nodeInfo.node)}`);
+		const position = node != null ? getLocation(node) : {
+			firstColumn: 0,
+			firstLine: 0,
+			lastColumn: 0,
+			lastLine: 0,
+		};
+		const isConstraintError = (node as ConstraintNode).op != null;
+
+		let errorMessage: string;
+		if (isConstraintError) {
+			errorMessage = getErrorMessageForConstraintError(
+				position.firstLine,
+				position.firstColumn,
+				variable,
+				printTypes(expectedType),
+				printTypes(foundType),
+				(constraintText as string),
+				text
+			);
+		} else if (constraintText != null) {
+			errorMessage = getErrorMessageConstraintTextError(
+				position.firstLine,
+				position.firstColumn,
+				variable,
+				printTypes(expectedType),
+				printTypes(foundType),
+				(constraintText as string),
+				text
+			);
+		} else {
+			errorMessage = getErrorMessageForSimpleText(
+				position.firstLine,
+				position.firstColumn,
+				variable,
+				printTypes(expectedType),
+				printTypes(foundType),
+				text
+			);
+		}
+		super(errorMessage);
 		this.foundType = foundType;
 		this.typeMap = typeMap;
-		this.nodeInfo = nodeInfo;
-		this.expectedTypes = expectedTypes;
+		this.expectedType = expectedType;
+		this.node = this.node;
+		this.position = position;
+		this.variable = variable;
+		this.text = text;
+		this.constraintText = constraintText;
 	}
 }
 

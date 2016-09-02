@@ -1,4 +1,7 @@
-import {TypedNode} from '../trees/text';
+import {
+	TypedASTRoot,
+	TypedNode,
+} from '../trees/text';
 import TypeMap from '../type_map';
 import Context from './context';
 
@@ -11,7 +14,7 @@ import {
 } from './constraint';
 
 import {
-	Node as ConstraintNode,
+	ASTRoot as ConstraintAST,
 } from '../trees/constraint';
 
 import {
@@ -49,7 +52,7 @@ function encodeString(
 }
 
 export function emitNodeListExpression(
-	nodes: TypedNode[],
+	ast: TypedASTRoot,
 	ctx: Context
 ): ASTTypes.Expression {
 	const exprs: Array<{
@@ -58,7 +61,7 @@ export function emitNodeListExpression(
 		isConstant: boolean,
 	}> = [];
 
-	for (const node of nodes) {
+	for (const node of ast.nodes) {
 		const textNodeType = node.textNodeType;
 		switch (node.textNodeType) {
 			case 'literal':
@@ -174,10 +177,7 @@ function getTypeGuards(
 }
 
 export function emitConstrainedTranslations(
-	translations: Array<{
-		constraints: ConstraintNode[],
-		translation: TypedNode[],
-	}>,
+	translations: ConstraintTranslation,
 	ctx: Context,
 	typeMap: TypeMap
 ): ASTTypes.Expression {
@@ -225,21 +225,21 @@ export function emitConstrainedTranslations(
 }
 
 export function emitSimpleTranslation(
-	nodes: TypedNode[],
+	ast: TypedASTRoot,
 	ctx: Context,
 	typeMap: TypeMap
 ): ASTTypes.Expression {
-	const first = nodes[0];
+	const first = ast.nodes[0];
 	// Constant translations are just emitted as their Constant
 	// translation
-	if (nodes.length === 1 && first.textNodeType === 'literal') {
+	if (ast.nodes.length === 1 && first.textNodeType === 'literal') {
 		return b.literal(first.value);
 	}
 
 	const statements = getTypeGuards(ctx, typeMap);
 
 	// Emit the body of the translation
-	const expr = emitNodeListExpression(nodes, ctx);
+	const expr = emitNodeListExpression(ast, ctx);
 
 	statements.push(b.returnStatement(expr));
 
@@ -254,11 +254,11 @@ export function emitSimpleTranslation(
 	);
 }
 
-export type SimpleTranslation = TypedNode[];
+export type SimpleTranslation = TypedASTRoot;
 // $FlowFixMe: Flow cannot deal with this union
 export type ConstraintTranslation = Array<{
-	constraints: ConstraintNode[],
-	translation: TypedNode[]
+	constraints: ConstraintAST,
+	translation: TypedASTRoot,
 }>;
 
 export type Translation = SimpleTranslation | ConstraintTranslation;
@@ -268,12 +268,8 @@ export function emitTranslation(
 	ctx: Context,
 	typeMap: TypeMap
 ): ASTTypes.Expression {
-	if (translation.length === 0) {
-		return b.literal('');
-	}
-
 	const simple = translation as SimpleTranslation;
-	if (simple[0].textNodeType !== undefined) {
+	if (typeof(simple.input) === 'string') {
 		return emitSimpleTranslation(simple, ctx, typeMap);
 	} else {
 		return emitConstrainedTranslations(translation as ConstraintTranslation, ctx, typeMap);

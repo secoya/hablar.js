@@ -55,7 +55,12 @@ function fixupPositionInformation(
 	return node;
 }
 
-export default function parse(input: string): Node[] {
+export type TextParserResult = {
+	input: string,
+	nodes: Node[]
+};
+
+export default function parse(input: string): TextParserResult {
 	let parsed: InitialNode[] = [];
 	try {
 		parsed = parseOnlyTextExpression(input);
@@ -168,5 +173,8 @@ export default function parse(input: string): Node[] {
 		}
 	}
 
-	return result;
+	return {
+		input: input,
+		nodes: result,
+	};
 }

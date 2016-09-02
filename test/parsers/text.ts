@@ -309,6 +309,7 @@ $test
 }}`;
 			// tslint:enable:indent
 			const res = fullTextParser(exp);
+			assert.equal(exp, res.input);
 			assert.deepEqual(
 				[
 					{
@@ -391,7 +392,7 @@ $test
 						},
 					},
 				],
-				res
+				res.nodes
 			);
 		});
 

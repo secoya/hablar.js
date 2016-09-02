@@ -1,14 +1,14 @@
 import {
-	Node as ConstraintNode,
+	ASTRoot,
 } from '../trees/constraint';
 import {
-	TypedNode as TextNode,
+	TypedASTRoot as TextTypedASTRoot,
 } from '../trees/text';
 
 import DeadCodeError from '../errors/dead_code_error';
 
-function isDefiniteReturn(constraints: ConstraintNode[]) {
-	for (const node of constraints) {
+function isDefiniteReturn(ast: ASTRoot) {
+	for (const node of ast.nodes) {
 		if (node.op !== '!') {
 			return false;
 		}
@@ -32,8 +32,8 @@ function isDefiniteReturn(constraints: ConstraintNode[]) {
  * it is more than possible.
  */
 export function analyzeConstraints(translations: Array<{
-	constraints: ConstraintNode[],
-	translation: TextNode[]
+	constraints: ASTRoot,
+	translation: TextTypedASTRoot
 }>): void {
 	let definiteReturn = false;
 	for (const translation of translations) {

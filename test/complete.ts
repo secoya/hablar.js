@@ -6,12 +6,14 @@ import {prettyPrint} from 'recast';
 import {
 	analyzeTranslation,
 	ConstraintTranslation,
-	SimpleTranslation,
 } from '../src/analysis/combined';
 import Context from '../src/emitting/context';
 import {
 	emitTranslation,
 } from '../src/emitting/translation';
+import TypeError from '../src/errors/type_error';
+import UnknownFunctionError from '../src/errors/unknown_function_error';
+import UnknownVariableError from '../src/errors/unknown_variable_error';
 import constraintParser from '../src/parsers/constraint';
 import fullTextParser from '../src/parsers/text';
 import TypeMap from '../src/type_map';
@@ -20,7 +22,7 @@ describe('Full tests', function() {
 	it('Should work with simple text translations', function() {
 		const text = 'Some translation';
 
-		const ast: SimpleTranslation = fullTextParser(text);
+		const ast = fullTextParser(text);
 
 		const typeMap = new TypeMap();
 		const ctx = new Context();
@@ -76,7 +78,7 @@ describe('Full tests', function() {
 	});
 
 	it('Should constant fold simple translation', function() {
-		const translation: SimpleTranslation = fullTextParser('Here\'s one million: {{1*1000*1000}}');
+		const translation = fullTextParser('Here\'s one million: {{1*1000*1000}}');
 		const typeMap = new TypeMap();
 		const ctx = new Context();
 		const analyzed = analyzeTranslation(translation, typeMap);
@@ -129,5 +131,78 @@ describe('Full tests', function() {
 }`;
 		// tslint:enable:indent
 		assert.equal(expected, prettyPrint(jsAst).code);
+	});
+
+	it('Should generate pretty type errors', function() {
+		const text = 'Calculation: {{$myVar*5}}.';
+
+		const ast = fullTextParser(text);
+
+		const typeMap = new TypeMap();
+		typeMap.addTypeUsage('myVar', 'string', {nodeType: 'custom'});
+		assert.throws(
+			() => analyzeTranslation(ast, typeMap),
+			TypeError,
+// tslint:disable:indent
+`Type error at line 1:
+1: Calculation: {{$myVar*5}}.
+   ----------------^
+   Variable $myVar was expected to have type: string, found: number.`
+// tslint:enable:indent
+		);
+	});
+
+	it('Should generate pretty unknown variable error - in expression', function() {
+		const text = 'Calculation: {{$myVar}}.';
+
+		const ast = fullTextParser(text);
+
+		const typeMap = new TypeMap();
+		assert.throws(
+			() => analyzeTranslation(ast, typeMap, ['someOtherVar']),
+			UnknownVariableError,
+// tslint:disable:indent
+`Unknown variable $myVar used on line 1:
+1: Calculation: {{$myVar}}.
+   ----------------^
+   Variable $myVar is not known to this translation. Known variables are: $someOtherVar`
+// tslint:enable:indent
+		);
+	});
+
+	it('Should generate pretty unknown variable error - outside of expression', function() {
+		const text = 'Calculation: $myVar.';
+
+		const ast = fullTextParser(text);
+
+		const typeMap = new TypeMap();
+		assert.throws(
+			() => analyzeTranslation(ast, typeMap, ['someOtherVar']),
+			UnknownVariableError,
+// tslint:disable:indent
+`Unknown variable $myVar used on line 1:
+1: Calculation: $myVar.
+   --------------^
+   Variable $myVar is not known to this translation. Known variables are: $someOtherVar`
+// tslint:enable:indent
+		);
+	});
+
+	it('Should generate pretty unknown function error', function() {
+		const text = 'Calculation: {{fn()}}';
+
+		const ast = fullTextParser(text);
+
+		const typeMap = new TypeMap();
+		assert.throws(
+			() => analyzeTranslation(ast, typeMap, null, ['otherFn']),
+			UnknownFunctionError,
+// tslint:disable:indent
+`Unknown function fn used on line 1:
+1: Calculation: {{fn()}}
+   ---------------^
+   Function fn is not known to this translation. Known functions are: otherFn`
+// tslint:enable:indent
+		);
 	});
 });

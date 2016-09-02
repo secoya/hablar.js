@@ -8,10 +8,12 @@ import {
 import DeadCodeError from '../../src/errors/dead_code_error';
 
 import {
+	ASTRoot as ConstraintAST,
 	Node as ConstraintNode,
 } from '../../src/trees/constraint';
 
 import {
+	TypedASTRoot as TypedTextASTRoot,
 	TypedNode as TypedTextNode,
 } from '../../src/trees/text';
 
@@ -62,12 +64,18 @@ function noReturnNode(v: string = 'var'): ConstraintNode {
 }
 
 function makeTranslation(constraints: ConstraintNode[] | ConstraintNode, text: string): {
-	constraints: ConstraintNode[],
-	translation: TypedTextNode[],
+	constraints: ConstraintAST,
+	translation: TypedTextASTRoot,
 } {
 	return {
-		constraints: Array.isArray(constraints) ? constraints : [constraints],
-		translation: [tn(text)],
+		constraints: {
+			input: '',
+			nodes: Array.isArray(constraints) ? constraints : [constraints],
+		},
+		translation: {
+			input: text,
+			nodes: [tn(text)],
+		},
 	};
 }
 

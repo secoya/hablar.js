@@ -1,3 +1,7 @@
+import {
+	showErrorLocation,
+} from  './util';
+
 export default class ParseError extends Error {
 	public static getErrorMessage(hash: {
 			text: string,
@@ -11,25 +15,12 @@ export default class ParseError extends Error {
 			},
 			expected: string[],
 		}): string {
-		const lines = hash.text.split('\n');
-		const maxLineNumLength = lines.length.toString().length;
-		const linesWithLineNumber = lines.map((e, i) => {
-			const lineNumber = (i + 1).toString();
-			const pad = ' '.repeat(maxLineNumLength - lineNumber.length + 1);
-			return lineNumber + ':' + pad + e;
-		});
-		const errPad = ' '.repeat(maxLineNumLength + 2);
 		const expected = hash.expected.join(', ');
 		const got = `'${hash.token}'`;
 
-		const errColumn = Math.min(lines[hash.line - 1].length, hash.loc.last_column + 1);
-		linesWithLineNumber.splice(
-			hash.loc.last_line,
-			0,
-			`${errPad}${'-'.repeat(errColumn)}^`, `${errPad}Expecting: ${expected} got ${got}`
-		);
 		return (
-			`Parse error on line ${hash.loc.last_line}:\n${linesWithLineNumber.join('\n')}`
+			`Parse error on line ${hash.loc.last_line}:\n` +
+			showErrorLocation(hash.text, `Expecting: ${expected} got ${got}`, hash.line, hash.loc.last_column)
 		);
 	}
 

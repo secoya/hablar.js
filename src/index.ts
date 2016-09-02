@@ -22,13 +22,12 @@ export const parsers = {
 	text: parseText,
 };
 
-import {default as DeadCodeErrorConstructor} from './errors/dead_code_error';
-import {default as ParseErrorConstructor} from './errors/parse_error';
-import {default as TypeErrorConstructor} from './errors/type_error';
-
-export const ParseError = ParseErrorConstructor;
-export const DeadError = DeadCodeErrorConstructor;
-export const TypeError = TypeErrorConstructor;
+export {default as UnknownFunctionError} from './errors/unknown_function_error';
+export {default as UnknownVariableError} from './errors/unknown_variable_error';
+export {default as DeadCodeError} from './errors/dead_code_error';
+export {default as ParseError} from './errors/parse_error';
+export {default as TypeError} from './errors/type_error';
+export {showErrorLocation} from './errors/util';
 
 import {default as TypeMapConstructor, InferredType as InferType} from './type_map';
 

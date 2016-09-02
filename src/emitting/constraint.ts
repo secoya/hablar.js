@@ -1,16 +1,16 @@
-import {Node} from '../trees/constraint';
+import {ASTRoot} from '../trees/constraint';
 import Context from './context';
 import {builders as b} from 'ast-types';
 
 export function emitConstrainedTranslation(
-	constraints: Node[],
+	ast: ASTRoot,
 	expr: ASTTypes.Expression,
 	ctx: Context
 ): ASTTypes.Statement {
 
 	const tests: ASTTypes.Expression[] = [];
 
-	for (const t of constraints) {
+	for (const t of ast.nodes) {
 		const tOp = t.op;
 		switch (t.op) {
 			case '!': // This test generates no code

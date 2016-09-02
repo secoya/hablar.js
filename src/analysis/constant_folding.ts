@@ -3,6 +3,7 @@ import {
 } from '../trees/expression';
 import {
 	Pos,
+	TypedASTRoot,
 	TypedLiteralNode,
 	TypedNode as TextNode,
 } from '../trees/text';
@@ -198,7 +199,7 @@ export function constantFoldExpression(expr: Node): Node {
 			if (isConstantExpression(val)) {
 				if (val.exprType !== 'number') {
 					throw new Error(
-						'ould not constant fold expression. ' +
+						'Could not constant fold expression. ' +
 						'Unary minus with a string. It is only allowed on numbers.'
 					);
 				}
@@ -232,10 +233,10 @@ export function constantFoldExpression(expr: Node): Node {
 	}
 }
 
-export function constantFoldExpressionList(nodes: TextNode[]): TextNode[] {
+export function constantFoldExpressionList(ast: TypedASTRoot): TypedASTRoot {
 	const result: TextNode[] = [];
 	let lastConstantExpr: TypedLiteralNode | null = null;
-	for (const expr of nodes) {
+	for (const expr of ast.nodes) {
 		switch (expr.textNodeType) {
 			case 'expr': {
 				expr.value = constantFoldExpression(expr.value);
@@ -275,5 +276,8 @@ export function constantFoldExpressionList(nodes: TextNode[]): TextNode[] {
 		}
 	}
 
-	return result;
+	return {
+		input: ast.input,
+		nodes: result,
+	};
 }
