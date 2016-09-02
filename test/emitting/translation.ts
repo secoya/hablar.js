@@ -438,5 +438,33 @@ describe('Emitting - translation', function() {
 			// tslint:enable:indent
 			assert.equal(expected, res.code);
 		});
+
+		it('Should not double escape variable in expression', function() {
+			const tr = {
+				input: 'Some translation {{$myVar}}',
+				nodes: [
+					tn('Some translation '),
+					en(v('string', 'myVar')),
+				],
+			};
+
+			const map = new TypeMap();
+			const ctx = new Context();
+
+			const res = prettyPrint(emitSimpleTranslation(
+				tr,
+				ctx,
+				map,
+			));
+
+			const expected =
+// tslint:disable:indent
+`function(vars, fns, ctx) {
+    return ctx.encode("Some translation ") + encodeIfString(ctx, vars.myVar);
+}`;
+// tslint:enable:indent
+
+			assert.equal(expected, res.code);
+		});
 	});
 });

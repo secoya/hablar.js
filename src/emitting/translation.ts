@@ -78,11 +78,6 @@ export function emitNodeListExpression(
 					false
 				);
 
-				if (
-					node.textType !== 'number'
-				) {
-					varExp = varExp;
-				}
 				exprs.push({
 					exp: varExp,
 					isConstant: false,
@@ -94,9 +89,6 @@ export function emitNodeListExpression(
 				const exp = (node.value as any) as ExprNode;
 				let varExp = emitExpression(exp, ctx);
 
-				if (exp.exprType !== 'number') {
-					varExp = encodeIfString(varExp, ctx);
-				}
 				exprs.push({
 					exp: varExp,
 					isConstant: false,
