@@ -1,6 +1,6 @@
 /// <reference path="./ast-types.d.ts" />
 declare module 'recast' {
-	export interface SourceMap extends Node {}
+	export interface SourceMap extends ASTTypes.Node {}
 
 	export function prettyPrint(node: ASTTypes.Node, options?: {
 		tabWidth?: number,
