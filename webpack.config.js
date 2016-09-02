@@ -4,7 +4,7 @@ module.exports = {
 		loaders: [
 			{
 				test: /\.ts$/,
-				loaders: ['babel-loader', 'ts-loader'],
+				loaders: ['ts-loader'],
 			},
 			{
 				test: /\.jison$/,

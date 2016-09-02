@@ -49,6 +49,7 @@ export default class ParseError extends Error {
 		}
 	) {
 		super(message);
+		this.message = message;
 		if (hash != null) {
 			this.text = hash.text;
 			this.token = hash.token;

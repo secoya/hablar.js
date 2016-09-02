@@ -242,7 +242,7 @@ export default class TypeMap {
 		this.functions.add(functionName);
 	}
 
-	public functionNames(): IterableIterator<string> {
-		return this.functions.values();
+	public functionNames(): string[] {
+		return Array.from(this.functions.values());
 	}
 }

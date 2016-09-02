@@ -150,6 +150,7 @@ export default class TypeError extends Error {
 			);
 		}
 		super(errorMessage);
+		this.message = errorMessage;
 		this.foundType = foundType;
 		this.typeMap = typeMap;
 		this.expectedType = expectedType;

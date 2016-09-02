@@ -2,14 +2,18 @@
     "compilerOptions": {
         "strictNullChecks": true,
         "module": "commonjs",
-        "target": "es6",
+        "target": "es5",
         "declaration": false,
         "noEmit": false,
         "newLine": "LF",
         "outDir": "lib",
         "noImplicitAny": true,
         "allowJs": false,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "lib": [
+            "es6",
+            "es2015"
+        ]
     },
     "files": [
         "typings/index.d.ts",

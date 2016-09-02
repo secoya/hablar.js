@@ -33,7 +33,7 @@ export default class UnknownVariableError extends Error {
 			varName = (node as TextVarNode).value;
 		}
 
-		super(
+		const errMessage = '' +
 			`Unknown variable \$${varName} used on line ${node.pos.firstLine}:\n` +
 			showErrorLocation(
 				ast.input,
@@ -41,9 +41,12 @@ export default class UnknownVariableError extends Error {
 				`Known variables are: ${allowedVariables.map((e) => '$' + e).join(', ')}`,
 				node.pos.firstLine,
 				node.pos.firstColumn,
-			)
+			);
+		super(
+			errMessage
 		);
 
+		this.message = errMessage;
 		this.variable = varName;
 		this.allowedVariables = allowedVariables;
 		this.line = node.pos.firstLine;

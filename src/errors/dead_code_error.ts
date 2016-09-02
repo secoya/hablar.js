@@ -19,6 +19,7 @@ export default class DeadCodeError extends Error {
 		}
 	) {
 		super(message);
+		this.message = message;
 	}
 }
 DeadCodeError.prototype.name = 'DeadCodeError';

@@ -26,8 +26,7 @@ export default class UnknownFunctionError extends Error {
 		constraints: ConstraintAST | null = null,
 	) {
 		const functionName = node.name;
-
-		super(
+		const errMessage = '' +
 			`Unknown function ${functionName} used on line ${node.pos.firstLine}:\n` +
 			showErrorLocation(
 				ast.input,
@@ -35,9 +34,11 @@ export default class UnknownFunctionError extends Error {
 				`Known functions are: ${allowedFunctions.join(', ')}`,
 				node.pos.firstLine,
 				node.pos.firstColumn - 1,
-			)
+			);
+		super(
+			errMessage
 		);
-
+		this.message = errMessage;
 		this.functionName = functionName;
 		this.allowedFunctions = allowedFunctions;
 		this.line = node.pos.firstLine;
