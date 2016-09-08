@@ -214,6 +214,7 @@ function makeTypedExpressionNode(
 	node: ExprNode,
 	typeMap: TypeMap,
 ): TypedExprNode {
+	const exprNodeType = node.exprNodeType;
 	if (node.exprNodeType === 'string_literal') {
 		return {
 			exprNodeType: 'string_literal',
@@ -335,7 +336,7 @@ function makeTypedExpressionNode(
 			typed: true,
 		};
 	} else {
-		throw new Error('Unknown expression type: ' + node.exprNodeType);
+		throw new Error('Unknown expression type: ' + exprNodeType);
 	}
 }
 
