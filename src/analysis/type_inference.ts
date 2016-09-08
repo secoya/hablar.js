@@ -5,7 +5,11 @@ import {
 import {
 	Node as ExprNode,
 	TypedBinaryOpNode,
+	TypedFunctionInvocationNode,
 	TypedNode as TypedExprNode,
+	TypedNumberNode,
+	TypedStringLiteralNode,
+	TypedVariableNode,
 	VariableNode as ExprVariableNode,
 } from '../trees/expression';
 import {
@@ -223,7 +227,7 @@ function makeTypedExpressionNode(
 			pos: node.pos,
 			typed: true,
 			value: node.value,
-		};
+		} as TypedStringLiteralNode;
 	} else if (node.exprNodeType === 'number') {
 		return {
 			exprNodeType: 'number',
@@ -232,7 +236,7 @@ function makeTypedExpressionNode(
 			pos: node.pos,
 			typed: true,
 			value: node.value,
-		};
+		} as TypedNumberNode;
 	} else if (node.exprNodeType === 'variable') {
 		if (!typeMap.hasInfoForType(node.name)) {
 			throw new Error(
@@ -257,7 +261,7 @@ function makeTypedExpressionNode(
 			name: node.name,
 			pos: node.pos,
 			typed: true,
-		};
+		} as TypedVariableNode;
 	} else if (node.exprNodeType === 'unary_minus') {
 		const typedOp = makeTypedExpressionNode(node.op, typeMap);
 
@@ -334,7 +338,7 @@ function makeTypedExpressionNode(
 			parameters: parameters,
 			pos: node.pos,
 			typed: true,
-		};
+		} as TypedFunctionInvocationNode;
 	} else {
 		throw new Error('Unknown expression type: ' + exprNodeType);
 	}

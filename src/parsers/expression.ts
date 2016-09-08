@@ -27,15 +27,15 @@ export function walkTypedNode(node: TypedNode, callback: (node: TypedNode) => vo
 	switch (node.exprNodeType) {
 		case 'function_invocation':
 			for (const param of node.parameters) {
-				walkNode(param, callback);
+				walkTypedNode(param, callback);
 			}
 			break;
 		case 'unary_minus':
-			walkNode(node.op, callback);
+			walkTypedNode(node.op, callback);
 			break;
 		case 'binary_op':
-			walkNode(node.lhs, callback);
-			walkNode(node.rhs, callback);
+			walkTypedNode(node.lhs, callback);
+			walkTypedNode(node.rhs, callback);
 			break;
 		default: // Not needed, no child nodes of other types
 	}

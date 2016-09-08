@@ -1,5 +1,8 @@
 import {
+	TypedFunctionInvocationNode,
 	TypedNode as Node,
+	TypedNumberNode,
+	TypedStringLiteralNode,
 } from '../trees/expression';
 import {
 	Pos,
@@ -128,7 +131,7 @@ export function constantFoldExpression(expr: Node): Node {
 				parameters,
 				pos: expr.pos,
 				typed: true,
-			};
+			} as TypedFunctionInvocationNode;
 		}
 		case 'binary_op': {
 			const lhs = constantFoldExpression(expr.lhs);
@@ -144,7 +147,7 @@ export function constantFoldExpression(expr: Node): Node {
 						pos: expr.pos,
 						typed: true,
 						value: val,
-					};
+					} as TypedStringLiteralNode;
 				} else {
 					return {
 						exprNodeType: 'number',
@@ -153,7 +156,7 @@ export function constantFoldExpression(expr: Node): Node {
 						pos: expr.pos,
 						typed: true,
 						value: val,
-					};
+					} as TypedNumberNode;
 				}
 			}	else if (
 				expr.binaryOp === 'multiply' &&
@@ -178,7 +181,7 @@ export function constantFoldExpression(expr: Node): Node {
 						pos: combinePosInformation(lhs.rhs.pos, rhs.pos),
 						typed: true,
 						value: val,
-					},
+					} as TypedNumberNode,
 					typed: true,
 				};
 			}
@@ -216,7 +219,7 @@ export function constantFoldExpression(expr: Node): Node {
 					pos: expr.pos,
 					typed: true,
 					value: -constantValue,
-				};
+				} as TypedNumberNode;
 			}
 
 			return {

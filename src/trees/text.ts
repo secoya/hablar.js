@@ -18,7 +18,7 @@ export type LiteralNode = {
 	textNodeType: 'literal',
 	value: string,
 	pos: Pos,
-	typed?: boolean,
+	typed?: false,
 };
 
 export type TypedLiteralNode = {
@@ -26,14 +26,14 @@ export type TypedLiteralNode = {
 	value: string,
 	pos: Pos,
 	textType: InferredType,
-	typed: boolean,
+	typed: true,
 }
 
 export type VariableNode = {
 	textNodeType: 'variable',
 	value: string,
 	pos: Pos,
-	typed?: boolean,
+	typed?: false,
 };
 
 export type TypedVariableNode = {
@@ -41,14 +41,14 @@ export type TypedVariableNode = {
 	value: string,
 	pos: Pos,
 	textType: InferredType,
-	typed: boolean,
+	typed: true,
 };
 
 export type ExprNode = {
 	textNodeType: 'expr',
 	value: ExpressionNode,
 	pos: Pos,
-	typed?: boolean,
+	typed?: false,
 };
 
 export type TypedExprNode = {
@@ -56,7 +56,7 @@ export type TypedExprNode = {
 	value: TypedExpressionNode,
 	pos: Pos,
 	textType: InferredType,
-	typed: boolean,
+	typed: true,
 };
 
 export type Node = LiteralNode
