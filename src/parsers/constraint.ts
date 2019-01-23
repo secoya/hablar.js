@@ -1,12 +1,12 @@
-import {Node} from '../trees/constraint';
+import { Node } from '../trees/constraint';
 import getParser from './get_parser';
 
 const constraintParser = getParser('constraint');
 
 export type ConstraintParserResult = {
-	input: string,
-	nodes: Node[],
-}
+	input: string;
+	nodes: Node[];
+};
 
 export default function parse(input: string): ConstraintParserResult {
 	return {

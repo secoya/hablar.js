@@ -1,70 +1,52 @@
-import {
-	ASTRoot,
-	Node as TextNode,
-} from './trees/text';
+import { ASTRoot, Node as TextNode } from './trees/text';
 
-import {
-	ASTRoot as ConstraintAST,
-	Node as ConstraintNode,
-} from './trees/constraint';
+import { ASTRoot as ConstraintAST, Node as ConstraintNode } from './trees/constraint';
 
-import {
-	Node as ExprNode,
-} from './trees/expression';
+import { Node as ExprNode } from './trees/expression';
 
 import TypeError from './errors/type_error';
 
-export type InferredType = 'enum'
-	| 'error'
-	| 'gender'
-	| 'number-or-string'
-	| 'number'
-	| 'string'
-	| 'unknown'
-;
+export type InferredType = 'enum' | 'error' | 'gender' | 'number-or-string' | 'number' | 'string' | 'unknown';
 
 export type UsageLocation = {
-	text: ASTRoot,
-	constraints?: ConstraintAST,
+	text: ASTRoot;
+	constraints?: ConstraintAST;
 };
 
 export type ConstraintTypeUsage = {
-	nodeType: 'constraint',
-	node: ConstraintNode,
-	location: UsageLocation,
-	type: 'unknown' | 'gender' | 'enum' | 'number',
+	nodeType: 'constraint';
+	node: ConstraintNode;
+	location: UsageLocation;
+	type: 'unknown' | 'gender' | 'enum' | 'number';
 };
 
 export type ExpressionTypeUsage = {
-	nodeType: 'expression',
-	node: ExprNode,
-	location: UsageLocation,
-	type: 'unknown' | 'number-or-string' | 'number' | 'string',
-}
+	nodeType: 'expression';
+	node: ExprNode;
+	location: UsageLocation;
+	type: 'unknown' | 'number-or-string' | 'number' | 'string';
+};
 
 export type TextTypeUsage = {
-	nodeType: 'text',
-	node: TextNode,
-	location: UsageLocation,
-	type: 'number-or-string',
-}
+	nodeType: 'text';
+	node: TextNode;
+	location: UsageLocation;
+	type: 'number-or-string';
+};
 
 // Used for third party integration. It could be that the person
 // integrating with this has some sort of metadata
 // on the actual translation - that specifies the types
 // of all variables.
 export type CustomTypeUsage = {
-	nodeType: 'custom',
-}
+	nodeType: 'custom';
+};
 
-export type TypeUsage = ConstraintTypeUsage
-	| ExpressionTypeUsage
-	| TextTypeUsage
-	| CustomTypeUsage
+export type TypeUsage = ConstraintTypeUsage | ExpressionTypeUsage | TextTypeUsage | CustomTypeUsage;
 
 export type TypeInfo = {
-	usages: TypeUsage[],
-	type: InferredType,
+	usages: TypeUsage[];
+	type: InferredType;
 };
 
 export default class TypeMap {
@@ -205,14 +187,8 @@ export default class TypeMap {
 		throw this.typeErrors[0];
 	}
 
-	public addTypeUsage(
-		variable: string,
-		type: InferredType,
-		usage: TypeUsage,
-	): InferredType {
-		this._throwIfFrozen(
-			`Cannot add type usage for ${variable} when type map is frozen`
-		);
+	public addTypeUsage(variable: string, type: InferredType, usage: TypeUsage): InferredType {
+		this._throwIfFrozen(`Cannot add type usage for ${variable} when type map is frozen`);
 		const info = this.getVariableTypeInfo(variable);
 		const existingType = info.type;
 		info.type = TypeMap.mergeTypeInfo(info.type, type);
@@ -221,24 +197,24 @@ export default class TypeMap {
 		if (info.type === 'error') {
 			const loc = (usage as TextTypeUsage).location;
 			this.hasError = true;
-			this.typeErrors.push(new TypeError(
-				existingType,
-				type,
-				this,
-				(usage as (TextTypeUsage | ConstraintTypeUsage | ExpressionTypeUsage)).node || null,
-				loc != null ? loc.text.input : '',
-				loc.constraints != null ? loc.constraints.input : null,
-				variable,
-			));
+			this.typeErrors.push(
+				new TypeError(
+					existingType,
+					type,
+					this,
+					(usage as (TextTypeUsage | ConstraintTypeUsage | ExpressionTypeUsage)).node || null,
+					loc != null ? loc.text.input : '',
+					loc.constraints != null ? loc.constraints.input : null,
+					variable,
+				),
+			);
 		}
 
 		return info.type;
 	}
 
 	public addFunction(functionName: string): void {
-		this._throwIfFrozen(
-			`Cannot add function ${functionName} after map is frozen`
-		);
+		this._throwIfFrozen(`Cannot add function ${functionName} after map is frozen`);
 		this.functions.add(functionName);
 	}
 

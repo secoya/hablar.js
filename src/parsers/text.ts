@@ -1,63 +1,46 @@
 import ParseError from '../errors/parse_error';
-import expressionParser, {walkNode} from './expression';
+import expressionParser, { walkNode } from './expression';
 import getParser from './get_parser';
 
 const textParser = getParser('text');
 
-import {
-	Node as NodeExpression,
-} from '../trees/expression';
-import {
-	ExprNode,
-	LiteralNode,
-	Node,
-	Pos,
-	VariableNode,
-} from '../trees/text';
+import { Node as NodeExpression } from '../trees/expression';
+import { ExprNode, LiteralNode, Node, Pos, VariableNode } from '../trees/text';
 
 export type InitialExprNode = {
-	textNodeType: 'expr',
-	value: string,
-	pos: Pos,
-	valuePos: Pos,
+	textNodeType: 'expr';
+	value: string;
+	pos: Pos;
+	valuePos: Pos;
 };
 
-export type InitialNode = LiteralNode
-	| VariableNode
-	| InitialExprNode
-;
+export type InitialNode = LiteralNode | VariableNode | InitialExprNode;
 
 export function parseOnlyTextExpression(input: string): InitialNode[] {
 	return textParser.parse(input);
 }
 
-function repositionPosition(
-	enclosingPosition: Pos,
-	pos: Pos
-): Pos {
+function repositionPosition(enclosingPosition: Pos, pos: Pos): Pos {
 	// We subtract one from line indices as they are one indexed.
 	// If we're still on line one - we add the firstColumn to both first and last column
 	return {
-		firstColumn: pos.firstLine !== 1 ? pos.firstColumn : (enclosingPosition.firstColumn + pos.firstColumn),
+		firstColumn: pos.firstLine !== 1 ? pos.firstColumn : enclosingPosition.firstColumn + pos.firstColumn,
 		firstLine: enclosingPosition.firstLine + pos.firstLine - 1,
-		lastColumn: pos.lastLine !== 1 ? pos.lastColumn : (enclosingPosition.firstColumn + pos.lastColumn),
+		lastColumn: pos.lastLine !== 1 ? pos.lastColumn : enclosingPosition.firstColumn + pos.lastColumn,
 		lastLine: enclosingPosition.firstLine + pos.lastLine - 1,
 	};
 }
 
-function fixupPositionInformation(
-	node: NodeExpression,
-	exprNode: InitialExprNode
-): NodeExpression {
-	walkNode(node, (n) => {
+function fixupPositionInformation(node: NodeExpression, exprNode: InitialExprNode): NodeExpression {
+	walkNode(node, n => {
 		n.pos = repositionPosition(exprNode.valuePos, n.pos);
 	});
 	return node;
 }
 
 export type TextParserResult = {
-	input: string,
-	nodes: Node[]
+	input: string;
+	nodes: Node[];
 };
 
 export default function parse(input: string): TextParserResult {
@@ -94,13 +77,10 @@ export default function parse(input: string): TextParserResult {
 		throw new ParseError(message, hash);
 	}
 
-	let last: Node | null = null;
 	const result: Node[] = [];
 
 	for (const fragment of parsed) {
-		if (fragment.textNodeType === 'literal' && last != null && last.textNodeType === 'literal') {
-			last.value += fragment.value;
-		} else if (fragment.textNodeType === 'expr') {
+		if (fragment.textNodeType === 'expr') {
 			try {
 				const newNode: ExprNode = {
 					pos: fragment.pos,
@@ -108,7 +88,6 @@ export default function parse(input: string): TextParserResult {
 					value: fixupPositionInformation(expressionParser(fragment.value), fragment),
 				};
 				result.push(newNode);
-				last = newNode;
 			} catch (e) {
 				if (!(e instanceof ParseError)) {
 					throw e;
@@ -125,7 +104,7 @@ export default function parse(input: string): TextParserResult {
 					throw e;
 				}
 
-				const token = (parseErr.token) === `EOF` ? `CLOSE_EXPR` : (parseErr.token || `NONE`);
+				const token = parseErr.token === `EOF` ? `CLOSE_EXPR` : parseErr.token || `NONE`;
 
 				const errPos = repositionPosition(fragment.valuePos, {
 					firstColumn: parseErr.firstColumn,
@@ -139,7 +118,7 @@ export default function parse(input: string): TextParserResult {
 					errPos.lastColumn = fragment.valuePos.lastColumn - 1; // This should be +2 but we add that in the end
 					errPos.lastLine = fragment.valuePos.lastLine;
 				}
-				const expected = (parseErr.expected || ['NONE']).map((e) => {
+				const expected = (parseErr.expected || ['NONE']).map(e => {
 					if (e === 'EOF') {
 						return `'CLOSE_EXPR'`;
 					}

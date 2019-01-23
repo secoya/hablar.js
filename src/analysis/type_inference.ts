@@ -1,7 +1,4 @@
-import {
-	ASTRoot as ConstraintAST,
-	Node as ConstraintNode,
-} from '../trees/constraint';
+import { ASTRoot as ConstraintAST, Node as ConstraintNode } from '../trees/constraint';
 import {
 	Node as ExprNode,
 	TypedBinaryOpNode,
@@ -12,18 +9,9 @@ import {
 	TypedVariableNode,
 	VariableNode as ExprVariableNode,
 } from '../trees/expression';
-import {
-	ASTRoot,
-	TypedASTRoot,
-	TypedNode as TypedTextNode,
-	VariableNode as TextVariableNode,
-} from '../trees/text';
+import { ASTRoot, TypedASTRoot, TypedNode as TypedTextNode, VariableNode as TextVariableNode } from '../trees/text';
 
-import {
-	default as TypeMap,
-	InferredType,
-	UsageLocation,
-} from '../type_map';
+import { default as TypeMap, InferredType, UsageLocation } from '../type_map';
 
 function addConstraintTypeUsageForNode(
 	typeMap: TypeMap,
@@ -38,9 +26,9 @@ function addConstraintTypeUsageForNode(
 
 	const addTypeInfo = (variable: string, type: 'unknown' | 'gender' | 'enum' | 'number') => {
 		typeMap.addTypeUsage(variable, type, {
-			nodeType: 'constraint',
-			node,
 			location,
+			node,
+			nodeType: 'constraint',
 			type,
 		});
 	};
@@ -69,33 +57,25 @@ function addExprTypeInfo(
 	typeMap: TypeMap,
 	variable: ExprVariableNode,
 	type: InferredType,
-	location: UsageLocation
+	location: UsageLocation,
 ): InferredType {
-	if (
-		type === 'error' ||
-		type === 'gender' ||
-		type === 'enum'
-	) {
+	if (type === 'error' || type === 'gender' || type === 'enum') {
 		throw new Error('Invalid expression type usage type: ' + type);
 	}
-	return typeMap.addTypeUsage(
-		variable.name,
-		type,
-		{
-			location,
-			node: variable,
-			nodeType: 'expression',
-			// We have excluded the other values from type in the guard above. I think this is a typescript bug
-			type: (type as 'unknown' | 'number-or-string' | 'number' | 'string'),
-		}
-	);
+	return typeMap.addTypeUsage(variable.name, type, {
+		location,
+		node: variable,
+		nodeType: 'expression',
+		// We have excluded the other values from type in the guard above. I think this is a typescript bug
+		type: type as 'unknown' | 'number-or-string' | 'number' | 'string',
+	});
 }
 
 function inferExprType(
 	typeMap: TypeMap,
 	node: ExprNode,
 	location: UsageLocation,
-	resultType?: InferredType
+	resultType?: InferredType,
 ): InferredType {
 	const exprType = node.exprNodeType;
 	switch (node.exprNodeType) {
@@ -104,18 +84,18 @@ function inferExprType(
 			return 'number';
 		case 'variable': {
 			if (resultType != null) {
-				const type = addExprTypeInfo(typeMap, node, resultType, location);
-				if (type === 'gender' || type === 'enum') {
+				const resultExprType = addExprTypeInfo(typeMap, node, resultType, location);
+				if (resultExprType === 'gender' || resultExprType === 'enum') {
 					return 'string';
 				}
-				return type;
+				return resultExprType;
 			}
-			const type = addExprTypeInfo(typeMap, node, 'unknown', location);
-			if (type === 'gender' || type === 'enum') {
+			const nodeExprType = addExprTypeInfo(typeMap, node, 'unknown', location);
+			if (nodeExprType === 'gender' || nodeExprType === 'enum') {
 				return 'string';
 			}
 
-			return type;
+			return nodeExprType;
 		}
 		case 'number':
 			return 'number';
@@ -170,35 +150,23 @@ function inferExprType(
 	}
 }
 
-export function inferExpressionTypes(
-	typeMap: TypeMap,
-	node: ExprNode,
-	location: UsageLocation
-) {
+export function inferExpressionTypes(typeMap: TypeMap, node: ExprNode, location: UsageLocation) {
 	inferExprType(typeMap, node, location);
 }
 
-export function inferTextTypes(
-	typeMap: TypeMap,
-	textAST: ASTRoot,
-	constraintAST?: ConstraintAST
-) {
+export function inferTextTypes(typeMap: TypeMap, textAST: ASTRoot, constraintAST?: ConstraintAST) {
 	const location = {
 		constraints: constraintAST,
 		text: textAST,
 	};
 
 	const addVariableTypeInfo = (node: TextVariableNode) => {
-		typeMap.addTypeUsage(
-			node.value,
-			'number-or-string',
-			{
-				nodeType: 'text',
-				node,
-				location,
-				type: 'number-or-string',
-			}
-		);
+		typeMap.addTypeUsage(node.value, 'number-or-string', {
+			location,
+			node,
+			nodeType: 'text',
+			type: 'number-or-string',
+		});
 	};
 
 	for (const node of textAST.nodes) {
@@ -214,10 +182,7 @@ export function inferTextTypes(
 	}
 }
 
-function makeTypedExpressionNode(
-	node: ExprNode,
-	typeMap: TypeMap,
-): TypedExprNode {
+function makeTypedExpressionNode(node: ExprNode, typeMap: TypeMap): TypedExprNode {
 	const exprNodeType = node.exprNodeType;
 	if (node.exprNodeType === 'string_literal') {
 		return {
@@ -240,9 +205,9 @@ function makeTypedExpressionNode(
 	} else if (node.exprNodeType === 'variable') {
 		if (!typeMap.hasInfoForType(node.name)) {
 			throw new Error(
-					`Type for variable ${node.name} not found in type map.` +
-					'Are you sure you ran the type inference phase first?'
-				);
+				`Type for variable ${node.name} not found in type map.` +
+					'Are you sure you ran the type inference phase first?',
+			);
 		}
 
 		let type = typeMap.getVariableType(node.name);
@@ -265,7 +230,7 @@ function makeTypedExpressionNode(
 	} else if (node.exprNodeType === 'unary_minus') {
 		const typedOp = makeTypedExpressionNode(node.op, typeMap);
 
-		let exprType = typedOp.exprType;
+		const exprType = typedOp.exprType;
 
 		return {
 			exprNodeType: 'unary_minus',
@@ -281,7 +246,10 @@ function makeTypedExpressionNode(
 		const typedRhs = makeTypedExpressionNode(node.rhs, typeMap);
 		const rhsType = typedRhs.exprType;
 
-		const makeBinaryResult = (op: 'plus' | 'minus' | 'divide' | 'multiply', type: InferredType) : TypedBinaryOpNode => {
+		const makeBinaryResult = (
+			op: 'plus' | 'minus' | 'divide' | 'multiply',
+			type: InferredType,
+		): TypedBinaryOpNode => {
 			return {
 				binaryOp: op,
 				exprNodeType: 'binary_op',
@@ -307,10 +275,7 @@ function makeTypedExpressionNode(
 				// Attempt to find the most specific type of both sides
 				// Basicly if either side is a string, the result
 				// is also a string. Otherwise it is number-or-string
-				return makeBinaryResult(
-					'plus',
-					type,
-				);
+				return makeBinaryResult('plus', type);
 			}
 			case 'minus':
 			case 'divide':
@@ -326,9 +291,7 @@ function makeTypedExpressionNode(
 		// any potential calculations can be done inside the function.
 		// And in any case in general they should be used
 		// to return some kind of escaped markup.
-		const parameters: TypedExprNode[] = node.parameters.map(
-			(n) => makeTypedExpressionNode(n, typeMap)
-		);
+		const parameters: TypedExprNode[] = node.parameters.map(n => makeTypedExpressionNode(n, typeMap));
 
 		return {
 			exprNodeType: 'function_invocation',
@@ -344,10 +307,7 @@ function makeTypedExpressionNode(
 	}
 }
 
-export function makeTypedExpressionTree(
-	typeMap: TypeMap,
-	node: ExprNode
-): TypedExprNode {
+export function makeTypedExpressionTree(typeMap: TypeMap, node: ExprNode): TypedExprNode {
 	if (!typeMap.isFrozen()) {
 		throw new Error('Type map passed must be frozen. Use TypeMap.freeze()');
 	}
@@ -359,10 +319,7 @@ export function makeTypedExpressionTree(
 	return makeTypedExpressionNode(node, typeMap);
 }
 
-export function makeTypedExpressionList(
-	typeMap: TypeMap,
-	ast: ASTRoot,
-): TypedASTRoot {
+export function makeTypedExpressionList(typeMap: TypeMap, ast: ASTRoot): TypedASTRoot {
 	if (!typeMap.isFrozen()) {
 		throw new Error('Type map passed must be frozen. Use TypeMap.freeze()');
 	}

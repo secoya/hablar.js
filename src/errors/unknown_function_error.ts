@@ -1,15 +1,7 @@
-import {
-	ASTRoot as ConstraintAST,
-} from '../trees/constraint';
-import {
-	TypedFunctionInvocationNode,
-} from '../trees/expression';
-import {
-	TypedASTRoot,
-} from '../trees/text';
-import {
-	showErrorLocation,
-} from './util';
+import { ASTRoot as ConstraintAST } from '../trees/constraint';
+import { TypedFunctionInvocationNode } from '../trees/expression';
+import { TypedASTRoot } from '../trees/text';
+import { showErrorLocation } from './util';
 
 export default class UnknownFunctionError extends Error {
 	public functionName: string;
@@ -26,18 +18,18 @@ export default class UnknownFunctionError extends Error {
 		constraints: ConstraintAST | null = null,
 	) {
 		const functionName = node.name;
-		const errMessage = '' +
+		const errMessage =
+			'' +
 			`Unknown function ${functionName} used on line ${node.pos.firstLine}:\n` +
 			showErrorLocation(
 				ast.input,
 				`Function ${functionName} is not known to this translation. ` +
-				`Known functions are: ${allowedFunctions.join(', ')}`,
+					`Known functions are: ${allowedFunctions.join(', ')}`,
 				node.pos.firstLine,
 				node.pos.firstColumn - 1,
 			);
-		super(
-			errMessage
-		);
+		super(errMessage);
+		Object.setPrototypeOf(this, UnknownFunctionError.prototype);
 		this.message = errMessage;
 		this.functionName = functionName;
 		this.allowedFunctions = allowedFunctions;

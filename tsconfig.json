@@ -1,23 +1,23 @@
 {
-    "compilerOptions": {
-        "strictNullChecks": true,
-        "module": "commonjs",
-        "target": "es5",
-        "declaration": false,
-        "noEmit": false,
-        "newLine": "LF",
-        "outDir": "lib",
-        "noImplicitAny": true,
-        "allowJs": false,
-        "moduleResolution": "node",
-        "lib": [
-            "es6",
-            "es2015"
-        ]
-    },
-    "include": [
-        "typings/**/*.d.ts",
-        "src/**/*.ts",
-        "test/**/*.ts"
-    ]
+	"compilerOptions": {
+		"strictNullChecks": true,
+		"target": "es5",
+		"declaration": true,
+		"noEmit": false,
+		"newLine": "LF",
+		"outDir": "lib",
+		"noImplicitAny": true,
+		"allowJs": false,
+		"moduleResolution": "node",
+		"baseUrl": "./src",
+		"importHelpers": true,
+		"esModuleInterop": true,
+		"paths": {
+			"jison": ["../typings/jison.d.ts"],
+			"recast": ["../typings/recast.d.ts"]
+		},
+		"lib": ["es6", "es2015"]
+	},
+	"include": ["__tests__/**/*.ts"],
+	"files": ["src/index.ts"]
 }

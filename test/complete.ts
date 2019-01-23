@@ -1,25 +1,14 @@
-import {assert} from 'chai';
-import 'mocha';
+import { prettyPrint } from 'recast';
 
-import {prettyPrint} from 'recast';
-
-import {
-	analyzeTranslation,
-	ConstraintTranslation,
-} from '../src/analysis/combined';
+import { analyzeTranslation, ConstraintTranslation } from '../src/analysis/combined';
 import Context from '../src/emitting/context';
-import {
-	emitTranslation,
-} from '../src/emitting/translation';
-import TypeError from '../src/errors/type_error';
-import UnknownFunctionError from '../src/errors/unknown_function_error';
-import UnknownVariableError from '../src/errors/unknown_variable_error';
+import { emitTranslation } from '../src/emitting/translation';
 import constraintParser from '../src/parsers/constraint';
 import fullTextParser from '../src/parsers/text';
 import TypeMap from '../src/type_map';
 
-describe('Full tests', function() {
-	it('Should work with simple text translations', function() {
+describe('Full tests', () => {
+	it('Should work with simple text translations', () => {
 		const text = 'Some translation';
 
 		const ast = fullTextParser(text);
@@ -29,10 +18,10 @@ describe('Full tests', function() {
 		const analyzed = analyzeTranslation(ast, typeMap);
 
 		const jsAst = emitTranslation(analyzed, ctx, typeMap);
-		assert.equal('"Some translation"', prettyPrint(jsAst).code);
+		expect('"Some translation"').toEqual(prettyPrint(jsAst).code);
 	});
 
-	it('Should work with complex translations', function() {
+	it('Should work with complex translations', () => {
 		const translation: ConstraintTranslation = [
 			{
 				constraints: constraintParser('n = 0'),
@@ -52,43 +41,41 @@ describe('Full tests', function() {
 		const analyzed = analyzeTranslation(translation, typeMap);
 
 		const jsAst = emitTranslation(analyzed, ctx, typeMap);
-		// tslint:disable:indent
-		const expected =
-			`function(vars, fns, ctx) {
-    if (typeof(vars.n) !== "number") {
-        throw new Error("Variable n must be of type number");
+
+		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    if (typeof(vars.n) !== \\"number\\") {
+        throw new Error(\\"Variable n must be of type number\\");
     }
 
     if (vars.n === 0) {
-        return ctx.encode("You have nothing in your basket");
+        return ctx.encode(\\"You have nothing in your basket\\");
     }
 
     if (vars.n === 1) {
-        return ctx.encode("You have one item in your basket");
+        return ctx.encode(\\"You have one item in your basket\\");
     }
 
     if (vars.n > 1) {
-        return ctx.encode("You have " + vars.n + " items in your basket");
+        return ctx.encode(\\"You have \\" + vars.n + \\" items in your basket\\");
     }
 
-    throw new Error("No translation matched the parameters");
-}`;
-		// tslint:enable:indent
-		assert.equal(expected, prettyPrint(jsAst).code);
+    throw new Error(\\"No translation matched the parameters\\");
+}"
+`);
 	});
 
-	it('Should constant fold simple translation', function() {
-		const translation = fullTextParser('Here\'s one million: {{1*1000*1000}}');
+	it('Should constant fold simple translation', () => {
+		const translation = fullTextParser("Here's one million: {{1*1000*1000}}");
 		const typeMap = new TypeMap();
 		const ctx = new Context();
 		const analyzed = analyzeTranslation(translation, typeMap);
 
 		const jsAst = emitTranslation(analyzed, ctx, typeMap);
-		const expected = '"Here\'s one million: 1000000"';
-		assert.equal(expected, prettyPrint(jsAst).code);
+		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`"\\"Here's one million: 1000000\\""`);
 	});
 
-	it('Should constant fold complex translations', function() {
+	it('Should constant fold complex translations', () => {
 		const translation: ConstraintTranslation = [
 			{
 				constraints: constraintParser('n = 0'),
@@ -108,112 +95,93 @@ describe('Full tests', function() {
 		const analyzed = analyzeTranslation(translation, typeMap);
 
 		const jsAst = emitTranslation(analyzed, ctx, typeMap);
-		// tslint:disable:indent
-		const expected =
-			`function(vars, fns, ctx) {
-    if (typeof(vars.n) !== "number") {
-        throw new Error("Variable n must be of type number");
+
+		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    if (typeof(vars.n) !== \\"number\\") {
+        throw new Error(\\"Variable n must be of type number\\");
     }
 
     if (vars.n === 0) {
-        return ctx.encode("You have nothing in your basket. One million: 1000000");
+        return ctx.encode(\\"You have nothing in your basket. One million: 1000000\\");
     }
 
     if (vars.n === 1) {
-        return ctx.encode("You have one item in your basket. One million: 1000000");
+        return ctx.encode(\\"You have one item in your basket. One million: 1000000\\");
     }
 
     if (vars.n > 1) {
-        return ctx.encode("You have " + vars.n + " items in your basket. One million: 1000000");
+        return ctx.encode(\\"You have \\" + vars.n + \\" items in your basket. One million: 1000000\\");
     }
 
-    throw new Error("No translation matched the parameters");
-}`;
-		// tslint:enable:indent
-		assert.equal(expected, prettyPrint(jsAst).code);
+    throw new Error(\\"No translation matched the parameters\\");
+}"
+`);
 	});
 
-	it('Should generate pretty type errors', function() {
+	it('Should generate pretty type errors', () => {
 		const text = 'Calculation: {{$myVar*5}}.';
 
 		const ast = fullTextParser(text);
 
 		const typeMap = new TypeMap();
-		typeMap.addTypeUsage('myVar', 'string', {nodeType: 'custom'});
-		assert.throws(
-			() => analyzeTranslation(ast, typeMap),
-			TypeError,
-// tslint:disable:indent
-`Type error at line 1:
+		typeMap.addTypeUsage('myVar', 'string', { nodeType: 'custom' });
+		expect(() => analyzeTranslation(ast, typeMap)).toThrowErrorMatchingInlineSnapshot(`
+"Type error at line 1:
 1: Calculation: {{$myVar*5}}.
    ----------------^
-   Variable $myVar was expected to have type: string, found: number.`
-// tslint:enable:indent
-		);
+   Variable $myVar was expected to have type: string, found: number."
+`);
 	});
 
-	it('Should generate pretty unknown variable error - in expression', function() {
+	it('Should generate pretty unknown variable error - in expression', () => {
 		const text = 'Calculation: {{$myVar}}.';
 
 		const ast = fullTextParser(text);
 
 		const typeMap = new TypeMap();
-		assert.throws(
-			() => analyzeTranslation(ast, typeMap, ['someOtherVar']),
-			UnknownVariableError,
-// tslint:disable:indent
-`Unknown variable $myVar used on line 1:
+		expect(() => analyzeTranslation(ast, typeMap, ['someOtherVar'])).toThrowErrorMatchingInlineSnapshot(`
+"Unknown variable $myVar used on line 1:
 1: Calculation: {{$myVar}}.
    ----------------^
-   Variable $myVar is not known to this translation. Known variables are: $someOtherVar`
-// tslint:enable:indent
-		);
+   Variable $myVar is not known to this translation. Known variables are: $someOtherVar"
+`);
 	});
 
-	it('Should generate pretty unknown variable error - outside of expression', function() {
+	it('Should generate pretty unknown variable error - outside of expression', () => {
 		const text = 'Calculation: $myVar.';
 
 		const ast = fullTextParser(text);
 
 		const typeMap = new TypeMap();
-		assert.throws(
-			() => analyzeTranslation(ast, typeMap, ['someOtherVar']),
-			UnknownVariableError,
-// tslint:disable:indent
-`Unknown variable $myVar used on line 1:
+		expect(() => analyzeTranslation(ast, typeMap, ['someOtherVar'])).toThrowErrorMatchingInlineSnapshot(`
+"Unknown variable $myVar used on line 1:
 1: Calculation: $myVar.
    --------------^
-   Variable $myVar is not known to this translation. Known variables are: $someOtherVar`
-// tslint:enable:indent
-		);
+   Variable $myVar is not known to this translation. Known variables are: $someOtherVar"
+`);
 	});
 
-	it('Should allow known variable to be used', function() {
+	it('Should allow known variable to be used', () => {
 		const text = 'Calculation: $myVar';
 
 		const ast = fullTextParser(text);
 
 		const typeMap = new TypeMap();
-		assert.doesNotThrow(
-			() => analyzeTranslation(ast, typeMap, ['myVar'], ['someFunction']),
-		);
+		expect(() => analyzeTranslation(ast, typeMap, ['myVar'], ['someFunction'])).not.toThrow();
 	});
 
-	it('Should generate pretty unknown function error', function() {
+	it('Should generate pretty unknown function error', () => {
 		const text = 'Calculation: {{fn()}}';
 
 		const ast = fullTextParser(text);
 
 		const typeMap = new TypeMap();
-		assert.throws(
-			() => analyzeTranslation(ast, typeMap, null, ['otherFn']),
-			UnknownFunctionError,
-// tslint:disable:indent
-`Unknown function fn used on line 1:
+		expect(() => analyzeTranslation(ast, typeMap, null, ['otherFn'])).toThrowErrorMatchingInlineSnapshot(`
+"Unknown function fn used on line 1:
 1: Calculation: {{fn()}}
    ---------------^
-   Function fn is not known to this translation. Known functions are: otherFn`
-// tslint:enable:indent
-		);
+   Function fn is not known to this translation. Known functions are: otherFn"
+`);
 	});
 });

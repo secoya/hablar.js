@@ -1,21 +1,10 @@
-import {assert} from 'chai';
-import 'mocha';
-
-import {
-	analyzeConstraints,
-} from '../../src/analysis/constraints';
+import { analyzeConstraints } from '../../src/analysis/constraints';
 
 import DeadCodeError from '../../src/errors/dead_code_error';
 
-import {
-	ASTRoot as ConstraintAST,
-	Node as ConstraintNode,
-} from '../../src/trees/constraint';
+import { ASTRoot as ConstraintAST, Node as ConstraintNode } from '../../src/trees/constraint';
 
-import {
-	TypedASTRoot as TypedTextASTRoot,
-	TypedNode as TypedTextNode,
-} from '../../src/trees/text';
+import { TypedASTRoot as TypedTextASTRoot, TypedNode as TypedTextNode } from '../../src/trees/text';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,
@@ -63,9 +52,12 @@ function noReturnNode(v: string = 'var'): ConstraintNode {
 	};
 }
 
-function makeTranslation(constraints: ConstraintNode[] | ConstraintNode, text: string): {
-	constraints: ConstraintAST,
-	translation: TypedTextASTRoot,
+function makeTranslation(
+	constraints: ConstraintNode[] | ConstraintNode,
+	text: string,
+): {
+	constraints: ConstraintAST;
+	translation: TypedTextASTRoot;
 } {
 	return {
 		constraints: {
@@ -81,20 +73,20 @@ function makeTranslation(constraints: ConstraintNode[] | ConstraintNode, text: s
 
 // We many more tests here. But this is simple stuff to verify
 // that it works.
-describe('Constraints analyzer', function() {
-	describe('Dead code', function() {
-		it('It detects a simple dead code', function() {
+describe('Constraints analyzer', () => {
+	describe('Dead code', () => {
+		it('It detects a simple dead code', () => {
 			const ret = makeTranslation(returnNode(), 'Return node');
 			const noRet = makeTranslation(noReturnNode(), 'No return node');
 
-			assert.throws(() => analyzeConstraints([ret, noRet]), DeadCodeError);
+			expect(() => analyzeConstraints([ret, noRet])).toThrowErrorMatchingInlineSnapshot(`"Dead code"`);
 		});
 
-		it('It does not detects a simple non dead code', function() {
+		it('It does not detects a simple non dead code', () => {
 			const ret = makeTranslation(returnNode(), 'Return node');
 			const noRet = makeTranslation(noReturnNode(), 'No return node');
 
-			assert.doesNotThrow(() => analyzeConstraints([noRet, ret]), DeadCodeError);
+			expect(() => analyzeConstraints([noRet, ret])).not.toThrow();
 		});
 	});
 });

@@ -1,9 +1,5 @@
-import {
-	ASTRoot,
-} from '../trees/constraint';
-import {
-	TypedASTRoot as TextTypedASTRoot,
-} from '../trees/text';
+import { ASTRoot } from '../trees/constraint';
+import { TypedASTRoot as TextTypedASTRoot } from '../trees/text';
 
 import DeadCodeError from '../errors/dead_code_error';
 
@@ -31,10 +27,12 @@ function isDefiniteReturn(ast: ASTRoot) {
  * But this is much more complicated with more values than one. However,
  * it is more than possible.
  */
-export function analyzeConstraints(translations: Array<{
-	constraints: ASTRoot,
-	translation: TextTypedASTRoot
-}>): void {
+export function analyzeConstraints(
+	translations: Array<{
+		constraints: ASTRoot;
+		translation: TextTypedASTRoot;
+	}>,
+): void {
 	let definiteReturn = false;
 	for (const translation of translations) {
 		if (isDefiniteReturn(translation.constraints)) {

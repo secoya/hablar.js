@@ -1,64 +1,29 @@
-import {
-	TypedASTRoot,
-	TypedNode,
-} from '../trees/text';
+import T from 'ast-types';
+import * as ASTTypes from 'ast-types/gen/kinds';
+import { ASTRoot as ConstraintAST } from '../trees/constraint';
+import { TypedNode as ExprNode } from '../trees/expression';
+import { TypedASTRoot } from '../trees/text';
 import TypeMap from '../type_map';
+import { emitConstrainedTranslation } from './constraint';
 import Context from './context';
+import { emitExpression } from './expression';
+import { getTypeGuardStatements } from './type_guards';
 
-import {
-	getTypeGuardStatements,
-} from './type_guards';
+const b = T.builders;
 
-import {
-	emitConstrainedTranslation,
-} from './constraint';
-
-import {
-	ASTRoot as ConstraintAST,
-} from '../trees/constraint';
-
-import {
-	TypedNode as ExprNode,
-} from '../trees/expression';
-
-import {
-	emitExpression,
-} from './expression';
-
-import {builders as b} from 'ast-types';
-
-function encodeIfString(
-	exp: ASTTypes.Expression,
-	ctx: Context
-): ASTTypes.Expression {
-	return b.callExpression(
-		ctx.encodeIfStringExpr,
-		[ctx.ctxExpr, exp]
-	);
+function encodeIfString(exp: ASTTypes.ExpressionKind, ctx: Context): ASTTypes.ExpressionKind {
+	return b.callExpression(ctx.encodeIfStringExpr, [ctx.ctxExpr, exp]);
 }
 
-function encodeString(
-	exp: ASTTypes.Expression,
-	ctx: Context
-): ASTTypes.Expression {
-	return b.callExpression(
-		b.memberExpression(
-			ctx.ctxExpr,
-			b.identifier('encode'),
-			false
-		),
-		[exp]
-	);
+function encodeString(exp: ASTTypes.ExpressionKind, ctx: Context): ASTTypes.ExpressionKind {
+	return b.callExpression(b.memberExpression(ctx.ctxExpr, b.identifier('encode'), false), [exp]);
 }
 
-export function emitNodeListExpression(
-	ast: TypedASTRoot,
-	ctx: Context
-): ASTTypes.Expression {
+export function emitNodeListExpression(ast: TypedASTRoot, ctx: Context): ASTTypes.ExpressionKind {
 	const exprs: Array<{
-		type: 'string' | 'number',
-		exp: ASTTypes.Expression,
-		isConstant: boolean,
+		type: 'string' | 'number';
+		exp: ASTTypes.ExpressionKind;
+		isConstant: boolean;
 	}> = [];
 
 	for (const node of ast.nodes) {
@@ -72,11 +37,7 @@ export function emitNodeListExpression(
 				});
 				break;
 			case 'variable': {
-				let varExp = b.memberExpression(
-					ctx.varsExpr,
-					b.identifier(node.value),
-					false
-				);
+				const varExp = b.memberExpression(ctx.varsExpr, b.identifier(node.value), false);
 
 				exprs.push({
 					exp: varExp,
@@ -87,7 +48,7 @@ export function emitNodeListExpression(
 			}
 			case 'expr': {
 				const exp = (node.value as any) as ExprNode;
-				let varExp = emitExpression(exp, ctx);
+				const varExp = emitExpression(exp, ctx);
 
 				exprs.push({
 					exp: varExp,
@@ -101,12 +62,12 @@ export function emitNodeListExpression(
 		}
 	}
 
-	const encodeGroup = (group: ASTTypes.Expression): ASTTypes.Expression => {
+	const encodeGroup = (group: ASTTypes.ExpressionKind): ASTTypes.ExpressionKind => {
 		return encodeString(group, ctx);
 	};
 
-	const encodedExprGroups: ASTTypes.Expression[] = [];
-	let currentGroup: ASTTypes.Expression | null = null;
+	const encodedExprGroups: ASTTypes.ExpressionKind[] = [];
+	let currentGroup: ASTTypes.ExpressionKind | null = null;
 	for (const expr of exprs) {
 		if (currentGroup == null) {
 			if (expr.type === 'number') {
@@ -143,24 +104,16 @@ export function emitNodeListExpression(
 	}, init);
 }
 
-function getTypeGuards(
-	ctx: Context,
-	typeMap: TypeMap
-): ASTTypes.Statement[] {
+function getTypeGuards(ctx: Context, typeMap: TypeMap): ASTTypes.StatementKind[] {
 	const usesTypeGuardScratchVariable = ctx.usesTypeGuardScratchVariable;
 	ctx.usesTypeGuardScratchVariable = false;
-	const statements: ASTTypes.Statement[] = getTypeGuardStatements(typeMap, ctx);
+	const statements: ASTTypes.StatementKind[] = getTypeGuardStatements(typeMap, ctx);
 
 	if (ctx.usesTypeGuardScratchVariable) {
 		statements.splice(
 			0,
 			0,
-			b.variableDeclaration(
-				'var',
-				[
-					b.variableDeclarator(ctx.typeGuardScratchVarExpr, null),
-				]
-			)
+			b.variableDeclaration('var', [b.variableDeclarator(ctx.typeGuardScratchVarExpr, null)]),
 		);
 	}
 	ctx.usesTypeGuardScratchVariable = usesTypeGuardScratchVariable;
@@ -171,13 +124,13 @@ function getTypeGuards(
 export function emitConstrainedTranslations(
 	translations: ConstraintTranslation,
 	ctx: Context,
-	typeMap: TypeMap
-): ASTTypes.Expression {
+	typeMap: TypeMap,
+): ASTTypes.ExpressionKind {
 	if (translations.length === 0) {
 		throw new Error('No constraints found');
 	}
 
-	const statements: ASTTypes.Statement[] = getTypeGuards(ctx, typeMap);
+	const statements: ASTTypes.StatementKind[] = getTypeGuards(ctx, typeMap);
 
 	let unconditionallyReturned = false;
 	for (const translation of translations) {
@@ -195,32 +148,15 @@ export function emitConstrainedTranslations(
 	if (!unconditionallyReturned) {
 		statements.push(
 			b.throwStatement(
-				b.newExpression(
-					b.identifier('Error'),
-					[
-						b.literal('No translation matched the parameters'),
-					]
-				)
-			)
+				b.newExpression(b.identifier('Error'), [b.literal('No translation matched the parameters')]),
+			),
 		);
 	}
 
-	return b.functionExpression(
-		null,
-		[
-			ctx.varsExpr,
-			ctx.functionsExpr,
-			ctx.ctxExpr,
-		],
-		b.blockStatement(statements)
-	);
+	return b.functionExpression(null, [ctx.varsExpr, ctx.functionsExpr, ctx.ctxExpr], b.blockStatement(statements));
 }
 
-export function emitSimpleTranslation(
-	ast: TypedASTRoot,
-	ctx: Context,
-	typeMap: TypeMap
-): ASTTypes.Expression {
+export function emitSimpleTranslation(ast: TypedASTRoot, ctx: Context, typeMap: TypeMap): ASTTypes.ExpressionKind {
 	const first = ast.nodes[0];
 	// Constant translations are just emitted as their Constant
 	// translation
@@ -235,33 +171,21 @@ export function emitSimpleTranslation(
 
 	statements.push(b.returnStatement(expr));
 
-	return b.functionExpression(
-		null,
-		[
-			ctx.varsExpr,
-			ctx.functionsExpr,
-			ctx.ctxExpr,
-		],
-		b.blockStatement(statements)
-	);
+	return b.functionExpression(null, [ctx.varsExpr, ctx.functionsExpr, ctx.ctxExpr], b.blockStatement(statements));
 }
 
 export type SimpleTranslation = TypedASTRoot;
 // $FlowFixMe: Flow cannot deal with this union
 export type ConstraintTranslation = Array<{
-	constraints: ConstraintAST,
-	translation: TypedASTRoot,
+	constraints: ConstraintAST;
+	translation: TypedASTRoot;
 }>;
 
 export type Translation = SimpleTranslation | ConstraintTranslation;
 
-export function emitTranslation(
-	translation: Translation,
-	ctx: Context,
-	typeMap: TypeMap
-): ASTTypes.Expression {
+export function emitTranslation(translation: Translation, ctx: Context, typeMap: TypeMap): ASTTypes.ExpressionKind {
 	const simple = translation as SimpleTranslation;
-	if (typeof(simple.input) === 'string') {
+	if (typeof simple.input === 'string') {
 		return emitSimpleTranslation(simple, ctx, typeMap);
 	} else {
 		return emitConstrainedTranslations(translation as ConstraintTranslation, ctx, typeMap);

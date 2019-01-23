@@ -1,34 +1,21 @@
-import {
-	ASTRoot as ConstraintAST,
-} from '../trees/constraint';
-import {
-	ASTRoot,
-	TypedASTRoot,
-} from '../trees/text';
+import { ASTRoot as ConstraintAST } from '../trees/constraint';
+import { ASTRoot, TypedASTRoot } from '../trees/text';
 import TypeMap from '../type_map';
-import {
-	ensureAllVariablesAndFunctionsAreAllowed,
-} from './allowed_symbols';
-import {
-	constantFoldExpressionList,
-} from './constant_folding';
-import {
-	inferConstraintTypes,
-	inferTextTypes,
-	makeTypedExpressionList,
-} from './type_inference';
+import { ensureAllVariablesAndFunctionsAreAllowed } from './allowed_symbols';
+import { constantFoldExpressionList } from './constant_folding';
+import { inferConstraintTypes, inferTextTypes, makeTypedExpressionList } from './type_inference';
 
 export type SimpleTranslation = ASTRoot;
 // $FlowFixMe: Flow is not happy that we use unions between two types that have no relations
 export type ConstraintTranslation = {
-	constraints: ConstraintAST,
-	translation: ASTRoot,
+	constraints: ConstraintAST;
+	translation: ASTRoot;
 }[];
 
 export type SimpleTypedTranslation = TypedASTRoot;
 export type TypedConstraintTranslation = Array<{
-	constraints: ConstraintAST,
-	translation: TypedASTRoot,
+	constraints: ConstraintAST;
+	translation: TypedASTRoot;
 }>;
 
 export type Translation = SimpleTranslation | ConstraintTranslation;
@@ -38,7 +25,7 @@ export type TypedTranslation = SimpleTypedTranslation | TypedConstraintTranslati
 function workWithTranslation<TSimple, TConstraint>(
 	translation: Translation,
 	callbackSimple: (translation: SimpleTranslation) => TSimple,
-	callbackConstraint: (translation: ConstraintTranslation) => TConstraint
+	callbackConstraint: (translation: ConstraintTranslation) => TConstraint,
 ): TSimple | TConstraint {
 	const simple = translation as SimpleTranslation;
 	const constraint = translation as ConstraintTranslation;
@@ -49,19 +36,16 @@ function workWithTranslation<TSimple, TConstraint>(
 	}
 }
 
-export function typeInferTranslation(
-	translation: Translation,
-	map: TypeMap
-): void {
+export function typeInferTranslation(translation: Translation, map: TypeMap): void {
 	workWithTranslation(
 		translation,
-		(tr) => inferTextTypes(map, tr),
-		(tr) => {
+		tr => inferTextTypes(map, tr),
+		tr => {
 			for (const trans of tr) {
 				inferConstraintTypes(map, trans.constraints, trans.translation);
 				inferTextTypes(map, trans.translation, trans.constraints);
 			}
-		}
+		},
 	);
 }
 
@@ -73,8 +57,8 @@ export function analyzeOnlyTranslation(
 ): TypedTranslation {
 	return workWithTranslation(
 		translation,
-		(tr) : SimpleTypedTranslation => analyzeOnlySimpleTranslation(tr, map, allowedVariables, allowedFunctions),
-		(tr) => analyzeOnlyConstraintTranslation(tr, map, allowedVariables, allowedFunctions)
+		(tr): SimpleTypedTranslation => analyzeOnlySimpleTranslation(tr, map, allowedVariables, allowedFunctions),
+		tr => analyzeOnlyConstraintTranslation(tr, map, allowedVariables, allowedFunctions),
 	);
 }
 
@@ -82,7 +66,7 @@ export function analyzeTranslation(
 	translation: Translation,
 	map: TypeMap,
 	allowedVariables: string[] | null = null,
-	allowedFunctions: string[] | null = null
+	allowedFunctions: string[] | null = null,
 ): TypedTranslation {
 	typeInferTranslation(translation, map);
 	map.freeze();
@@ -99,12 +83,7 @@ export function analyzeOnlySimpleTranslation(
 	const res = makeTypedExpressionList(map, translation);
 
 	if (allowedVariables != null || allowedFunctions != null) {
-		ensureAllVariablesAndFunctionsAreAllowed(
-			res,
-			null,
-			allowedVariables,
-			allowedFunctions,
-		);
+		ensureAllVariablesAndFunctionsAreAllowed(res, null, allowedVariables, allowedFunctions);
 	}
 
 	return constantFoldExpressionList(res);

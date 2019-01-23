@@ -1,14 +1,17 @@
-import {ASTRoot} from '../trees/constraint';
+import T from 'ast-types';
+import * as ASTTypes from 'ast-types/gen/kinds';
+
+import { ASTRoot } from '../trees/constraint';
 import Context from './context';
-import {builders as b} from 'ast-types';
+
+const b = T.builders;
 
 export function emitConstrainedTranslation(
 	ast: ASTRoot,
-	expr: ASTTypes.Expression,
-	ctx: Context
-): ASTTypes.Statement {
-
-	const tests: ASTTypes.Expression[] = [];
+	expr: ASTTypes.ExpressionKind,
+	ctx: Context,
+): ASTTypes.StatementKind {
+	const tests: ASTTypes.ExpressionKind[] = [];
 
 	for (const t of ast.nodes) {
 		const tOp = t.op;
@@ -21,11 +24,7 @@ export function emitConstrainedTranslation(
 			case '<=':
 			case '>':
 			case '>=':
-				const lhs = b.memberExpression(
-					ctx.varsExpr,
-					b.identifier(t.lhs.name),
-					false
-				);
+				const lhs = b.memberExpression(ctx.varsExpr, b.identifier(t.lhs.name), false);
 				const rhs = b.literal(t.rhs.value);
 
 				let op: '===' | '!==' | '>' | '<' | '>=' | '<=';
@@ -60,7 +59,7 @@ export function emitConstrainedTranslation(
 		}
 	}
 
-	const test = tests.reduce((acc: ASTTypes.Expression | null, exp: ASTTypes.Expression) => {
+	const test = tests.reduce((acc: ASTTypes.ExpressionKind | null, exp: ASTTypes.ExpressionKind) => {
 		if (acc === null) {
 			return exp;
 		}

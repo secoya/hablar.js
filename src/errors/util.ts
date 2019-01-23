@@ -9,10 +9,6 @@ export function showErrorLocation(input: string, errText: string, line: number, 
 	const errPad = ' '.repeat(maxLineNumLength + 2);
 
 	const errColumn = Math.min(lines[line - 1].length, column + 1);
-	linesWithLineNumber.splice(
-		line,
-		0,
-		`${errPad}${'-'.repeat(errColumn)}^`, `${errPad}${errText}`
-	);
+	linesWithLineNumber.splice(line, 0, `${errPad}${'-'.repeat(errColumn)}^`, `${errPad}${errText}`);
 	return linesWithLineNumber.join('\n');
 }

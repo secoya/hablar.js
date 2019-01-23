@@ -1,16 +1,7 @@
-import {
-	ASTRoot as ConstraintAST,
-} from '../trees/constraint';
-import {
-	TypedVariableNode as ExprVarNode,
-} from '../trees/expression';
-import {
-	TypedASTRoot,
-	TypedVariableNode as TextVarNode,
-} from '../trees/text';
-import {
-	showErrorLocation,
-} from './util';
+import { ASTRoot as ConstraintAST } from '../trees/constraint';
+import { TypedVariableNode as ExprVarNode } from '../trees/expression';
+import { TypedASTRoot, TypedVariableNode as TextVarNode } from '../trees/text';
+import { showErrorLocation } from './util';
 
 export default class UnknownVariableError extends Error {
 	public variable: string;
@@ -33,18 +24,18 @@ export default class UnknownVariableError extends Error {
 			varName = (node as TextVarNode).value;
 		}
 
-		const errMessage = '' +
+		const errMessage =
+			'' +
 			`Unknown variable \$${varName} used on line ${node.pos.firstLine}:\n` +
 			showErrorLocation(
 				ast.input,
 				`Variable \$${varName} is not known to this translation. ` +
-				`Known variables are: ${allowedVariables.map((e) => '$' + e).join(', ')}`,
+					`Known variables are: ${allowedVariables.map(e => '$' + e).join(', ')}`,
 				node.pos.firstLine,
 				node.pos.firstColumn,
 			);
-		super(
-			errMessage
-		);
+		super(errMessage);
+		Object.setPrototypeOf(this, UnknownVariableError.prototype);
 
 		this.message = errMessage;
 		this.variable = varName;

@@ -1,11 +1,6 @@
-import {assert} from 'chai';
-import 'mocha';
-
 import * as infer from '../../src/analysis/type_inference';
 
-import {
-	Node as ConstraintNode,
-} from '../../src/trees/constraint';
+import { Node as ConstraintNode } from '../../src/trees/constraint';
 import {
 	BinaryOpNode,
 	FunctionInvocationNode,
@@ -22,14 +17,9 @@ import {
 	UnaryMinusNode,
 	VariableNode,
 } from '../../src/trees/expression';
-import {
-	Node as TextNode,
-} from '../../src/trees/text';
+import { Node as TextNode } from '../../src/trees/text';
 import TypeMap from '../../src/type_map';
-import {
-	InferredType,
-	TypeInfo,
-} from '../../src/type_map';
+import { InferredType, TypeInfo } from '../../src/type_map';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,
@@ -41,19 +31,16 @@ const makeEmptyPos = () => ({
 const location = {
 	constraints: {
 		input: '',
-		nodes: ([] as ConstraintNode[]),
+		nodes: [] as ConstraintNode[],
 	},
 	text: {
 		input: '',
-		nodes: ([] as TextNode[]),
+		nodes: [] as TextNode[],
 	},
 };
 
 function getTypeInfo(typeMap: TypeMap, variable: string): TypeInfo {
-	assert.isTrue(
-		typeMap.hasInfoForType(variable),
-		'Expected type map to have info for ' + variable
-	);
+	expect(typeMap.hasInfoForType(variable)).toBe(true);
 
 	return typeMap.getVariableTypeInfo(variable);
 }
@@ -85,9 +72,7 @@ function makeNumberNode(val: number): NumberNode {
 	};
 }
 
-function makeTypedNumberNode(
-	val: number
-): TypedNumberNode {
+function makeTypedNumberNode(val: number): TypedNumberNode {
 	return {
 		exprNodeType: 'number',
 		exprType: 'number',
@@ -98,9 +83,7 @@ function makeTypedNumberNode(
 	};
 }
 
-function makeUnaryMinusNode(
-	op: Node
-): UnaryMinusNode {
+function makeUnaryMinusNode(op: Node): UnaryMinusNode {
 	return {
 		exprNodeType: 'unary_minus',
 		op: op,
@@ -108,10 +91,7 @@ function makeUnaryMinusNode(
 	};
 }
 
-function makeTypedUnaryMinusNode(
-	op: TypedNode,
-	type: InferredType
-): TypedUnaryMinusNode {
+function makeTypedUnaryMinusNode(op: TypedNode, type: InferredType): TypedUnaryMinusNode {
 	return {
 		exprNodeType: 'unary_minus',
 		exprType: type,
@@ -130,9 +110,7 @@ function makeStringLiteralNode(val: string): StringLiteralNode {
 	};
 }
 
-function makeTypedStringLiteralNode(
-	val: string
-): TypedStringLiteralNode {
+function makeTypedStringLiteralNode(val: string): TypedStringLiteralNode {
 	return {
 		exprNodeType: 'string_literal',
 		exprType: 'string',
@@ -143,10 +121,7 @@ function makeTypedStringLiteralNode(
 	};
 }
 
-function makeBinaryPlusNode(
-	lhs: Node,
-	rhs: Node
-): BinaryOpNode {
+function makeBinaryPlusNode(lhs: Node, rhs: Node): BinaryOpNode {
 	return {
 		binaryOp: 'plus',
 		exprNodeType: 'binary_op',
@@ -156,11 +131,7 @@ function makeBinaryPlusNode(
 	};
 }
 
-function makeTypedBinaryPlusNode(
-	lhs: TypedNode,
-	rhs: TypedNode,
-	type: InferredType
-): TypedBinaryOpNode {
+function makeTypedBinaryPlusNode(lhs: TypedNode, rhs: TypedNode, type: InferredType): TypedBinaryOpNode {
 	return {
 		binaryOp: 'plus',
 		exprNodeType: 'binary_op',
@@ -183,11 +154,7 @@ function makeBinaryNumberNode(lhs: Node, rhs: Node): BinaryOpNode {
 	};
 }
 
-function makeTypedBinaryNumberNode(
-	lhs: TypedNode,
-	rhs: TypedNode,
-	type: InferredType
-): TypedBinaryOpNode {
+function makeTypedBinaryNumberNode(lhs: TypedNode, rhs: TypedNode, type: InferredType): TypedBinaryOpNode {
 	return {
 		binaryOp: 'minus',
 		exprNodeType: 'binary_op',
@@ -200,10 +167,7 @@ function makeTypedBinaryNumberNode(
 	};
 }
 
-function makeFunctionInvocationNode(
-	name: string,
-	parameters: Node[],
-): FunctionInvocationNode {
+function makeFunctionInvocationNode(name: string, parameters: Node[]): FunctionInvocationNode {
 	return {
 		exprNodeType: 'function_invocation',
 		name: name,
@@ -228,99 +192,84 @@ function makeTypedFunctionInvocationNode(
 	};
 }
 
-describe('Type inference', function() {
-	describe('Binary operators', function() {
-		describe('Plus', function() {
-			it('Should infer var+10 as number-or-string', function() {
+describe('Type inference', () => {
+	describe('Binary operators', () => {
+		describe('Plus', () => {
+			it('Should infer var+10 as number-or-string', () => {
 				const varName = 'var';
-				const node = makeBinaryPlusNode(
-					makeVariableNode(varName),
-					makeNumberNode(10)
-				);
+				const node = makeBinaryPlusNode(makeVariableNode(varName), makeNumberNode(10));
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.equal('number-or-string', info.type);
+				expect('number-or-string').toEqual(info.type);
 
 				const typedNode = makeTypedBinaryPlusNode(
 					makeTypedVariableNode(varName, 'number-or-string'),
 					makeTypedNumberNode(10),
-					'number-or-string'
+					'number-or-string',
 				);
-				const typeInfo = infer.makeTypedExpressionTree(
-					typeMap,
-					node,
-				);
+				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
 
-				assert.deepEqual(typedNode, typeInfo);
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(typedNode).toEqual(typeInfo);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 
-			it('Should infer var+"hello" as number-or-string', function() {
+			it('Should infer var+"hello" as number-or-string', () => {
 				const varName = 'var';
-				const node = makeBinaryPlusNode(
-					makeVariableNode(varName),
-					makeStringLiteralNode('hello')
-				);
+				const node = makeBinaryPlusNode(makeVariableNode(varName), makeStringLiteralNode('hello'));
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.equal('number-or-string', info.type);
+				expect('number-or-string').toEqual(info.type);
 
 				const typedNode = makeTypedBinaryPlusNode(
 					makeTypedVariableNode(varName, 'number-or-string'),
 					makeTypedStringLiteralNode('hello'),
-					'number-or-string'
+					'number-or-string',
 				);
 
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
 
-				assert.deepEqual(typedNode, typeInfo);
+				expect(typedNode).toEqual(typeInfo);
 
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 
-			it('Should infer both vars in var+var2 as number-or-string', function() {
+			it('Should infer both vars in var+var2 as number-or-string', () => {
 				const varName = 'var';
 				const secondVarName = 'var2';
-				const node = makeBinaryPlusNode(
-					makeVariableNode(varName),
-					makeVariableNode(secondVarName)
-				);
+				const node = makeBinaryPlusNode(makeVariableNode(varName), makeVariableNode(secondVarName));
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.equal('number-or-string', info.type);
+				expect('number-or-string').toEqual(info.type);
 
 				const secondInfo = getTypeInfo(typeMap, secondVarName);
-				assert.equal('number-or-string', secondInfo.type);
+				expect('number-or-string').toEqual(secondInfo.type);
 
 				const typedNode = makeTypedBinaryPlusNode(
 					makeTypedVariableNode(varName, 'number-or-string'),
 					makeTypedVariableNode(secondVarName, 'number-or-string'),
-					'number-or-string'
+					'number-or-string',
 				);
 
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-				assert.deepEqual(typedNode, typeInfo);
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(typedNode).toEqual(typeInfo);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 
-			it('Should infer var+5 where var is number as number', function() {
+			it('Should infer var+5 where var is number as number', () => {
 				const varName = 'var';
-				const node = makeBinaryPlusNode(
-					makeVariableNode(varName),
-					makeNumberNode(5)
-				);
+				const node = makeBinaryPlusNode(makeVariableNode(varName), makeNumberNode(5));
 
 				const typeMap = new TypeMap();
 				typeMap.addTypeUsage(varName, 'number', {
@@ -331,84 +280,78 @@ describe('Type inference', function() {
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.equal('number', info.type);
+				expect('number').toEqual(info.type);
 
 				const typedNode = makeTypedBinaryPlusNode(
 					makeTypedVariableNode(varName, 'number'),
 					makeTypedNumberNode(5),
-					'number'
+					'number',
 				);
 
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-				assert.deepEqual(typedNode, typeInfo);
+				expect(typedNode).toEqual(typeInfo);
 
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 		});
 
-		describe('Number operators', function() {
-			it('Should infer var-5 as number', function() {
+		describe('Number operators', () => {
+			it('Should infer var-5 as number', () => {
 				const varName = 'var';
-				const node = makeBinaryNumberNode(
-					makeVariableNode(varName),
-					makeNumberNode(5)
-				);
+				const node = makeBinaryNumberNode(makeVariableNode(varName), makeNumberNode(5));
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.equal('number', info.type);
+				expect('number').toEqual(info.type);
 
 				const typedNode = makeTypedBinaryNumberNode(
 					makeTypedVariableNode(varName, 'number'),
 					makeTypedNumberNode(5),
-					'number'
+					'number',
 				);
 
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-				assert.deepEqual(typedNode, typeInfo);
+				expect(typedNode).toEqual(typeInfo);
 
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 
-			it('Should infers both vars in var-var2 as number', function() {
+			it('Should infers both vars in var-var2 as number', () => {
 				const varName = 'var';
 				const secondVarName = 'var2';
-				const node = makeBinaryNumberNode(
-					makeVariableNode(varName),
-					makeVariableNode(secondVarName)
-				);
+				const node = makeBinaryNumberNode(makeVariableNode(varName), makeVariableNode(secondVarName));
 
 				const typeMap = new TypeMap();
 				infer.inferExpressionTypes(typeMap, node, location);
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.equal('number', info.type);
+				expect('number').toEqual(info.type);
 
 				const secondInfo = getTypeInfo(typeMap, secondVarName);
-				assert.equal('number', secondInfo.type);
+				expect('number').toEqual(secondInfo.type);
 
 				const typedNode = makeTypedBinaryNumberNode(
 					makeTypedVariableNode(varName, 'number'),
 					makeTypedVariableNode(secondVarName, 'number'),
-					'number'
+					'number',
 				);
 
 				const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-				assert.deepEqual(typedNode, typeInfo);
+				expect(typedNode).toEqual(typeInfo);
 
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 		});
 	});
 
-	describe('Unary minus', function() {
-		it('Should infer -var as number', function() {
+	describe('Unary minus', () => {
+		it('Should infer -var as number', () => {
 			const varName = 'var';
-			const node  = makeUnaryMinusNode(makeVariableNode(varName));
+			const node = makeUnaryMinusNode(makeVariableNode(varName));
 
 			const typeMap = new TypeMap();
 
@@ -417,27 +360,19 @@ describe('Type inference', function() {
 
 			const info = getTypeInfo(typeMap, varName);
 
-			assert.equal('number', info.type);
+			expect('number').toEqual(info.type);
 
-			const typedNode = makeTypedUnaryMinusNode(
-				makeTypedVariableNode(varName, 'number'),
-				'number'
-			);
+			const typedNode = makeTypedUnaryMinusNode(makeTypedVariableNode(varName, 'number'), 'number');
 
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-			assert.deepEqual(typedNode, typeInfo);
+			expect(typedNode).toEqual(typeInfo);
 
-			assert.equal(0, Array.from(typeMap.functionNames()).length);
+			expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 		});
 
-		it('Should infer -(var+5) as number', function() {
+		it('Should infer -(var+5) as number', () => {
 			const varName = 'var';
-			const node = makeUnaryMinusNode(
-				makeBinaryPlusNode(
-					makeVariableNode(varName),
-					makeNumberNode(5)
-				)
-			);
+			const node = makeUnaryMinusNode(makeBinaryPlusNode(makeVariableNode(varName), makeNumberNode(5)));
 
 			const typeMap = new TypeMap();
 
@@ -445,30 +380,23 @@ describe('Type inference', function() {
 			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
-			assert.equal('number', info.type);
+			expect('number').toEqual(info.type);
 
 			const typedNode = makeTypedUnaryMinusNode(
-				makeTypedBinaryPlusNode(
-					makeTypedVariableNode(varName, 'number'),
-					makeTypedNumberNode(5),
-					'number'
-				),
-				'number'
+				makeTypedBinaryPlusNode(makeTypedVariableNode(varName, 'number'), makeTypedNumberNode(5), 'number'),
+				'number',
 			);
 
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-			assert.deepEqual(typedNode, typeInfo);
-			assert.equal(0, Array.from(typeMap.functionNames()).length);
+			expect(typedNode).toEqual(typeInfo);
+			expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 		});
 
-		it('Should infer both vars in -(var+var2) as number', function() {
+		it('Should infer both vars in -(var+var2) as number', () => {
 			const varName = 'var';
 			const secondVarName = 'var2';
 			const node = makeUnaryMinusNode(
-				makeBinaryPlusNode(
-					makeVariableNode(varName),
-					makeVariableNode(secondVarName)
-				)
+				makeBinaryPlusNode(makeVariableNode(varName), makeVariableNode(secondVarName)),
 			);
 
 			const typeMap = new TypeMap();
@@ -476,32 +404,30 @@ describe('Type inference', function() {
 			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
-			assert.equal('number', info.type);
+			expect('number').toEqual(info.type);
 
 			const secondInfo = getTypeInfo(typeMap, secondVarName);
-			assert.equal('number', secondInfo.type);
+			expect('number').toEqual(secondInfo.type);
 
 			const typedNode = makeTypedUnaryMinusNode(
 				makeTypedBinaryPlusNode(
 					makeTypedVariableNode(varName, 'number'),
 					makeTypedVariableNode(secondVarName, 'number'),
-					'number'
+					'number',
 				),
-				'number'
+				'number',
 			);
 
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-			assert.deepEqual(typedNode, typeInfo);
+			expect(typedNode).toEqual(typeInfo);
 
-			assert.equal(0, Array.from(typeMap.functionNames()).length);
+			expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 		});
 
-		describe('Fail cases', function() {
-			it('Should fail to unify number with string', function() {
+		describe('Fail cases', () => {
+			it('Should fail to unify number with string', () => {
 				const varName = 'var';
-				const node = makeUnaryMinusNode(
-					makeVariableNode(varName)
-				);
+				const node = makeUnaryMinusNode(makeVariableNode(varName));
 
 				const typeMap = new TypeMap();
 				typeMap.addTypeUsage(varName, 'string', {
@@ -512,17 +438,15 @@ describe('Type inference', function() {
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.isTrue(typeMap.hasTypeErrors(), 'Should have type errors');
-				assert.equal('error', info.type);
+				expect(typeMap.hasTypeErrors()).toBe(true);
+				expect('error').toEqual(info.type);
 
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 
-			it('Should fail to unify number with enum', function() {
+			it('Should fail to unify number with enum', () => {
 				const varName = 'var';
-				const node = makeUnaryMinusNode(
-					makeVariableNode(varName),
-				);
+				const node = makeUnaryMinusNode(makeVariableNode(varName));
 
 				const typeMap = new TypeMap();
 				typeMap.addTypeUsage(varName, 'enum', {
@@ -533,17 +457,15 @@ describe('Type inference', function() {
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.isTrue(typeMap.hasTypeErrors(), 'Should have type errors');
-				assert.equal('error', info.type);
+				expect(typeMap.hasTypeErrors()).toBe(true);
+				expect('error').toEqual(info.type);
 
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 
-			it('Should fail to unify number with gender', function() {
+			it('Should fail to unify number with gender', () => {
 				const varName = 'var';
-				const node = makeUnaryMinusNode(
-					makeVariableNode(varName)
-				);
+				const node = makeUnaryMinusNode(makeVariableNode(varName));
 
 				const typeMap = new TypeMap();
 
@@ -555,15 +477,15 @@ describe('Type inference', function() {
 				typeMap.freeze();
 
 				const info = getTypeInfo(typeMap, varName);
-				assert.isTrue(typeMap.hasTypeErrors(), 'Should have type errors');
-				assert.equal('error', info.type);
-				assert.equal(0, Array.from(typeMap.functionNames()).length);
+				expect(typeMap.hasTypeErrors()).toBe(true);
+				expect('error').toEqual(info.type);
+				expect(0).toEqual(Array.from(typeMap.functionNames()).length);
 			});
 		});
 	});
 
-	describe('Functions', function() {
-		it('Will infer unknown for variable used as a parameter', function() {
+	describe('Functions', () => {
+		it('Will infer unknown for variable used as a parameter', () => {
 			const varName = 'var';
 
 			const node = makeFunctionInvocationNode('fn', [makeVariableNode(varName)]);
@@ -574,55 +496,46 @@ describe('Type inference', function() {
 			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
-			assert.equal('unknown', info.type);
+			expect('unknown').toEqual(info.type);
 
 			const typedNode = makeTypedFunctionInvocationNode(
 				'fn',
 				[makeTypedVariableNode(varName, 'unknown')],
-				'string'
+				'string',
 			);
 
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-			assert.deepEqual(typedNode, typeInfo);
+			expect(typedNode).toEqual(typeInfo);
 
-			assert.sameMembers(['fn'], Array.from(typeMap.functionNames()));
+			expect(['fn']).toEqual(Array.from(typeMap.functionNames()));
 		});
 
-		it('Will infer unknown for multiple variables used as parameters', function() {
+		it('Will infer unknown for multiple variables used as parameters', () => {
 			const varName = 'var';
 			const secondVarName = 'var2';
 
-			const node = makeFunctionInvocationNode(
-				'fn',
-				[
-					makeVariableNode(varName),
-					makeVariableNode(secondVarName),
-				]
-			);
+			const node = makeFunctionInvocationNode('fn', [makeVariableNode(varName), makeVariableNode(secondVarName)]);
 
 			const typeMap = new TypeMap();
 			infer.inferExpressionTypes(typeMap, node, location);
 			typeMap.freeze();
 
 			const info = getTypeInfo(typeMap, varName);
-			assert.equal('unknown', info.type);
+			expect('unknown').toEqual(info.type);
 
 			const secondInfo = getTypeInfo(typeMap, secondVarName);
-			assert.equal('unknown', secondInfo.type);
+			expect('unknown').toEqual(secondInfo.type);
 
 			const typedNode = makeTypedFunctionInvocationNode(
 				'fn',
-				[
-					makeTypedVariableNode(varName, 'unknown'),
-					makeTypedVariableNode(secondVarName, 'unknown'),
-				],
-				'string'
+				[makeTypedVariableNode(varName, 'unknown'), makeTypedVariableNode(secondVarName, 'unknown')],
+				'string',
 			);
 
 			const typeInfo = infer.makeTypedExpressionTree(typeMap, node);
-			assert.deepEqual(typedNode, typeInfo);
+			expect(typedNode).toEqual(typeInfo);
 
-			assert.sameMembers(['fn'], Array.from(typeMap.functionNames()));
+			expect(['fn']).toEqual(Array.from(typeMap.functionNames()));
 		});
 	});
 });

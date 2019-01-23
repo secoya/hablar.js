@@ -1,29 +1,15 @@
-import {assert} from 'chai';
-import 'mocha';
-
 import Context from '../../src/emitting/context';
-import {
-	emitConstrainedTranslations,
-	emitSimpleTranslation,
-} from '../../src/emitting/translation';
-import {
-	Node as ConstraintNode,
-	ValueNode,
-} from '../../src/trees/constraint';
-import {
-	TypedNode,
-	TypedVariableNode,
-} from '../../src/trees/expression';
+import { emitConstrainedTranslations, emitSimpleTranslation } from '../../src/emitting/translation';
+import { Node as ConstraintNode, ValueNode } from '../../src/trees/constraint';
+import { TypedNode, TypedVariableNode } from '../../src/trees/expression';
 import {
 	TypedExprNode as TypedTextExprNode,
 	TypedLiteralNode as TypedTextLiteralNode,
 	TypedVariableNode as TypedTextVariableNode,
 } from '../../src/trees/text';
-import {
-	InferredType,
-} from '../../src/type_map';
+import { InferredType } from '../../src/type_map';
 import TypeMap from '../../src/type_map';
-import {prettyPrint} from 'recast';
+import { prettyPrint } from 'recast';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,
@@ -62,10 +48,7 @@ function en(exp: TypedNode): TypedTextExprNode {
 	};
 }
 
-function v(
-	type: InferredType,
-	name: string
-): TypedVariableNode {
+function v(type: InferredType, name: string): TypedVariableNode {
 	return {
 		exprNodeType: 'variable',
 		exprType: type,
@@ -76,9 +59,7 @@ function v(
 	};
 }
 
-function cignore(
-	varName: string
-): ConstraintNode {
+function cignore(varName: string): ConstraintNode {
 	return {
 		op: '!',
 		operand: {
@@ -90,13 +71,9 @@ function cignore(
 	};
 }
 
-function ceq(
-	op: '=' | '!=',
-	varName: string,
-	value: string | number
-): ConstraintNode {
+function ceq(op: '=' | '!=', varName: string, value: string | number): ConstraintNode {
 	let rhs: ValueNode;
-	if (typeof (value) === 'number') {
+	if (typeof value === 'number') {
 		rhs = {
 			pos: makeEmptyPos(),
 			type: 'number',
@@ -121,30 +98,28 @@ function ceq(
 	};
 }
 
-describe('Emitting - translation', function() {
-	it('Should emit simple string on basic translation', function() {
-		const nodes = [
-			tn('Some text'),
-		];
+describe('Emitting - translation', () => {
+	it('Should emit simple string on basic translation', () => {
+		const nodes = [tn('Some text')];
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(
-			{
-				input: 'Some text',
-				nodes: nodes,
-			},
-			ctx,
-			map,
-		));
+		const res = prettyPrint(
+			emitSimpleTranslation(
+				{
+					input: 'Some text',
+					nodes: nodes,
+				},
+				ctx,
+				map,
+			),
+		);
 
-		assert.equal('"Some text"', res.code);
+		expect('"Some text"').toEqual(res.code);
 	});
 
-	it('Should emit function with guard on variable node - excluding scratch variable', function() {
-		const nodes = [
-			vn('myVar', 'string'),
-		];
+	it('Should emit function with guard on variable node - excluding scratch variable', () => {
+		const nodes = [vn('myVar', 'string')];
 		const map = new TypeMap();
 		map.addTypeUsage('myVar', 'string', {
 			nodeType: 'custom',
@@ -152,31 +127,30 @@ describe('Emitting - translation', function() {
 
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(
-			{
-				input: '$myVar',
-				nodes: nodes,
-			},
-			ctx,
-			map,
-		));
+		const res = prettyPrint(
+			emitSimpleTranslation(
+				{
+					input: '$myVar',
+					nodes: nodes,
+				},
+				ctx,
+				map,
+			),
+		);
 
-		// tslint:disable:indent
-		const expected = `function(vars, fns, ctx) {
-    if (typeof(vars.myVar) !== "string" && !ctx.isSafeString(vars.myVar)) {
-        throw new Error("Variable myVar must be of type string");
+		expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    if (typeof(vars.myVar) !== \\"string\\" && !ctx.isSafeString(vars.myVar)) {
+        throw new Error(\\"Variable myVar must be of type string\\");
     }
 
     return encodeIfString(ctx, vars.myVar);
-}`;
-		// tslint:enable:indent
-		assert.equal(expected, res.code);
+}"
+`);
 	});
 
-	it('Should emit function with guard on variable node - including scratch variable', function() {
-		const nodes = [
-			vn('myVar', 'number-or-string'),
-		];
+	it('Should emit function with guard on variable node - including scratch variable', () => {
+		const nodes = [vn('myVar', 'number-or-string')];
 		const map = new TypeMap();
 		map.addTypeUsage('myVar', 'number-or-string', {
 			nodeType: 'custom',
@@ -184,143 +158,133 @@ describe('Emitting - translation', function() {
 
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(
-			{
-				input: '$myVar',
-				nodes: nodes,
-			},
-			ctx,
-			map
-		));
+		const res = prettyPrint(
+			emitSimpleTranslation(
+				{
+					input: '$myVar',
+					nodes: nodes,
+				},
+				ctx,
+				map,
+			),
+		);
 
-		// tslint:disable:indent
-		const expected = `function(vars, fns, ctx) {
+		expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
     var _;
 
-    if (!((_ = typeof(vars.myVar)) === "string" || _ === "number" || ctx.isSafeString(vars.myVar))) {
-        throw new Error("Variable myVar must be of type number-or-string");
+    if (!((_ = typeof(vars.myVar)) === \\"string\\" || _ === \\"number\\" || ctx.isSafeString(vars.myVar))) {
+        throw new Error(\\"Variable myVar must be of type number-or-string\\");
     }
 
     return encodeIfString(ctx, vars.myVar);
-}`;
-		// tslint:enable:indent
-		assert.equal(expected, res.code);
+}"
+`);
 	});
 
-	it('Should ensure result is a string', function() {
-		const nodes = [
-			vn('myVar', 'number'),
-		];
+	it('Should ensure result is a string', () => {
+		const nodes = [vn('myVar', 'number')];
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(
-			{
-				input: '$myVar',
-				nodes: nodes,
-			},
-			ctx,
-			map
-		));
+		const res = prettyPrint(
+			emitSimpleTranslation(
+				{
+					input: '$myVar',
+					nodes: nodes,
+				},
+				ctx,
+				map,
+			),
+		);
 
-		// tslint:disable:indent
-		const expected = `function(vars, fns, ctx) {
-    return ctx.encode("" + vars.myVar);
-}`;
-		// tslint:enable:indent
-		assert.equal(expected, res.code);
+		expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    return ctx.encode(\\"\\" + vars.myVar);
+}"
+`);
 	});
 
-	it('Should remove unneeded empty string literal with leading text', function() {
-		const nodes = [
-			tn('Some number: '),
-			vn('myVar', 'number'),
-		];
+	it('Should remove unneeded empty string literal with leading text', () => {
+		const nodes = [tn('Some number: '), vn('myVar', 'number')];
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(
-			{
-				input: 'Some number: $myVar',
-				nodes: nodes,
-			},
-			ctx,
-			map,
-		));
+		const res = prettyPrint(
+			emitSimpleTranslation(
+				{
+					input: 'Some number: $myVar',
+					nodes: nodes,
+				},
+				ctx,
+				map,
+			),
+		);
 
-		// tslint:disable:indent
-		const expected = `function(vars, fns, ctx) {
-    return ctx.encode("Some number: " + vars.myVar);
-}`;
-		// tslint:enable:indent
-		assert.equal(expected, res.code);
+		expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    return ctx.encode(\\"Some number: \\" + vars.myVar);
+}"
+`);
 	});
 
-	it('Should remove unneeded empty string literal with leading text - when using expression', function() {
-		const nodes = [
-			tn('Some number: '),
-			en(v('number', 'myVar')),
-		];
+	it('Should remove unneeded empty string literal with leading text - when using expression', () => {
+		const nodes = [tn('Some number: '), en(v('number', 'myVar'))];
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(
-			{
-				input: 'Some number: $number',
-				nodes: nodes,
-			},
-			ctx,
-			map,
-		));
+		const res = prettyPrint(
+			emitSimpleTranslation(
+				{
+					input: 'Some number: $number',
+					nodes: nodes,
+				},
+				ctx,
+				map,
+			),
+		);
 
-		// tslint:disable:indent
-		const expected = `function(vars, fns, ctx) {
-    return ctx.encode("Some number: " + vars.myVar);
-}`;
-		// tslint:enable:indent
-		assert.equal(expected, res.code);
+		expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    return ctx.encode(\\"Some number: \\" + vars.myVar);
+}"
+`);
 	});
 
-	it('Should add empty string literal to force string concat on two numbers', function() {
-		const nodes = [
-			en(v('number', 'myOtherVar')),
-			en(v('number', 'myVar')),
-		];
+	it('Should add empty string literal to force string concat on two numbers', () => {
+		const nodes = [en(v('number', 'myOtherVar')), en(v('number', 'myVar'))];
 		const map = new TypeMap();
 		const ctx = new Context();
 
-		const res = prettyPrint(emitSimpleTranslation(
-			{
-				input: '{{$myOtherVar}}{{$myVar}}',
-				nodes: nodes,
-			},
-			ctx,
-			map,
-		));
+		const res = prettyPrint(
+			emitSimpleTranslation(
+				{
+					input: '{{$myOtherVar}}{{$myVar}}',
+					nodes: nodes,
+				},
+				ctx,
+				map,
+			),
+		);
 
-		// tslint:disable:indent
-		const expected = `function(vars, fns, ctx) {
-    return ctx.encode("" + vars.myOtherVar + vars.myVar);
-}`;
-		// tslint:enable:indent
-		assert.equal(expected, res.code);
+		expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    return ctx.encode(\\"\\" + vars.myOtherVar + vars.myVar);
+}"
+`);
 	});
 
-	describe('Constrained translations', function() {
-		it('Should emit simple return on ignore constraint', function() {
+	describe('Constrained translations', () => {
+		it('Should emit simple return on ignore constraint', () => {
 			const translations = [
 				{
 					constraints: {
 						input: '!someVar',
-						nodes: [
-							cignore('someVar'),
-						],
+						nodes: [cignore('someVar')],
 					},
 					translation: {
 						input: 'Some translation',
-						nodes: [
-							tn('Some translation'),
-						],
+						nodes: [tn('Some translation')],
 					},
 				},
 			];
@@ -329,28 +293,23 @@ describe('Emitting - translation', function() {
 
 			const res = prettyPrint(emitConstrainedTranslations(translations, ctx, map));
 
-			// tslint:disable:indent
-			const expected = `function(vars, fns, ctx) {
-    return ctx.encode("Some translation");
-}`;
-			// tslint:enable:indent
-			assert.equal(expected, res.code);
+			expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    return ctx.encode(\\"Some translation\\");
+}"
+`);
 		});
 
-		it('Should emit if statement with throw statement when not guarenteed to return', function() {
+		it('Should emit if statement with throw statement when not guarenteed to return', () => {
 			const translations = [
 				{
 					constraints: {
 						input: 'someVar=5',
-						nodes: [
-							ceq('=', 'someVar', 5),
-						],
+						nodes: [ceq('=', 'someVar', 5)],
 					},
 					translation: {
 						input: 'Some translation',
-						nodes: [
-							tn('Some translation'),
-						],
+						nodes: [tn('Some translation')],
 					},
 				},
 			];
@@ -359,112 +318,90 @@ describe('Emitting - translation', function() {
 
 			const res = prettyPrint(emitConstrainedTranslations(translations, ctx, map));
 
-			// tslint:disable:indent
-			const expected = `function(vars, fns, ctx) {
+			expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
     if (vars.someVar === 5) {
-        return ctx.encode("Some translation");
+        return ctx.encode(\\"Some translation\\");
     }
 
-    throw new Error("No translation matched the parameters");
-}`;
-			// tslint:enable:indent
-			assert.equal(expected, res.code);
+    throw new Error(\\"No translation matched the parameters\\");
+}"
+`);
 		});
 
 		it(
 			'Should emit constrained translations in order - ' +
-			'and not emit throw statement if unconstrained translation exists', function() {
-			const translations = [
-				{
-					constraints: {
-						input: 'someVar=5',
-						nodes: [
-							ceq('=', 'someVar', 5),
-						],
+				'and not emit throw statement if unconstrained translation exists',
+			() => {
+				const translations = [
+					{
+						constraints: {
+							input: 'someVar=5',
+							nodes: [ceq('=', 'someVar', 5)],
+						},
+						translation: {
+							input: 'Some translation',
+							nodes: [tn('Some translation')],
+						},
 					},
-					translation: {
-						input: 'Some translation',
-						nodes: [
-							tn('Some translation'),
-						],
+					{
+						constraints: {
+							input: 'someVar=10',
+							nodes: [ceq('=', 'someVar', 10)],
+						},
+						translation: {
+							input: 'Some other translation',
+							nodes: [tn('Some other translation')],
+						},
 					},
-				},
-				{
-					constraints: {
-						input: 'someVar=10',
-						nodes: [
-							ceq('=', 'someVar', 10),
-						],
+					{
+						constraints: {
+							input: '!someVar',
+							nodes: [cignore('someVar')],
+						},
+						translation: {
+							input: 'Some default translation',
+							nodes: [tn('Some default translation')],
+						},
 					},
-					translation: {
-						input: 'Some other translation',
-						nodes: [
-							tn('Some other translation'),
-						],
-					},
-				},
-				{
-					constraints: {
-						input: '!someVar',
-						nodes: [
-							cignore('someVar'),
-						],
-					},
-					translation: {
-						input: 'Some default translation',
-						nodes: [
-							tn('Some default translation'),
-						],
-					},
-				},
-			];
-			const map = new TypeMap();
-			const ctx = new Context();
+				];
+				const map = new TypeMap();
+				const ctx = new Context();
 
-			const res = prettyPrint(emitConstrainedTranslations(translations, ctx, map));
+				const res = prettyPrint(emitConstrainedTranslations(translations, ctx, map));
 
-			// tslint:disable:indent
-			const expected = `function(vars, fns, ctx) {
+				expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
     if (vars.someVar === 5) {
-        return ctx.encode("Some translation");
+        return ctx.encode(\\"Some translation\\");
     }
 
     if (vars.someVar === 10) {
-        return ctx.encode("Some other translation");
+        return ctx.encode(\\"Some other translation\\");
     }
 
-    return ctx.encode("Some default translation");
-}`;
-			// tslint:enable:indent
-			assert.equal(expected, res.code);
-		});
+    return ctx.encode(\\"Some default translation\\");
+}"
+`);
+			},
+		);
 
-		it('Should not double escape variable in expression', function() {
+		it('Should not double escape variable in expression', () => {
 			const tr = {
 				input: 'Some translation {{$myVar}}',
-				nodes: [
-					tn('Some translation '),
-					en(v('string', 'myVar')),
-				],
+				nodes: [tn('Some translation '), en(v('string', 'myVar'))],
 			};
 
 			const map = new TypeMap();
 			const ctx = new Context();
 
-			const res = prettyPrint(emitSimpleTranslation(
-				tr,
-				ctx,
-				map,
-			));
+			const res = prettyPrint(emitSimpleTranslation(tr, ctx, map));
 
-			const expected =
-// tslint:disable:indent
-`function(vars, fns, ctx) {
-    return ctx.encode("Some translation ") + encodeIfString(ctx, vars.myVar);
-}`;
-// tslint:enable:indent
-
-			assert.equal(expected, res.code);
+			expect(res.code).toMatchInlineSnapshot(`
+"function(vars, fns, ctx) {
+    return ctx.encode(\\"Some translation \\") + encodeIfString(ctx, vars.myVar);
+}"
+`);
 		});
 	});
 });

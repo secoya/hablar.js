@@ -1,20 +1,18 @@
-import {
-	showErrorLocation,
-} from  './util';
+import { showErrorLocation } from './util';
 
 export default class ParseError extends Error {
 	public static getErrorMessage(hash: {
-			text: string,
-			token: string,
-			line: number,
-			loc: {
-				first_line: number,
-				first_column: number,
-				last_line: number,
-				last_column: number,
-			},
-			expected: string[],
-		}): string {
+		text: string;
+		token: string;
+		line: number;
+		loc: {
+			first_line: number;
+			first_column: number;
+			last_line: number;
+			last_column: number;
+		};
+		expected: string[];
+	}): string {
 		const expected = hash.expected.join(', ');
 		const got = `'${hash.token}'`;
 
@@ -36,19 +34,20 @@ export default class ParseError extends Error {
 	public constructor(
 		message: string,
 		hash?: {
-			text: string,
-			token: string,
-			line: number,
+			text: string;
+			token: string;
+			line: number;
 			loc: {
-				first_line: number,
-				first_column: number,
-				last_line: number,
-				last_column: number,
-			},
-			expected: string[],
-		}
+				first_line: number;
+				first_column: number;
+				last_line: number;
+				last_column: number;
+			};
+			expected: string[];
+		},
 	) {
 		super(message);
+		Object.setPrototypeOf(this, ParseError.prototype);
 		this.message = message;
 		if (hash != null) {
 			this.text = hash.text;

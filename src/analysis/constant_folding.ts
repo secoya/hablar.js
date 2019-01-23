@@ -4,12 +4,7 @@ import {
 	TypedNumberNode,
 	TypedStringLiteralNode,
 } from '../trees/expression';
-import {
-	Pos,
-	TypedASTRoot,
-	TypedLiteralNode,
-	TypedNode as TextNode,
-} from '../trees/text';
+import { Pos, TypedASTRoot, TypedLiteralNode, TypedNode as TextNode } from '../trees/text';
 
 function isConstantExpression(expr: Node) {
 	return expr.exprNodeType === 'number' || expr.exprNodeType === 'string_literal';
@@ -34,20 +29,14 @@ function combinePosInformation(firstPos: Pos, lastPos: Pos): Pos {
 	};
 }
 
-function constantMultiplyOp(
-	lhs: string | number,
-	rhs: string | number
-): number {
-	if (
-	typeof (lhs) === 'string' ||
-	typeof (rhs) === 'string'
-	) {
-		const lhsType = typeof (lhs);
-		const rhsType = typeof (rhs);
+function constantMultiplyOp(lhs: string | number, rhs: string | number): number {
+	if (typeof lhs === 'string' || typeof rhs === 'string') {
+		const lhsType = typeof lhs;
+		const rhsType = typeof rhs;
 		throw new Error(
 			'Could not constant fold expression. ' +
-			`Multiply operation between ${lhsType} and ${rhsType}. ` +
-			'Only allowed between 2 numbers.'
+				`Multiply operation between ${lhsType} and ${rhsType}. ` +
+				'Only allowed between 2 numbers.',
 		);
 	}
 	return lhs * rhs;
@@ -56,7 +45,7 @@ function constantMultiplyOp(
 function constantBinaryOp(
 	op: 'plus' | 'minus' | 'divide' | 'multiply',
 	lhs: string | number,
-	rhs: string | number
+	rhs: string | number,
 ): string | number {
 	switch (op) {
 		case 'plus':
@@ -64,31 +53,25 @@ function constantBinaryOp(
 			// It is intended to be allowed to mix and match number/string here.
 			return (lhs as string) + (rhs as string);
 		case 'minus': {
-			if (
-				typeof (lhs) === 'string' ||
-				typeof (rhs) === 'string'
-			) {
-				const lhsType = typeof (lhs);
-				const rhsType = typeof (rhs);
+			if (typeof lhs === 'string' || typeof rhs === 'string') {
+				const lhsType = typeof lhs;
+				const rhsType = typeof rhs;
 				throw new Error(
 					'Could not constant fold expression. ' +
-					`Minus operation between ${lhsType} and ${rhsType}. ` +
-					'Only allowed between 2 numbers.'
+						`Minus operation between ${lhsType} and ${rhsType}. ` +
+						'Only allowed between 2 numbers.',
 				);
 			}
 			return lhs - rhs;
 		}
 		case 'divide': {
-			if (
-			typeof (lhs) === 'string' ||
-			typeof (rhs) === 'string'
-		) {
-				const lhsType = typeof (lhs);
-				const rhsType = typeof (rhs);
+			if (typeof lhs === 'string' || typeof rhs === 'string') {
+				const lhsType = typeof lhs;
+				const rhsType = typeof rhs;
 				throw new Error(
 					'Could not constant fold expression. ' +
-					`Divide operation between ${lhsType} and ${rhsType}. ` +
-					'Only allowed between 2 numbers.'
+						`Divide operation between ${lhsType} and ${rhsType}. ` +
+						'Only allowed between 2 numbers.',
 				);
 			}
 			return lhs / rhs;
@@ -139,7 +122,7 @@ export function constantFoldExpression(expr: Node): Node {
 
 			if (isConstantExpression(lhs) && isConstantExpression(rhs)) {
 				const val = constantBinaryOp(expr.binaryOp, getConstantValue(lhs), getConstantValue(rhs));
-				if (typeof (val) === 'string') {
+				if (typeof val === 'string') {
 					return {
 						exprNodeType: 'string_literal',
 						exprType: 'string',
@@ -158,7 +141,7 @@ export function constantFoldExpression(expr: Node): Node {
 						value: val,
 					} as TypedNumberNode;
 				}
-			}	else if (
+			} else if (
 				expr.binaryOp === 'multiply' &&
 				isConstantExpression(rhs) &&
 				lhs.exprNodeType === 'binary_op' &&
@@ -203,13 +186,13 @@ export function constantFoldExpression(expr: Node): Node {
 				if (val.exprType !== 'number') {
 					throw new Error(
 						'Could not constant fold expression. ' +
-						'Unary minus with a string. It is only allowed on numbers.'
+							'Unary minus with a string. It is only allowed on numbers.',
 					);
 				}
 
 				const constantValue = getConstantValue(val);
 
-				if (typeof (constantValue) === 'string') {
+				if (typeof constantValue === 'string') {
 					throw new Error('Expected constant value to be a number, it was a string');
 				}
 				return {

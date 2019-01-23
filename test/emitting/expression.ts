@@ -1,10 +1,7 @@
-import {assert} from 'chai';
-import 'mocha';
-
-import {prettyPrint} from 'recast';
+import { prettyPrint } from 'recast';
 
 import Context from '../../src/emitting/context';
-import {emitExpression} from '../../src/emitting/expression';
+import { emitExpression } from '../../src/emitting/expression';
 import {
 	TypedBinaryOpNode,
 	TypedFunctionInvocationNode,
@@ -13,9 +10,7 @@ import {
 	TypedStringLiteralNode,
 	TypedVariableNode,
 } from '../../src/trees/expression';
-import {
-	InferredType,
-} from '../../src/type_map';
+import { InferredType } from '../../src/type_map';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,
@@ -50,7 +45,7 @@ function b(
 	type: InferredType,
 	op: 'plus' | 'minus' | 'multiply' | 'divide',
 	lhs: TypedNode,
-	rhs: TypedNode
+	rhs: TypedNode,
 ): TypedBinaryOpNode {
 	return {
 		binaryOp: op,
@@ -64,10 +59,7 @@ function b(
 	};
 }
 
-function v(
-	type: InferredType,
-	name: string
-): TypedVariableNode {
+function v(type: InferredType, name: string): TypedVariableNode {
 	return {
 		exprNodeType: 'variable',
 		exprType: type,
@@ -78,10 +70,7 @@ function v(
 	};
 }
 
-function f(
-	name: string,
-	args: TypedNode[]
-): TypedFunctionInvocationNode {
+function f(name: string, args: TypedNode[]): TypedFunctionInvocationNode {
 	return {
 		exprNodeType: 'function_invocation',
 		exprType: 'string',
@@ -93,172 +82,117 @@ function f(
 	};
 }
 
-describe('Emitting - Expressions', function() {
-	it('Should emit simple string literal', function() {
-		const n = s('string');
+describe('Emitting - Expressions', () => {
+	it('Should emit simple string literal', () => {
+		const node = s('string');
 		const ctx = new Context();
 
-		const res = prettyPrint(emitExpression(n, ctx));
+		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('"string"', res.code);
+		expect('"string"').toEqual(res.code);
 	});
 
-	it('Should emit simple number literal', function() {
+	it('Should emit simple number literal', () => {
 		const node = n(10);
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('10', res.code);
+		expect('10').toEqual(res.code);
 	});
 
-	it('Should emit simple binary op', function() {
+	it('Should emit simple binary op', () => {
 		const node = b('number', 'plus', n(5), n(10));
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('5 + 10', res.code);
+		expect('5 + 10').toEqual(res.code);
 	});
 
-	it('Should group nested binary ops properly', function() {
-		const node = b(
-			'number',
-			'plus',
-			n(5),
-			b(
-				'number',
-				'multiply',
-				n(10),
-				n(5)
-			)
-		);
+	it('Should group nested binary ops properly', () => {
+		const node = b('number', 'plus', n(5), b('number', 'multiply', n(10), n(5)));
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('5 + 10 * 5', res.code);
+		expect('5 + 10 * 5').toEqual(res.code);
 	});
 
-	it('Should group nested binary ops properly - and add needed parens', function() {
-		const node = b(
-			'number',
-			'multiply',
-			n(5),
-			b(
-				'number',
-				'plus',
-				n(10),
-				n(5)
-			)
-		);
+	it('Should group nested binary ops properly - and add needed parens', () => {
+		const node = b('number', 'multiply', n(5), b('number', 'plus', n(10), n(5)));
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('5 * (10 + 5)', res.code);
+		expect('5 * (10 + 5)').toEqual(res.code);
 	});
 
-	it('Should emit simple variable expression correct', function() {
-		const node = v(
-			'string',
-			'myVarName'
-		);
+	it('Should emit simple variable expression correct', () => {
+		const node = v('string', 'myVarName');
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('vars.myVarName', res.code);
+		expect('vars.myVarName').toEqual(res.code);
 	});
 
 	// Note: This test verifies that no weird thing is attempted
 	// to resolve invalid JS identifiers. We disallow them in the grammar
 	// so it should be *ok*
-	it('Should emit simple variable expressions with weird names as incorrect javascript', function() {
-		const node = v(
-			'string',
-			'myVar-Name'
-		);
+	it('Should emit simple variable expressions with weird names as incorrect javascript', () => {
+		const node = v('string', 'myVar-Name');
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('vars.myVar-Name', res.code);
+		expect('vars.myVar-Name').toEqual(res.code);
 	});
 
-	it('Should emit helper function call on binary plus when variable string involved', function() {
-		const node = b(
-			'number-or-string',
-			'plus',
-			n(5),
-			v('number-or-string', 'myVar')
-		);
+	it('Should inline binary plus when variable string involved', () => {
+		const node = b('number-or-string', 'plus', n(5), v('number-or-string', 'myVar'));
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isTrue(ctx.usesPlusOp);
-		assert.equal('plusOp(5, vars.myVar)', res.code);
+		expect(res.code).toMatchInlineSnapshot(
+			`"ctx.makeSafeString(encodeIfString(ctx, 5) + encodeIfString(ctx, vars.myVar))"`,
+		);
 	});
 
-	it('Should not emit helper function call on plus when expr type is number', function() {
-		const node = b(
-			'number',
-			'plus',
-			n(5),
-			v('number', 'myVar')
-		);
+	it('Should not emit helper function call on plus when expr type is number', () => {
+		const node = b('number', 'plus', n(5), v('number', 'myVar'));
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('5 + vars.myVar', res.code);
+		expect('5 + vars.myVar').toEqual(res.code);
 	});
 
-	it('Should emit method call on function call', function() {
-		const node = f(
-			'myFn',
-			[]
-		);
+	it('Should emit method call on function call', () => {
+		const node = f('myFn', []);
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('fns.myFn(ctx)', res.code);
+		expect('fns.myFn(ctx)').toEqual(res.code);
 	});
 
-	it('Should emit method call on function call - single parameter', function() {
-		const node = f(
-			'myFn',
-			[n(10)]
-		);
+	it('Should emit method call on function call - single parameter', () => {
+		const node = f('myFn', [n(10)]);
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('fns.myFn(ctx, 10)', res.code);
+		expect('fns.myFn(ctx, 10)').toEqual(res.code);
 	});
 
-	it('Should emit method call on function call - two parameters', function() {
-		const node = f(
-			'myFn',
-			[n(10), s('stuff')]
-		);
+	it('Should emit method call on function call - two parameters', () => {
+		const node = f('myFn', [n(10), s('stuff')]);
 		const ctx = new Context();
 
 		const res = prettyPrint(emitExpression(node, ctx));
 
-		assert.isFalse(ctx.usesPlusOp);
-		assert.equal('fns.myFn(ctx, 10, "stuff")', res.code);
+		expect('fns.myFn(ctx, 10, "stuff")').toEqual(res.code);
 	});
 });

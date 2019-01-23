@@ -1,11 +1,9 @@
-loaders/
 src/
 typings/
 test/
 .vscode/
-.babelrc
 .gitignore
 tsconfig.json
 tslint.json
-mocha.sh
-webpack.config.js
+jest.config.js
+.prettierrc

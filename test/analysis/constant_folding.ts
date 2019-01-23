@@ -1,10 +1,4 @@
-import {assert} from 'chai';
-import 'mocha';
-
-import {
-	constantFoldExpression,
-	constantFoldExpressionList,
-} from '../../src/analysis/constant_folding';
+import { constantFoldExpression, constantFoldExpressionList } from '../../src/analysis/constant_folding';
 
 import {
 	Pos,
@@ -22,9 +16,7 @@ import {
 	TypedVariableNode as TypedTextVariableNode,
 } from '../../src/trees/text';
 
-import {
-	InferredType,
-} from '../../src/type_map';
+import { InferredType } from '../../src/type_map';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,
@@ -71,7 +63,7 @@ function b(
 	op: 'plus' | 'minus' | 'multiply' | 'divide',
 	lhs: TypedNode,
 	rhs: TypedNode,
-	pos?: Pos
+	pos?: Pos,
 ): TypedBinaryOpNode {
 	return {
 		binaryOp: op,
@@ -85,11 +77,7 @@ function b(
 	};
 }
 
-function v(
-	type: InferredType,
-	name: string,
-	pos?: Pos
-): TypedVariableNode {
+function v(type: InferredType, name: string, pos?: Pos): TypedVariableNode {
 	return {
 		exprNodeType: 'variable',
 		exprType: type,
@@ -100,11 +88,7 @@ function v(
 	};
 }
 
-function f(
-	name: string,
-	args: TypedNode[],
-	pos?: Pos
-): TypedFunctionInvocationNode {
+function f(name: string, args: TypedNode[], pos?: Pos): TypedFunctionInvocationNode {
 	return {
 		exprNodeType: 'function_invocation',
 		exprType: 'string',
@@ -146,84 +130,86 @@ function en(exp: TypedNode): TypedTextExprNode {
 	};
 }
 
-describe('Constant folding', function() {
-	describe('Number', function() {
-		it('Constant folds 10 to itself', function() {
+describe('Constant folding', () => {
+	describe('Number', () => {
+		it('Constant folds 10 to itself', () => {
 			const numberNode = n(10);
 
 			const folded = constantFoldExpression(numberNode);
-			assert.equal(numberNode, folded);
+			expect(numberNode).toEqual(folded);
 		});
 
-		it('Constant folds -5 to itself', function() {
+		it('Constant folds -5 to itself', () => {
 			const numberNode = n(-5);
 
 			const folded = constantFoldExpression(numberNode);
-			assert.equal(numberNode, folded);
+			expect(numberNode).toEqual(folded);
 		});
 	});
 
-	describe('Number', function() {
-		it('Constant empty string to itself', function() {
+	describe('Number', () => {
+		it('Constant empty string to itself', () => {
 			const stringNode = s('');
 
 			const folded = constantFoldExpression(stringNode);
-			assert.equal(stringNode, folded);
+			expect(stringNode).toEqual(folded);
 		});
 
-		it('Constant folds "hello" to itself', function() {
+		it('Constant folds "hello" to itself', () => {
 			const stringNode = s('hello');
 
 			const folded = constantFoldExpression(stringNode);
-			assert.equal(stringNode, folded);
+			expect(stringNode).toEqual(folded);
 		});
 	});
 
-	describe('Unary Minus', function() {
-		it('Can constant fold a simple unary minus number node', function() {
+	describe('Unary Minus', () => {
+		it('Can constant fold a simple unary minus number node', () => {
 			const numberNode = n(10);
 
 			const unaryMinusNode = um(numberNode);
 
 			const folded = constantFoldExpression(unaryMinusNode);
 
-			assert.deepEqual(n(-10), folded);
-			assert.equal(unaryMinusNode.pos, folded.pos);
+			expect(n(-10)).toEqual(folded);
+			expect(unaryMinusNode.pos).toEqual(folded.pos);
 		});
 
-		it('Can constant fold a simple unary minus number node with negative starting number', function() {
+		it('Can constant fold a simple unary minus number node with negative starting number', () => {
 			const numberNode = n(-100);
 
 			const unaryMinusNode = um(numberNode);
 
 			const folded = constantFoldExpression(unaryMinusNode);
 
-			assert.deepEqual(n(100), folded);
-			assert.equal(unaryMinusNode.pos, folded.pos);
+			expect(n(100)).toEqual(folded);
+			expect(unaryMinusNode.pos).toEqual(folded.pos);
 		});
 
-		it('Errors on unary minus with a string', function() {
+		it('Errors on unary minus with a string', () => {
 			const stringNode = s('hello');
 
 			const unaryMinusNode = um(stringNode);
 
-			assert.throws(() => constantFoldExpression(unaryMinusNode));
+			expect(() => constantFoldExpression(unaryMinusNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Unary minus with a string. It is only allowed on numbers."`,
+			);
 		});
 
-		it('Does not constant fold -var', function() {
+		it('Does not constant fold -var', () => {
 			const varNode = v('number', 'var');
 
 			const unaryMinus = um(varNode);
 
 			const folded = constantFoldExpression(unaryMinus);
 
-			assert.deepEqual(unaryMinus, folded);
-			assert.equal(unaryMinus.pos, folded.pos);
+			expect(unaryMinus).toEqual(folded);
+			expect(unaryMinus.pos).toEqual(folded.pos);
 		});
 	});
 
-	describe('Binary op - plus', function() {
-		it('Can concat two strings', function() {
+	describe('Binary op - plus', () => {
+		it('Can concat two strings', () => {
 			const lhs = s('Hello ');
 			const rhs = s('world');
 
@@ -231,11 +217,11 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(concatNode);
 
-			assert.deepEqual(s('Hello world'), folded);
-			assert.equal(concatNode.pos, folded.pos);
+			expect(s('Hello world')).toEqual(folded);
+			expect(concatNode.pos).toEqual(folded.pos);
 		});
 
-		it('Accepts string and variable', function() {
+		it('Accepts string and variable', () => {
 			const lhs = s('Hello ');
 			const rhs = v('string', 'world');
 
@@ -243,11 +229,11 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(concatNode);
 
-			assert.deepEqual(concatNode, folded);
-			assert.equal(concatNode.pos, folded.pos);
+			expect(concatNode).toEqual(folded);
+			expect(concatNode.pos).toEqual(folded.pos);
 		});
 
-		it('Accepts variable and variable', function() {
+		it('Accepts variable and variable', () => {
 			const lhs = v('string', 'hello');
 			const rhs = v('string', 'world');
 
@@ -255,11 +241,11 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(concatNode);
 
-			assert.deepEqual(concatNode, folded);
-			assert.equal(concatNode.pos, folded.pos);
+			expect(concatNode).toEqual(folded);
+			expect(concatNode.pos).toEqual(folded.pos);
 		});
 
-		it('Can concat string and number', function() {
+		it('Can concat string and number', () => {
 			const lhs = s('5');
 			const rhs = n(10);
 
@@ -267,11 +253,11 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(concatNode);
 
-			assert.deepEqual(s('510'), folded);
-			assert.equal(concatNode.pos, folded.pos);
+			expect(s('510')).toEqual(folded);
+			expect(concatNode.pos).toEqual(folded.pos);
 		});
 
-		it('Can concat number and string', function() {
+		it('Can concat number and string', () => {
 			const lhs = n(10);
 			const rhs = s(' hello');
 
@@ -279,11 +265,11 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(concatNode);
 
-			assert.deepEqual(s('10 hello'), folded);
-			assert.equal(concatNode.pos, folded.pos);
+			expect(s('10 hello')).toEqual(folded);
+			expect(concatNode.pos).toEqual(folded.pos);
 		});
 
-		it('Can add two numbers', function() {
+		it('Can add two numbers', () => {
 			const lhs = n(10);
 			const rhs = n(5);
 
@@ -291,40 +277,46 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(additionNode);
 
-			assert.deepEqual(n(15), folded);
-			assert.equal(additionNode.pos, folded.pos);
+			expect(n(15)).toEqual(folded);
+			expect(additionNode.pos).toEqual(folded.pos);
 		});
 	});
 
-	describe('Binary op minus', function() {
-		it('Cannot minus two strings', function() {
+	describe('Binary op minus', () => {
+		it('Cannot minus two strings', () => {
 			const lhs = s('Hello ');
 			const rhs = s('world');
 
 			const minusNode = b('string', 'minus', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(minusNode));
+			expect(() => constantFoldExpression(minusNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Minus operation between string and string. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Cannot minus string and number', function() {
+		it('Cannot minus string and number', () => {
 			const lhs = s('5');
 			const rhs = n(10);
 
 			const minusNode = b('string', 'minus', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(minusNode));
+			expect(() => constantFoldExpression(minusNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Minus operation between string and number. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Cannot minus number and string', function() {
+		it('Cannot minus number and string', () => {
 			const lhs = n(10);
 			const rhs = s(' hello');
 
 			const minusNode = b('string', 'minus', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(minusNode));
+			expect(() => constantFoldExpression(minusNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Minus operation between number and string. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Can minus two numbers', function() {
+		it('Can minus two numbers', () => {
 			const lhs = n(10);
 			const rhs = n(5);
 
@@ -332,11 +324,11 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(minusNode);
 
-			assert.deepEqual(n(5), folded);
-			assert.equal(minusNode.pos, folded.pos);
+			expect(n(5)).toEqual(folded);
+			expect(minusNode.pos).toEqual(folded.pos);
 		});
 
-		it('Accepts number and varaible', function() {
+		it('Accepts number and varaible', () => {
 			const lhs = n(10);
 			const rhs = v('number', 'var');
 
@@ -344,11 +336,11 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(minusNode);
 
-			assert.deepEqual(minusNode, folded);
-			assert.equal(minusNode.pos, folded.pos);
+			expect(minusNode).toEqual(folded);
+			expect(minusNode.pos).toEqual(folded.pos);
 		});
 
-		it('Accepts variable and varaible', function() {
+		it('Accepts variable and varaible', () => {
 			const lhs = v('number', 'var1');
 			const rhs = v('number', 'var2');
 
@@ -356,40 +348,46 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(minusNode);
 
-			assert.deepEqual(minusNode, folded);
-			assert.equal(minusNode.pos, folded.pos);
+			expect(minusNode).toEqual(folded);
+			expect(minusNode.pos).toEqual(folded.pos);
 		});
 	});
 
-	describe('Binary op multiply', function() {
-		it('Cannot multiply two strings', function() {
+	describe('Binary op multiply', () => {
+		it('Cannot multiply two strings', () => {
 			const lhs = s('Hello ');
 			const rhs = s('world');
 
 			const multiplyNode = b('string', 'multiply', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(multiplyNode));
+			expect(() => constantFoldExpression(multiplyNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Multiply operation between string and string. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Cannot multiply string and number', function() {
+		it('Cannot multiply string and number', () => {
 			const lhs = s('5');
 			const rhs = n(10);
 
 			const multiplyNode = b('string', 'multiply', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(multiplyNode));
+			expect(() => constantFoldExpression(multiplyNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Multiply operation between string and number. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Cannot multiply number and string', function() {
+		it('Cannot multiply number and string', () => {
 			const lhs = n(10);
 			const rhs = s(' hello');
 
 			const multiplyNode = b('string', 'multiply', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(multiplyNode));
+			expect(() => constantFoldExpression(multiplyNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Multiply operation between number and string. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Can multiply two numbers', function() {
+		it('Can multiply two numbers', () => {
 			const lhs = n(10);
 			const rhs = n(5);
 
@@ -397,11 +395,11 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(multiplyNode);
 
-			assert.deepEqual(n(50), folded);
-			assert.equal(multiplyNode.pos, folded.pos);
+			expect(n(50)).toEqual(folded);
+			expect(multiplyNode.pos).toEqual(folded.pos);
 		});
 
-		it('Folds var*number*number', function() {
+		it('Folds var*number*number', () => {
 			const varNode = v('number', 'var', {
 				firstColumn: 0,
 				firstLine: 1,
@@ -435,51 +433,63 @@ describe('Constant folding', function() {
 			});
 
 			const folded = constantFoldExpression(node);
-			const expected = b('number', 'multiply', varNode, n(50, {
-				firstColumn: 5,
-				firstLine: 1,
-				lastColumn: 9,
-				lastLine: 1,
-			}), {
-				firstColumn: 0,
-				firstLine: 1,
-				lastColumn: 9,
-				lastLine: 1,
-			});
+			const expected = b(
+				'number',
+				'multiply',
+				varNode,
+				n(50, {
+					firstColumn: 5,
+					firstLine: 1,
+					lastColumn: 9,
+					lastLine: 1,
+				}),
+				{
+					firstColumn: 0,
+					firstLine: 1,
+					lastColumn: 9,
+					lastLine: 1,
+				},
+			);
 
-			assert.deepEqual(expected, folded);
+			expect(folded).toEqual(expected);
 		});
 	});
 
-	describe('Binary op divide', function() {
-		it('Cannot divide two strings', function() {
+	describe('Binary op divide', () => {
+		it('Cannot divide two strings', () => {
 			const lhs = s('Hello ');
 			const rhs = s('world');
 
 			const divideNode = b('string', 'divide', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(divideNode));
+			expect(() => constantFoldExpression(divideNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Divide operation between string and string. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Cannot divide string and number', function() {
+		it('Cannot divide string and number', () => {
 			const lhs = s('5');
 			const rhs = n(10);
 
 			const divideNode = b('string', 'divide', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(divideNode));
+			expect(() => constantFoldExpression(divideNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Divide operation between string and number. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Cannot divide number and string', function() {
+		it('Cannot divide number and string', () => {
 			const lhs = n(10);
 			const rhs = s(' hello');
 
 			const divideNode = b('string', 'divide', lhs, rhs);
 
-			assert.throws(() => constantFoldExpression(divideNode));
+			expect(() => constantFoldExpression(divideNode)).toThrowErrorMatchingInlineSnapshot(
+				`"Could not constant fold expression. Divide operation between number and string. Only allowed between 2 numbers."`,
+			);
 		});
 
-		it('Can divide two numbers', function() {
+		it('Can divide two numbers', () => {
 			const lhs = n(10);
 			const rhs = n(5);
 
@@ -487,42 +497,37 @@ describe('Constant folding', function() {
 
 			const folded = constantFoldExpression(divideNode);
 
-			assert.deepEqual(n(2), folded);
-			assert.equal(divideNode.pos, folded.pos);
+			expect(n(2)).toEqual(folded);
+			expect(divideNode.pos).toEqual(folded.pos);
 		});
 	});
 
-	describe('Functions', function() {
-		it('Does not constant fold a function call', function() {
+	describe('Functions', () => {
+		it('Does not constant fold a function call', () => {
 			const functionNode = f('someFunction', []);
 
 			const folded = constantFoldExpression(functionNode);
 
-			assert.deepEqual(functionNode, folded);
-			assert.equal(functionNode.pos, folded.pos);
+			expect(functionNode).toEqual(folded);
+			expect(functionNode.pos).toEqual(folded.pos);
 		});
 
-		it('Does fold arguments', function() {
+		it('Does fold arguments', () => {
 			const functionNode = f('someFunction', [um(n(10))]);
 
 			const folded = constantFoldExpression(functionNode);
 
 			const expectedFolded = f('someFunction', [n(-10)]);
-			assert.deepEqual(expectedFolded, folded);
-			assert.equal(functionNode.pos, folded.pos);
+			expect(expectedFolded).toEqual(folded);
+			expect(functionNode.pos).toEqual(folded.pos);
 		});
 	});
 
-	describe('Full text constant folding', function() {
-		it('Can constant fold some stuff', function() {
+	describe('Full text constant folding', () => {
+		it('Can constant fold some stuff', () => {
 			const text = tn('Some text: ');
 			const varNode = vn('var', 'string');
-			const expNode = en(b(
-				'string',
-				'plus',
-				s('Hello '),
-				s('world')
-			));
+			const expNode = en(b('string', 'plus', s('Hello '), s('world')));
 			const text2 = tn('!');
 
 			const folded = constantFoldExpressionList({
@@ -530,22 +535,13 @@ describe('Constant folding', function() {
 				nodes: [text, varNode, expNode, text2],
 			});
 
-			assert.equal('Some text: $var{{"Hello"+"world"}}!', folded.input);
-			assert.deepEqual([
-				tn('Some text: '),
-				vn('var', 'string'),
-				tn('Hello world!'),
-			], folded.nodes);
+			expect('Some text: $var{{"Hello"+"world"}}!').toEqual(folded.input);
+			expect([tn('Some text: '), vn('var', 'string'), tn('Hello world!')]).toEqual(folded.nodes);
 		});
 
-		it('Can constant fold a complete constant expression', function() {
+		it('Can constant fold a complete constant expression', () => {
 			const text = tn('Some text: ');
-			const expNode = en(b(
-				'string',
-				'plus',
-				s('Hello '),
-				s('world')
-			));
+			const expNode = en(b('string', 'plus', s('Hello '), s('world')));
 			const text2 = tn('!');
 
 			const folded = constantFoldExpressionList({
@@ -553,9 +549,7 @@ describe('Constant folding', function() {
 				nodes: [text, expNode, text2],
 			});
 
-			assert.deepEqual([
-				tn('Some text: Hello world!'),
-			], folded.nodes);
+			expect([tn('Some text: Hello world!')]).toEqual(folded.nodes);
 		});
 	});
 });

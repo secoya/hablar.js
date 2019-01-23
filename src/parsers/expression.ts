@@ -1,5 +1,5 @@
 import ParseError from '../errors/parse_error';
-import {Node, TypedNode} from '../trees/expression';
+import { Node, TypedNode } from '../trees/expression';
 import getParser from './get_parser';
 const expressionParser = getParser('expression');
 
@@ -41,22 +41,20 @@ export function walkTypedNode(node: TypedNode, callback: (node: TypedNode) => vo
 	}
 }
 
-function substituteStringLiterals(
-	node: Node,
-	originalText: string
-): Node {
-	walkNode(node, (expr) : void => {
-		if (expr.exprNodeType === 'string_literal') {
-			try {
-				const v = JSON.parse(expr.value);
-				expr.value = v;
-			} catch (e) {
-				throw new ParseError(
-					`Error parsing '${originalText}'. Invalid string literal ${expr.value}`
-				);
+function substituteStringLiterals(node: Node, originalText: string): Node {
+	walkNode(
+		node,
+		(expr): void => {
+			if (expr.exprNodeType === 'string_literal') {
+				try {
+					const v = JSON.parse(expr.value);
+					expr.value = v;
+				} catch (e) {
+					throw new ParseError(`Error parsing '${originalText}'. Invalid string literal ${expr.value}`);
+				}
 			}
-		}
-	});
+		},
+	);
 
 	return node;
 }

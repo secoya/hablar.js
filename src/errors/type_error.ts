@@ -1,17 +1,10 @@
-import {
-	Node as ConstraintNode,
-} from '../trees/constraint';
-import {
-	Node as ExprNode,
-} from '../trees/expression';
-import {
-	Node as TextNode,
-	Pos,
-} from '../trees/text';
+import { Node as ConstraintNode } from '../trees/constraint';
+import { Node as ExprNode } from '../trees/expression';
+import { Node as TextNode, Pos } from '../trees/text';
 
-import {showErrorLocation} from './util';
+import { showErrorLocation } from './util';
 
-import {default as TypeMap, InferredType} from '../type_map';
+import { default as TypeMap, InferredType } from '../type_map';
 
 function printTypes(t: InferredType | InferredType[]): string {
 	if (Array.isArray(t)) {
@@ -41,10 +34,9 @@ function getErrorMessageForSimpleText(
 		`Type error at line ${line}:\n` +
 		showErrorLocation(
 			input,
-			`Variable \$${variable} was expected to have type: ${expectedType}, ` +
-			`found: ${foundType}.`,
+			`Variable \$${variable} was expected to have type: ${expectedType}, ` + `found: ${foundType}.`,
 			line,
-			column
+			column,
 		)
 	);
 }
@@ -62,10 +54,9 @@ function getErrorMessageForConstraintError(
 		`Type error at line ${line}:\n` +
 		showErrorLocation(
 			constraintInput,
-			`Variable \$${variable} was expected to have type: ${expectedType}, ` +
-			`found: ${foundType}.`,
+			`Variable \$${variable} was expected to have type: ${expectedType}, ` + `found: ${foundType}.`,
 			line,
-			column
+			column,
 		)
 	);
 }
@@ -83,10 +74,9 @@ function getErrorMessageConstraintTextError(
 		`Type error at line ${line}:\n` +
 		showErrorLocation(
 			textInput,
-			`Variable \$${variable} was expected to have type: ${expectedType}, ` +
-			`found: ${foundType}.`,
+			`Variable \$${variable} was expected to have type: ${expectedType}, ` + `found: ${foundType}.`,
 			line,
-			column
+			column,
 		)
 	);
 }
@@ -110,12 +100,16 @@ export default class TypeError extends Error {
 		constraintText: string | null,
 		variable: string,
 	) {
-		const position = node != null ? getLocation(node) : {
-			firstColumn: 0,
-			firstLine: 0,
-			lastColumn: 0,
-			lastLine: 0,
-		};
+		const position =
+			node != null
+				? getLocation(node)
+				: {
+						firstColumn: 0,
+						firstLine: 0,
+						lastColumn: 0,
+						lastLine: 0,
+						// tslint:disable-next-line
+				  };
 		const isConstraintError = (node as ConstraintNode).op != null;
 
 		let errorMessage: string;
@@ -126,8 +120,8 @@ export default class TypeError extends Error {
 				variable,
 				printTypes(expectedType),
 				printTypes(foundType),
-				(constraintText as string),
-				text
+				constraintText as string,
+				text,
 			);
 		} else if (constraintText != null) {
 			errorMessage = getErrorMessageConstraintTextError(
@@ -136,8 +130,8 @@ export default class TypeError extends Error {
 				variable,
 				printTypes(expectedType),
 				printTypes(foundType),
-				(constraintText as string),
-				text
+				constraintText as string,
+				text,
 			);
 		} else {
 			errorMessage = getErrorMessageForSimpleText(
@@ -146,10 +140,11 @@ export default class TypeError extends Error {
 				variable,
 				printTypes(expectedType),
 				printTypes(foundType),
-				text
+				text,
 			);
 		}
 		super(errorMessage);
+		Object.setPrototypeOf(this, TypeError.prototype);
 		this.message = errorMessage;
 		this.foundType = foundType;
 		this.typeMap = typeMap;
