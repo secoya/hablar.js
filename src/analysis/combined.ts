@@ -74,6 +74,22 @@ export function analyzeTranslation(
 	return analyzeOnlyTranslation(translation, map, allowedVariables, allowedFunctions);
 }
 
+export function analyzeTranslations(
+	translations: Translation[],
+	map: TypeMap,
+	allowedVariables: string[] | null = null,
+	allowedFunctions: string[] | null = null,
+): TypedTranslation[] {
+	for (const translation of translations) {
+		typeInferTranslation(translation, map);
+	}
+	map.freeze();
+
+	return translations.map(translation =>
+		analyzeOnlyTranslation(translation, map, allowedVariables, allowedFunctions),
+	);
+}
+
 export function analyzeOnlySimpleTranslation(
 	translation: SimpleTranslation,
 	map: TypeMap,

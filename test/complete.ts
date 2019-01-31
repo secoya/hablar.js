@@ -1,6 +1,6 @@
 import { prettyPrint } from 'recast';
 
-import { analyzeTranslation, ConstraintTranslation } from '../src/analysis/combined';
+import { analyzeTranslation, analyzeTranslations, ConstraintTranslation } from '../src/analysis/combined';
 import Context from '../src/emitting/context';
 import { emitTranslation } from '../src/emitting/translation';
 import constraintParser from '../src/parsers/constraint';
@@ -19,6 +19,23 @@ describe('Full tests', () => {
 
 		const jsAst = emitTranslation(analyzed, ctx, typeMap);
 		expect('"Some translation"').toEqual(prettyPrint(jsAst).code);
+	});
+
+	it('Should work with multiple simple text translations', () => {
+		const text1 = 'Some translation';
+		const ast1 = fullTextParser(text1);
+
+		const text2 = 'Some other translation';
+		const ast2 = fullTextParser(text2);
+
+		const typeMap = new TypeMap();
+		const ctx = new Context();
+		const analyzed = analyzeTranslations([ast1, ast2], typeMap);
+
+		const jsAst1 = emitTranslation(analyzed[0], ctx, typeMap);
+		const jsAst2 = emitTranslation(analyzed[1], ctx, typeMap);
+		expect('"Some translation"').toEqual(prettyPrint(jsAst1).code);
+		expect('"Some other translation"').toEqual(prettyPrint(jsAst2).code);
 	});
 
 	it('Should work with complex translations', () => {
