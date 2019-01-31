@@ -551,5 +551,18 @@ describe('Constant folding', () => {
 
 			expect([tn('Some text: Hello world!')]).toEqual(folded.nodes);
 		});
+
+		// Regression: https://github.com/secoya/hablar.js/issues/1
+		it('Can constant fold simple text + interpolation', () => {
+			const nodes = [tn('Svar til '), en(v('string', 'name')), tn("'s pulse")];
+			const nodesClone = JSON.parse(JSON.stringify(nodes));
+
+			const folded = constantFoldExpressionList({
+				input: "Svar til {{$name}}'s pulse",
+				nodes: nodesClone,
+			});
+
+			expect(folded.nodes).toEqual(nodes);
+		});
 	});
 });

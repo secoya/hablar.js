@@ -244,6 +244,7 @@ export function constantFoldExpressionList(ast: TypedASTRoot): TypedASTRoot {
 					}
 				} else {
 					result.push(expr);
+					lastConstantExpr = null;
 				}
 				break;
 			}
