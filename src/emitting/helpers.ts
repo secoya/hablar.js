@@ -1,8 +1,7 @@
-import T from 'ast-types';
+import { builders as b } from 'ast-types';
 import * as ASTTypes from 'ast-types/gen/kinds';
 import Context from './context';
 
-const b = T.builders;
 export function encodeIfStringFunction(ctx: Context): ASTTypes.FunctionDeclarationKind {
 	const strVar = b.identifier('str');
 	return b.functionDeclaration(

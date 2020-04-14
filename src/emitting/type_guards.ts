@@ -1,9 +1,7 @@
-import T from 'ast-types';
+import { builders as b } from 'ast-types';
 import * as ASTTypes from 'ast-types/gen/kinds';
 import { default as TypeMap, InferredType } from '../type_map';
 import Context from './context';
-
-const b = T.builders;
 
 function getTypeTestStatement(ctx: Context, varName: string, type: InferredType): ASTTypes.StatementKind {
 	const test = getNegativeTypeTest(ctx, varName, type);

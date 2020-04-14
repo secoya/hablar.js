@@ -1,7 +1,5 @@
-import T from 'ast-types';
+import { builders as b } from 'ast-types';
 import * as ASTTypes from 'ast-types/gen/kinds';
-
-const b = T.builders;
 
 export default class Context {
 	public ctxExpr: ASTTypes.IdentifierKind = b.identifier('ctx');

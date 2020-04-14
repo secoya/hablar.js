@@ -1,10 +1,8 @@
-import T from 'ast-types';
+import { builders as b } from 'ast-types';
 import * as ASTTypes from 'ast-types/gen/kinds';
 
 import { ASTRoot } from '../trees/constraint';
 import Context from './context';
-
-const b = T.builders;
 
 export function emitConstrainedTranslation(
 	ast: ASTRoot,

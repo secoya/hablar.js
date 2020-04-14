@@ -1,10 +1,8 @@
-import T from 'ast-types';
+import { builders as b } from 'ast-types';
 import * as ASTTypes from 'ast-types/gen/kinds';
 
 import { TypedNode } from '../trees/expression';
 import Context from './context';
-
-const b = T.builders;
 
 function getBinaryOp(op: 'plus' | 'minus' | 'divide' | 'multiply'): '+' | '-' | '*' | '/' {
 	switch (op) {

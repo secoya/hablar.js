@@ -1,4 +1,4 @@
-import T from 'ast-types';
+import { builders as b } from 'ast-types';
 import * as ASTTypes from 'ast-types/gen/kinds';
 import { ASTRoot as ConstraintAST } from '../trees/constraint';
 import { TypedNode as ExprNode } from '../trees/expression';
@@ -8,8 +8,6 @@ import { emitConstrainedTranslation } from './constraint';
 import Context from './context';
 import { emitExpression } from './expression';
 import { getTypeGuardStatements } from './type_guards';
-
-const b = T.builders;
 
 function encodeIfString(exp: ASTTypes.ExpressionKind, ctx: Context): ASTTypes.ExpressionKind {
 	return b.callExpression(ctx.encodeIfStringExpr, [ctx.ctxExpr, exp]);
