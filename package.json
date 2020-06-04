@@ -1,6 +1,6 @@
 {
 	"name": "hablar",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "A JavaScript library useful for compiling i18n translations in a custom language to JavaScript functions.",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
