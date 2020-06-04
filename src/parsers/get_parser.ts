@@ -14,19 +14,18 @@ function monkeyPatchParserWithProperParseError(parser: any): any {
 	return parser;
 }
 
+const parsers = {
+	constraint: require('./grammars/constraint.js'),
+	expression: require('./grammars/expression.js'),
+	text: require('./grammars/text.js'),
+};
+
 function getParser(
 	name: 'expression' | 'text' | 'constraint',
 ): {
 	parse(input: string): any;
 } {
-	const fs = require('fs');
-	const path = require('path');
-	const jison = require('jison');
-
-	const grammar = fs.readFileSync(path.join(__dirname, 'grammars', name + '.jison'), 'utf-8');
-	const parser = new jison.Parser(grammar);
-
+	const parser = parsers[name];
 	return monkeyPatchParserWithProperParseError(parser);
 }
-
 export default getParser;
