@@ -1,3 +1,4 @@
+import { prettyPrint } from 'recast';
 import Context from '../../src/emitting/context';
 import { emitConstrainedTranslations, emitSimpleTranslation } from '../../src/emitting/translation';
 import { Node as ConstraintNode, ValueNode } from '../../src/trees/constraint';
@@ -9,7 +10,6 @@ import {
 } from '../../src/trees/text';
 import { InferredType } from '../../src/type_map';
 import TypeMap from '../../src/type_map';
-import { prettyPrint } from 'recast';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,

@@ -60,26 +60,26 @@ describe('Full tests', () => {
 		const jsAst = emitTranslation(analyzed, ctx, typeMap);
 
 		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`
-"function(vars, fns, ctx) {
-    if (typeof(vars.n) !== \\"number\\") {
-        throw new Error(\\"Variable n must be of type number\\");
-    }
+		"function(vars, fns, ctx) {
+		    if (typeof(vars.n) !== \\"number\\") {
+		        throw new Error(\\"Variable n must be of type number\\");
+		    }
 
-    if (vars.n === 0) {
-        return ctx.encode(\\"You have nothing in your basket\\");
-    }
+		    if (vars.n === 0) {
+		        return ctx.encode(\\"You have nothing in your basket\\");
+		    }
 
-    if (vars.n === 1) {
-        return ctx.encode(\\"You have one item in your basket\\");
-    }
+		    if (vars.n === 1) {
+		        return ctx.encode(\\"You have one item in your basket\\");
+		    }
 
-    if (vars.n > 1) {
-        return ctx.encode(\\"You have \\" + vars.n + \\" items in your basket\\");
-    }
+		    if (vars.n > 1) {
+		        return ctx.encode(\\"You have \\" + vars.n + \\" items in your basket\\");
+		    }
 
-    throw new Error(\\"No translation matched the parameters\\");
-}"
-`);
+		    throw new Error(\\"No translation matched the parameters\\");
+		}"
+	`);
 	});
 
 	it('Should constant fold simple translation', () => {
@@ -114,26 +114,26 @@ describe('Full tests', () => {
 		const jsAst = emitTranslation(analyzed, ctx, typeMap);
 
 		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`
-"function(vars, fns, ctx) {
-    if (typeof(vars.n) !== \\"number\\") {
-        throw new Error(\\"Variable n must be of type number\\");
-    }
+		"function(vars, fns, ctx) {
+		    if (typeof(vars.n) !== \\"number\\") {
+		        throw new Error(\\"Variable n must be of type number\\");
+		    }
 
-    if (vars.n === 0) {
-        return ctx.encode(\\"You have nothing in your basket. One million: 1000000\\");
-    }
+		    if (vars.n === 0) {
+		        return ctx.encode(\\"You have nothing in your basket. One million: 1000000\\");
+		    }
 
-    if (vars.n === 1) {
-        return ctx.encode(\\"You have one item in your basket. One million: 1000000\\");
-    }
+		    if (vars.n === 1) {
+		        return ctx.encode(\\"You have one item in your basket. One million: 1000000\\");
+		    }
 
-    if (vars.n > 1) {
-        return ctx.encode(\\"You have \\" + vars.n + \\" items in your basket. One million: 1000000\\");
-    }
+		    if (vars.n > 1) {
+		        return ctx.encode(\\"You have \\" + vars.n + \\" items in your basket. One million: 1000000\\");
+		    }
 
-    throw new Error(\\"No translation matched the parameters\\");
-}"
-`);
+		    throw new Error(\\"No translation matched the parameters\\");
+		}"
+	`);
 	});
 
 	it('Should generate pretty type errors', () => {
@@ -200,5 +200,19 @@ describe('Full tests', () => {
    ---------------^
    Function fn is not known to this translation. Known functions are: otherFn"
 `);
+	});
+
+	it('Should be able to type infer function arguments', () => {
+		const text = 'Bold text: {{bold($myVar)}}';
+
+		const ast = fullTextParser(text);
+
+		const typeMap = new TypeMap();
+		analyzeTranslation(ast, typeMap, null, ['bold']);
+		expect(typeMap.getVariableType('myVar')).toMatchInlineSnapshot(`"unknown"`);
+		const newTypeMap = new TypeMap();
+		newTypeMap.addTypedFunction('bold', ['string']);
+		analyzeTranslation(ast, newTypeMap, null, ['bold']);
+		expect(newTypeMap.getVariableType('myVar')).toMatchInlineSnapshot(`"string"`);
 	});
 });

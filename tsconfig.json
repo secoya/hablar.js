@@ -13,11 +13,9 @@
 		"importHelpers": true,
 		"esModuleInterop": true,
 		"paths": {
-			"jison": ["../typings/jison.d.ts"],
 			"recast": ["../typings/recast.d.ts"]
 		},
 		"lib": ["es6", "es2015"]
 	},
-	"include": ["__tests__/**/*.ts"],
 	"files": ["src/index.ts"]
 }

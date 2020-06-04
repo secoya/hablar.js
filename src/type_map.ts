@@ -49,6 +49,17 @@ export type TypeInfo = {
 	type: InferredType;
 };
 
+export type UnknownFunctionParameterTypes = {
+	kind: 'unknown';
+};
+
+export type KnownFunctionParameterTypes = {
+	kind: 'known';
+	types: InferredType[];
+};
+
+export type FunctionParameterTypes = UnknownFunctionParameterTypes | KnownFunctionParameterTypes;
+
 export default class TypeMap {
 	private static mergeTypeInfo(existingType: InferredType, newType: InferredType): InferredType {
 		if (newType === 'unknown') {
@@ -114,14 +125,14 @@ export default class TypeMap {
 	}
 
 	private map: Map<string, TypeInfo>;
-	private functions: Set<string>;
+	private functions: Map<string, FunctionParameterTypes>;
 	private frozen: boolean;
 	private hasError: boolean;
 	private typeErrors: TypeError[];
 
 	public constructor() {
 		this.map = new Map<string, TypeInfo>();
-		this.functions = new Set<string>();
+		this.functions = new Map<string, FunctionParameterTypes>();
 		this.frozen = false;
 		this.hasError = false;
 		this.typeErrors = [];
@@ -202,7 +213,7 @@ export default class TypeMap {
 					existingType,
 					type,
 					this,
-					(usage as (TextTypeUsage | ConstraintTypeUsage | ExpressionTypeUsage)).node || null,
+					(usage as TextTypeUsage | ConstraintTypeUsage | ExpressionTypeUsage).node || null,
 					loc != null ? loc.text.input : '',
 					loc.constraints != null ? loc.constraints.input : null,
 					variable,
@@ -215,10 +226,31 @@ export default class TypeMap {
 
 	public addFunction(functionName: string): void {
 		this._throwIfFrozen(`Cannot add function ${functionName} after map is frozen`);
-		this.functions.add(functionName);
+		if (this.functions.has(functionName)) {
+			return;
+		}
+		this.functions.set(functionName, { kind: 'unknown' });
+	}
+
+	public addTypedFunction(functionName: string, parameterTypes: InferredType[]): void {
+		this._throwIfFrozen(`Cannot add function ${functionName} after map is frozen`);
+		if (this.functions.has(functionName)) {
+			throw new Error('Function has already been added with known parameter types');
+		}
+		this.functions.set(functionName, { kind: 'known', types: parameterTypes });
 	}
 
 	public functionNames(): string[] {
-		return Array.from(this.functions.values());
+		return Array.from(this.functions.keys());
+	}
+
+	public functionParameterTypes(functionName: string): FunctionParameterTypes {
+		const types = this.functions.get(functionName);
+		if (types == null) {
+			return {
+				kind: 'unknown',
+			};
+		}
+		return types;
 	}
 }

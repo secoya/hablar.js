@@ -102,14 +102,13 @@ function inferExprType(
 		case 'string_literal':
 			return 'string';
 		case 'function_invocation':
-			// In the future we might want a register of functions
-			// noting their type information. For now we can't say much about them.
-
-			// We will however continue our inference phase and pass it down to
-			// the arguments.
-
+			const parameterTypes = typeMap.functionParameterTypes(node.name);
+			const types = parameterTypes.kind === 'known' ? parameterTypes.types : [];
+			let idx = 0;
 			for (const param of node.parameters) {
-				inferExprType(typeMap, param, location);
+				const typeToInfer = idx < types.length ? types[idx] : undefined;
+				inferExprType(typeMap, param, location, typeToInfer);
+				idx++;
 			}
 			typeMap.addFunction(node.name);
 			return 'unknown';
@@ -291,7 +290,7 @@ function makeTypedExpressionNode(node: ExprNode, typeMap: TypeMap): TypedExprNod
 		// any potential calculations can be done inside the function.
 		// And in any case in general they should be used
 		// to return some kind of escaped markup.
-		const parameters: TypedExprNode[] = node.parameters.map(n => makeTypedExpressionNode(n, typeMap));
+		const parameters: TypedExprNode[] = node.parameters.map((n) => makeTypedExpressionNode(n, typeMap));
 
 		return {
 			exprNodeType: 'function_invocation',
