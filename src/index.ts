@@ -22,9 +22,9 @@ export { default as ParseError } from './errors/parse_error';
 export { default as TypeError } from './errors/type_error';
 export { showErrorLocation } from './errors/util';
 
-import { default as TypeMapConstructor, InferredType as InferType } from './type_map';
+import { InferredType as InferType } from './type_map';
+export { default as TypeMap } from './type_map';
 
-export const TypeMap = TypeMapConstructor;
 export type InferredType = InferType;
 
 import { emitConstrainedTranslation } from './emitting/constraint';
