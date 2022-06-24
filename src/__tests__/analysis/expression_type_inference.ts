@@ -1,6 +1,6 @@
-import * as infer from '../../src/analysis/type_inference';
+import * as infer from '../../analysis/type_inference';
 
-import { Node as ConstraintNode } from '../../src/trees/constraint';
+import { Node as ConstraintNode } from '../../trees/constraint';
 import {
 	BinaryOpNode,
 	FunctionInvocationNode,
@@ -16,10 +16,10 @@ import {
 	TypedVariableNode,
 	UnaryMinusNode,
 	VariableNode,
-} from '../../src/trees/expression';
-import { Node as TextNode } from '../../src/trees/text';
-import TypeMap from '../../src/type_map';
-import { InferredType, TypeInfo } from '../../src/type_map';
+} from '../../trees/expression';
+import { Node as TextNode } from '../../trees/text';
+import TypeMap from '../../type_map';
+import { InferredType, TypeInfo } from '../../type_map';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,

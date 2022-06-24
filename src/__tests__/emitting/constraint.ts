@@ -1,8 +1,8 @@
 import { prettyPrint, types } from 'recast';
 
-import { emitConstrainedTranslation } from '../../src/emitting/constraint';
-import Context from '../../src/emitting/context';
-import { EqualityNode, IgnoreNode, IneqNode, ValueNode } from '../../src/trees/constraint';
+import { emitConstrainedTranslation } from '../../emitting/constraint';
+import Context from '../../emitting/context';
+import { EqualityNode, IgnoreNode, IneqNode, ValueNode } from '../../trees/constraint';
 
 const b = types.builders;
 

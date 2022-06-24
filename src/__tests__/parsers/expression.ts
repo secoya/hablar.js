@@ -1,5 +1,5 @@
-import ParseError from '../../src/errors/parse_error';
-import expressionParser from '../../src/parsers/expression';
+import ParseError from '../../errors/parse_error';
+import expressionParser from '../../parsers/expression';
 
 describe('Expression parser', () => {
 	describe('Literals', () => {

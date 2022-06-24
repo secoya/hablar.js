@@ -1,4 +1,4 @@
-import { default as TypeMap, CustomTypeUsage, InferredType } from '../src/type_map';
+import { default as TypeMap, CustomTypeUsage, InferredType } from '../type_map';
 
 describe('TypeMap', () => {
 	it('Created unknown empty type info when accessing unknown variable', () => {

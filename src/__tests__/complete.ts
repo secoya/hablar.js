@@ -1,11 +1,11 @@
 import { prettyPrint } from 'recast';
 
-import { analyzeTranslation, analyzeTranslations, ConstraintTranslation } from '../src/analysis/combined';
-import Context from '../src/emitting/context';
-import { emitTranslation } from '../src/emitting/translation';
-import constraintParser from '../src/parsers/constraint';
-import fullTextParser from '../src/parsers/text';
-import TypeMap from '../src/type_map';
+import { analyzeTranslation, analyzeTranslations, ConstraintTranslation } from '../analysis/combined';
+import Context from '../emitting/context';
+import { emitTranslation } from '../emitting/translation';
+import constraintParser from '../parsers/constraint';
+import fullTextParser from '../parsers/text';
+import TypeMap from '../type_map';
 
 describe('Full tests', () => {
 	it('Should work with simple text translations', () => {

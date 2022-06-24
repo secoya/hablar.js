@@ -1,7 +1,7 @@
 import { prettyPrint, types } from 'recast';
-import Context from '../../src/emitting/context';
-import { getTypeGuardStatement, getTypeGuardStatements } from '../../src/emitting/type_guards';
-import TypeMap from '../../src/type_map';
+import Context from '../../emitting/context';
+import { getTypeGuardStatement, getTypeGuardStatements } from '../../emitting/type_guards';
+import TypeMap from '../../type_map';
 
 const b = types.builders;
 

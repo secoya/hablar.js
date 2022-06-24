@@ -1,15 +1,15 @@
 import { prettyPrint } from 'recast';
-import Context from '../../src/emitting/context';
-import { emitConstrainedTranslations, emitSimpleTranslation } from '../../src/emitting/translation';
-import { Node as ConstraintNode, ValueNode } from '../../src/trees/constraint';
-import { TypedNode, TypedVariableNode } from '../../src/trees/expression';
+import Context from '../../emitting/context';
+import { emitConstrainedTranslations, emitSimpleTranslation } from '../../emitting/translation';
+import { Node as ConstraintNode, ValueNode } from '../../trees/constraint';
+import { TypedNode, TypedVariableNode } from '../../trees/expression';
 import {
 	TypedExprNode as TypedTextExprNode,
 	TypedLiteralNode as TypedTextLiteralNode,
 	TypedVariableNode as TypedTextVariableNode,
-} from '../../src/trees/text';
-import { InferredType } from '../../src/type_map';
-import TypeMap from '../../src/type_map';
+} from '../../trees/text';
+import { InferredType } from '../../type_map';
+import TypeMap from '../../type_map';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,

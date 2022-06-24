@@ -1,5 +1,4 @@
-import ParseError from '../../src/errors/parse_error';
-import fullTextParser, { parseOnlyTextExpression as textParser } from '../../src/parsers/text';
+import fullTextParser, { parseOnlyTextExpression as textParser } from '../../parsers/text';
 
 describe('Text parser', () => {
 	describe('Simple text literals', () => {
@@ -432,7 +431,8 @@ Line 10
     Expecting: 'CHAR', 'CHARS', 'STRING_LITERAL', 'VARIABLE' got 'EOF'"
 `);
 		});
-
+		// tslint:disable: max-line-length
+		// tslint:disable: no-trailing-whitespace
 		it('Should give good error message with error inside expression parser at EOF', () => {
 			expect(() => fullTextParser('Hello {{ world( }}')).toThrowErrorMatchingInlineSnapshot(`
 "Parse error on line 1:

@@ -1,5 +1,4 @@
-import ParseError from '../../src/errors/parse_error';
-import constraintParser from '../../src/parsers/constraint';
+import constraintParser from '../../parsers/constraint';
 
 describe('Constraint parser', () => {
 	describe('Numeric constraints', () => {

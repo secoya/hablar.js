@@ -1,7 +1,7 @@
 import { prettyPrint } from 'recast';
 
-import Context from '../../src/emitting/context';
-import { emitExpression } from '../../src/emitting/expression';
+import Context from '../../emitting/context';
+import { emitExpression } from '../../emitting/expression';
 import {
 	TypedBinaryOpNode,
 	TypedFunctionInvocationNode,
@@ -9,8 +9,8 @@ import {
 	TypedNumberNode,
 	TypedStringLiteralNode,
 	TypedVariableNode,
-} from '../../src/trees/expression';
-import { InferredType } from '../../src/type_map';
+} from '../../trees/expression';
+import { InferredType } from '../../type_map';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,

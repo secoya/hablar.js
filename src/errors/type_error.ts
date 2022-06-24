@@ -149,7 +149,7 @@ export default class TypeError extends Error {
 		this.foundType = foundType;
 		this.typeMap = typeMap;
 		this.expectedType = expectedType;
-		this.node = this.node;
+		this.node = node;
 		this.position = position;
 		this.variable = variable;
 		this.text = text;

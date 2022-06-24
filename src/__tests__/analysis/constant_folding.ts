@@ -1,4 +1,4 @@
-import { constantFoldExpression, constantFoldExpressionList } from '../../src/analysis/constant_folding';
+import { constantFoldExpression, constantFoldExpressionList } from '../../analysis/constant_folding';
 
 import {
 	Pos,
@@ -9,14 +9,14 @@ import {
 	TypedStringLiteralNode,
 	TypedUnaryMinusNode,
 	TypedVariableNode,
-} from '../../src/trees/expression';
+} from '../../trees/expression';
 import {
 	TypedExprNode as TypedTextExprNode,
 	TypedLiteralNode as TypedTextLiteralNode,
 	TypedVariableNode as TypedTextVariableNode,
-} from '../../src/trees/text';
+} from '../../trees/text';
 
-import { InferredType } from '../../src/type_map';
+import { InferredType } from '../../type_map';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,
@@ -361,7 +361,8 @@ describe('Constant folding', () => {
 			const multiplyNode = b('string', 'multiply', lhs, rhs);
 
 			expect(() => constantFoldExpression(multiplyNode)).toThrowErrorMatchingInlineSnapshot(
-				`"Could not constant fold expression. Multiply operation between string and string. Only allowed between 2 numbers."`,
+				`"Could not constant fold expression. Multiply operation between string and string. ` +
+					`Only allowed between 2 numbers."`,
 			);
 		});
 
@@ -372,7 +373,8 @@ describe('Constant folding', () => {
 			const multiplyNode = b('string', 'multiply', lhs, rhs);
 
 			expect(() => constantFoldExpression(multiplyNode)).toThrowErrorMatchingInlineSnapshot(
-				`"Could not constant fold expression. Multiply operation between string and number. Only allowed between 2 numbers."`,
+				`"Could not constant fold expression. Multiply operation between string and number. ` +
+					`Only allowed between 2 numbers."`,
 			);
 		});
 
@@ -383,7 +385,8 @@ describe('Constant folding', () => {
 			const multiplyNode = b('string', 'multiply', lhs, rhs);
 
 			expect(() => constantFoldExpression(multiplyNode)).toThrowErrorMatchingInlineSnapshot(
-				`"Could not constant fold expression. Multiply operation between number and string. Only allowed between 2 numbers."`,
+				`"Could not constant fold expression. Multiply operation between number and string. ` +
+					`Only allowed between 2 numbers."`,
 			);
 		});
 

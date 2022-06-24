@@ -1,10 +1,8 @@
-import { analyzeConstraints } from '../../src/analysis/constraints';
+import { analyzeConstraints } from '../../analysis/constraints';
 
-import DeadCodeError from '../../src/errors/dead_code_error';
+import { ASTRoot as ConstraintAST, Node as ConstraintNode } from '../../trees/constraint';
 
-import { ASTRoot as ConstraintAST, Node as ConstraintNode } from '../../src/trees/constraint';
-
-import { TypedASTRoot as TypedTextASTRoot, TypedNode as TypedTextNode } from '../../src/trees/text';
+import { TypedASTRoot as TypedTextASTRoot, TypedNode as TypedTextNode } from '../../trees/text';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,

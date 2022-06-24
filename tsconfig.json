@@ -1,21 +1,32 @@
 {
 	"compilerOptions": {
-		"strictNullChecks": true,
-		"target": "es5",
-		"declaration": true,
-		"noEmit": false,
-		"newLine": "LF",
-		"outDir": "lib",
-		"noImplicitAny": true,
-		"allowJs": false,
-		"moduleResolution": "node",
-		"baseUrl": "./src",
+		"target": "es2018",
+		"module": "commonjs",
+		"lib": ["es2018"],
 		"importHelpers": true,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"strict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"skipLibCheck": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": false,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"moduleResolution": "node",
+		"outDir": "dist",
+		"rootDir": "src",
+		"baseUrl": ".",
 		"esModuleInterop": true,
 		"paths": {
-			"recast": ["../typings/recast.d.ts"]
+			"recast": [
+				"./types/packages/recast.d.ts"
+			]
 		},
-		"lib": ["es6", "es2015"]
 	},
-	"files": ["src/index.ts"]
+	"include": ["src/*.ts", "src/**/*.ts"]
 }

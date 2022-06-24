@@ -1,9 +1,7 @@
-import { prettyPrint, types } from 'recast';
+import { prettyPrint } from 'recast';
 
-import Context from '../../src/emitting/context';
-import { encodeIfStringFunction } from '../../src/emitting/helpers';
-
-const b = types.builders;
+import Context from '../../emitting/context';
+import { encodeIfStringFunction } from '../../emitting/helpers';
 
 describe('Emitting - Encode if string helper', () => {
 	it('Should emit valid function', () => {

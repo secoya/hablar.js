@@ -1,18 +1,10 @@
-import * as infer from '../../src/analysis/type_inference';
+import * as infer from '../../analysis/type_inference';
 
-import TypeMap from '../../src/type_map';
+import TypeMap from '../../type_map';
 
-import { ConstraintTypeUsage, TypeInfo, TypeUsage } from '../../src/type_map';
+import { ConstraintTypeUsage, TypeInfo, TypeUsage } from '../../type_map';
 
-import {
-	EnumNode,
-	EqualityNode,
-	GenderNode,
-	IdentifierNode,
-	IneqNode,
-	Node,
-	NumberNode,
-} from '../../src/trees/constraint';
+import { EnumNode, EqualityNode, GenderNode, IdentifierNode, IneqNode, Node, NumberNode } from '../../trees/constraint';
 
 const makeEmptyPos = () => ({
 	firstColumn: 0,

@@ -1,0 +1,26 @@
+{
+	"rootDir": "src",
+	"globals": {
+		"ts-jest": {
+			"tsconfig": "./tsconfig.json"
+		}
+	},
+	"testPathIgnorePatterns": [
+		"/node_modules/",
+		"/__helpers__/"
+	],
+	"transform": {
+		".(ts|tsx)": "ts-jest"
+	},
+	"moduleDirectories": [
+		"node_modules",
+		"src"
+	],
+	"testEnvironment": "node",
+	"testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+	"moduleFileExtensions": [
+		"ts",
+		"tsx",
+		"js"
+	]
+}
