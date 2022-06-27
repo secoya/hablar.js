@@ -2,3 +2,4 @@
 /node_modules
 /src/coverage
 /.npmrc
+/junit.xml

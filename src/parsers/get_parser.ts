@@ -6,7 +6,7 @@ function monkeyPatchParserWithProperParseError(parser: any): any {
 	parser.parse = (input: string): any => {
 		try {
 			return parse.call(parser, input);
-		} catch (e) {
+		} catch (e: any) {
 			throw new ParseError(e.message, e.hash);
 		}
 	};

@@ -399,7 +399,7 @@ Expecting 'MINUS', 'NUMBER', 'STRING_LITERAL', 'OPEN_PAREN', 'VARIABLE', 'IDENTI
 				let thrown = false;
 				try {
 					expressionParser(exp);
-				} catch (e) {
+				} catch (e: any) {
 					expect(e).toBeInstanceOf(ParseError);
 					const parseE = e as ParseError;
 					const expectedMessage =

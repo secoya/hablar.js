@@ -5,6 +5,10 @@
 			"tsconfig": "./tsconfig.json"
 		}
 	},
+	"reporters": [
+		"default",
+		"jest-junit"
+	],
 	"testPathIgnorePatterns": [
 		"/node_modules/",
 		"/__helpers__/"
