@@ -8,7 +8,7 @@ main() {
   for name in constraint expression text; do
     jison "$PKGROOT/src/parsers/grammars/$name.jison" -m commonjs -o "$PKGROOT/src/parsers/grammars/$name.js"
   done
-  jest --coverage
+  jest --coverage "$@"
 }
 
 main "$@"
