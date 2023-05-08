@@ -102,7 +102,7 @@ Expecting 'EOF', 'PLUS', 'MINUS', 'DIVIDE', 'MULTIPLY', 'CLOSE_PAREN', 'COMMA', 
 				it('Should reject simple string with invalid escape sequence', () => {
 					const exp = '"Some \\."';
 					expect(() => expressionParser(exp)).toThrowErrorMatchingInlineSnapshot(
-						`"Error parsing '\\"Some \\\\.\\"'. Invalid string literal \\"Some \\\\.\\""`,
+						`"Error parsing '\"Some \\.\"'. Invalid string literal \"Some \\.\""`,
 					);
 				});
 			});

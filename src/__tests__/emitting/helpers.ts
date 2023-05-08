@@ -11,7 +11,7 @@ describe('Emitting - Encode if string helper', () => {
 		expect(prettyPrint(stmt).code).toMatchInlineSnapshot(`
 "function encodeIfString(ctx, str) {
     if (!ctx.isSafeString(str)) {
-        return ctx.encode(\\"\\" + str);
+        return ctx.encode(\"\" + str);
     }
 
     return ctx.convertSafeString(str);

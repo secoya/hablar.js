@@ -61,23 +61,23 @@ describe('Full tests', () => {
 
 		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`
 		"function(vars, fns, ctx) {
-		    if (typeof(vars.n) !== \\"number\\") {
-		        throw new Error(\\"Variable n must be of type number\\");
+		    if (typeof(vars.n) !== \"number\") {
+		        throw new Error(\"Variable n must be of type number\");
 		    }
 
 		    if (vars.n === 0) {
-		        return ctx.encode(\\"You have nothing in your basket\\");
+		        return ctx.encode(\"You have nothing in your basket\");
 		    }
 
 		    if (vars.n === 1) {
-		        return ctx.encode(\\"You have one item in your basket\\");
+		        return ctx.encode(\"You have one item in your basket\");
 		    }
 
 		    if (vars.n > 1) {
-		        return ctx.encode(\\"You have \\" + vars.n + \\" items in your basket\\");
+		        return ctx.encode(\"You have \" + vars.n + \" items in your basket\");
 		    }
 
-		    throw new Error(\\"No translation matched the parameters\\");
+		    throw new Error(\"No translation matched the parameters\");
 		}"
 	`);
 	});
@@ -89,7 +89,7 @@ describe('Full tests', () => {
 		const analyzed = analyzeTranslation(translation, typeMap);
 
 		const jsAst = emitTranslation(analyzed, ctx, typeMap);
-		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`"\\"Here's one million: 1000000\\""`);
+		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`"\"Here's one million: 1000000\""`);
 	});
 
 	it('Should constant fold complex translations', () => {
@@ -115,23 +115,23 @@ describe('Full tests', () => {
 
 		expect(prettyPrint(jsAst).code).toMatchInlineSnapshot(`
 		"function(vars, fns, ctx) {
-		    if (typeof(vars.n) !== \\"number\\") {
-		        throw new Error(\\"Variable n must be of type number\\");
+		    if (typeof(vars.n) !== \"number\") {
+		        throw new Error(\"Variable n must be of type number\");
 		    }
 
 		    if (vars.n === 0) {
-		        return ctx.encode(\\"You have nothing in your basket. One million: 1000000\\");
+		        return ctx.encode(\"You have nothing in your basket. One million: 1000000\");
 		    }
 
 		    if (vars.n === 1) {
-		        return ctx.encode(\\"You have one item in your basket. One million: 1000000\\");
+		        return ctx.encode(\"You have one item in your basket. One million: 1000000\");
 		    }
 
 		    if (vars.n > 1) {
-		        return ctx.encode(\\"You have \\" + vars.n + \\" items in your basket. One million: 1000000\\");
+		        return ctx.encode(\"You have \" + vars.n + \" items in your basket. One million: 1000000\");
 		    }
 
-		    throw new Error(\\"No translation matched the parameters\\");
+		    throw new Error(\"No translation matched the parameters\");
 		}"
 	`);
 	});

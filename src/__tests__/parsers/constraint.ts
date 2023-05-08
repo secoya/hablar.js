@@ -563,7 +563,7 @@ Expecting 'NUMBER', got 'GENDER_FEMINUM'"
 				const constraint = 'n != "some string"';
 				expect(() => constraintParser(constraint)).toThrowErrorMatchingInlineSnapshot(`
 "Parse error on line 1:
-n != \\"some string\\"
+n != \"some string\"
 -----^
 Expecting 'GENDER_FEMINUM', 'GENDER_MASKULINUM', 'GENDER_NEUTRUM', 'ENUM_STRING', 'NUMBER', got 'INVALID'"
 `);
@@ -572,7 +572,7 @@ Expecting 'GENDER_FEMINUM', 'GENDER_MASKULINUM', 'GENDER_NEUTRUM', 'ENUM_STRING'
 			it('Should throw parse error when comparing inequalities to strings', () => {
 				expect(() => constraintParser('n > "Mystring"')).toThrowErrorMatchingInlineSnapshot(`
 "Parse error on line 1:
-n > \\"Mystring\\"
+n > \"Mystring\"
 ----^
 Expecting 'NUMBER', got 'ENUM_STRING'"
 `);

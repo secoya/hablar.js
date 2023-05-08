@@ -24,8 +24,8 @@ describe('Emitting - Type guards', () => {
 
 			expect(ctx.usesTypeGuardScratchVariable).toBe(false);
 			expect(prettyPrint(stmt).code).toMatchInlineSnapshot(`
-"if (!vars.hasOwnProperty(\\"myVar\\")) {
-    throw new Error(\\"Variable myVar must be of type unknown\\");
+"if (!vars.hasOwnProperty(\"myVar\")) {
+    throw new Error(\"Variable myVar must be of type unknown\");
 }"
 `);
 		});
@@ -36,8 +36,8 @@ describe('Emitting - Type guards', () => {
 
 			expect(ctx.usesTypeGuardScratchVariable).toBe(false);
 			expect(prettyPrint(stmt).code).toMatchInlineSnapshot(`
-"if (typeof(vars.myVar) !== \\"string\\" && !ctx.isSafeString(vars.myVar)) {
-    throw new Error(\\"Variable myVar must be of type string\\");
+"if (typeof(vars.myVar) !== \"string\" && !ctx.isSafeString(vars.myVar)) {
+    throw new Error(\"Variable myVar must be of type string\");
 }"
 `);
 		});
@@ -48,8 +48,8 @@ describe('Emitting - Type guards', () => {
 
 			expect(ctx.usesTypeGuardScratchVariable).toBe(false);
 			expect(prettyPrint(stmt).code).toMatchInlineSnapshot(`
-"if (typeof(vars.myVar) !== \\"number\\") {
-    throw new Error(\\"Variable myVar must be of type number\\");
+"if (typeof(vars.myVar) !== \"number\") {
+    throw new Error(\"Variable myVar must be of type number\");
 }"
 `);
 		});
@@ -60,8 +60,8 @@ describe('Emitting - Type guards', () => {
 
 			expect(ctx.usesTypeGuardScratchVariable).toBe(true);
 			expect(prettyPrint(stmt).code).toMatchInlineSnapshot(`
-"if (!((_ = typeof(vars.myVar)) === \\"string\\" || _ === \\"number\\" || ctx.isSafeString(vars.myVar))) {
-    throw new Error(\\"Variable myVar must be of type number-or-string\\");
+"if (!((_ = typeof(vars.myVar)) === \"string\" || _ === \"number\" || ctx.isSafeString(vars.myVar))) {
+    throw new Error(\"Variable myVar must be of type number-or-string\");
 }"
 `);
 		});
@@ -72,8 +72,8 @@ describe('Emitting - Type guards', () => {
 
 			expect(ctx.usesTypeGuardScratchVariable).toBe(false);
 			expect(prettyPrint(stmt).code).toMatchInlineSnapshot(`
-"if (!(vars.myVar === \\"M\\" || vars.myVar === \\"F\\" || vars.myVar === \\"N\\")) {
-    throw new Error(\\"Variable myVar must be of type gender\\");
+"if (!(vars.myVar === \"M\" || vars.myVar === \"F\" || vars.myVar === \"N\")) {
+    throw new Error(\"Variable myVar must be of type gender\");
 }"
 `);
 		});
@@ -98,8 +98,8 @@ describe('Emitting - Type guards', () => {
 
 			expect(1).toEqual(res.length);
 			expect(prettyPrint(res[0]).code).toMatchInlineSnapshot(`
-"if (typeof(fns.myFn) !== \\"function\\") {
-    throw new Error(\\"Translation requires function myFn to exist\\");
+"if (typeof(fns.myFn) !== \"function\") {
+    throw new Error(\"Translation requires function myFn to exist\");
 }"
 `);
 		});
@@ -114,12 +114,12 @@ describe('Emitting - Type guards', () => {
 
 			expect(prettyPrint(b.blockStatement(res)).code).toMatchInlineSnapshot(`
 "{
-    if (typeof(fns.myFn) !== \\"function\\") {
-        throw new Error(\\"Translation requires function myFn to exist\\");
+    if (typeof(fns.myFn) !== \"function\") {
+        throw new Error(\"Translation requires function myFn to exist\");
     }
 
-    if (typeof(fns.myOtherFn) !== \\"function\\") {
-        throw new Error(\\"Translation requires function myOtherFn to exist\\");
+    if (typeof(fns.myOtherFn) !== \"function\") {
+        throw new Error(\"Translation requires function myOtherFn to exist\");
     }
 }"
 `);

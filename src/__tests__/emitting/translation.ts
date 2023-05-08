@@ -140,8 +140,8 @@ describe('Emitting - translation', () => {
 
 		expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
-    if (typeof(vars.myVar) !== \\"string\\" && !ctx.isSafeString(vars.myVar)) {
-        throw new Error(\\"Variable myVar must be of type string\\");
+    if (typeof(vars.myVar) !== \"string\" && !ctx.isSafeString(vars.myVar)) {
+        throw new Error(\"Variable myVar must be of type string\");
     }
 
     return encodeIfString(ctx, vars.myVar);
@@ -173,8 +173,8 @@ describe('Emitting - translation', () => {
 "function(vars, fns, ctx) {
     var _;
 
-    if (!((_ = typeof(vars.myVar)) === \\"string\\" || _ === \\"number\\" || ctx.isSafeString(vars.myVar))) {
-        throw new Error(\\"Variable myVar must be of type number-or-string\\");
+    if (!((_ = typeof(vars.myVar)) === \"string\" || _ === \"number\" || ctx.isSafeString(vars.myVar))) {
+        throw new Error(\"Variable myVar must be of type number-or-string\");
     }
 
     return encodeIfString(ctx, vars.myVar);
@@ -200,7 +200,7 @@ describe('Emitting - translation', () => {
 
 		expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
-    return ctx.encode(\\"\\" + vars.myVar);
+    return ctx.encode(\"\" + vars.myVar);
 }"
 `);
 	});
@@ -223,7 +223,7 @@ describe('Emitting - translation', () => {
 
 		expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
-    return ctx.encode(\\"Some number: \\" + vars.myVar);
+    return ctx.encode(\"Some number: \" + vars.myVar);
 }"
 `);
 	});
@@ -246,7 +246,7 @@ describe('Emitting - translation', () => {
 
 		expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
-    return ctx.encode(\\"Some number: \\" + vars.myVar);
+    return ctx.encode(\"Some number: \" + vars.myVar);
 }"
 `);
 	});
@@ -269,7 +269,7 @@ describe('Emitting - translation', () => {
 
 		expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
-    return ctx.encode(\\"\\" + vars.myOtherVar + vars.myVar);
+    return ctx.encode(\"\" + vars.myOtherVar + vars.myVar);
 }"
 `);
 	});
@@ -295,7 +295,7 @@ describe('Emitting - translation', () => {
 
 			expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
-    return ctx.encode(\\"Some translation\\");
+    return ctx.encode(\"Some translation\");
 }"
 `);
 		});
@@ -321,10 +321,10 @@ describe('Emitting - translation', () => {
 			expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
     if (vars.someVar === 5) {
-        return ctx.encode(\\"Some translation\\");
+        return ctx.encode(\"Some translation\");
     }
 
-    throw new Error(\\"No translation matched the parameters\\");
+    throw new Error(\"No translation matched the parameters\");
 }"
 `);
 		});
@@ -373,14 +373,14 @@ describe('Emitting - translation', () => {
 				expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
     if (vars.someVar === 5) {
-        return ctx.encode(\\"Some translation\\");
+        return ctx.encode(\"Some translation\");
     }
 
     if (vars.someVar === 10) {
-        return ctx.encode(\\"Some other translation\\");
+        return ctx.encode(\"Some other translation\");
     }
 
-    return ctx.encode(\\"Some default translation\\");
+    return ctx.encode(\"Some default translation\");
 }"
 `);
 			},
@@ -399,7 +399,7 @@ describe('Emitting - translation', () => {
 
 			expect(res.code).toMatchInlineSnapshot(`
 "function(vars, fns, ctx) {
-    return ctx.encode(\\"Some translation \\") + encodeIfString(ctx, vars.myVar);
+    return ctx.encode(\"Some translation \") + encodeIfString(ctx, vars.myVar);
 }"
 `);
 		});
